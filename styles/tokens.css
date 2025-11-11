@@ -1,0 +1,30 @@
+:root {
+  /* brand */
+  --color-primary: #001b2b;
+  --color-secondary: #0e5e4b;
+  --color-accent: #c47a2c;
+
+  /* levels */
+  --level-1: #6a7174;
+  --level-2: #0e5e4b;
+  --level-3: #c47a2c;
+  --level-4: #4a84c1;
+  --level-5: #001b2b;
+  --level-6: #c88c3c;
+
+  /* surfaces */
+  --surface-bg: #f4f0ea;
+  --surface-card: rgba(255, 255, 255, 0.7);
+
+  /* radius & shadow */
+  --radius-card: 1.5rem;
+  --shadow-card: 0 12px 30px rgba(0, 27, 43, 0.08);
+}
+
+/* dark surface */
+[data-theme="dark"] {
+  --surface-bg: #19222b;
+  --surface-card: rgba(25, 34, 43, 0.68);
+}
+
+
