@@ -81,6 +81,27 @@ export function findSafeFireYear({
     .reduce((sum, asset) => sum + asset.value, 0);
   const pensionLockedAtStart = occPensionAssets + premiePensionAssets + privatePensionAssets;
 
+  // Beräkna viktad realReturnPension från de separata pensionsavkastningarna
+  const totalPensionValue = pensionLockedAtStart;
+  let realReturnPension = 0.07; // Default fallback
+  if (totalPensionValue > 0) {
+    const weightedReturn = 
+      (occPensionAssets * autoReturns.realReturnOccPension +
+       premiePensionAssets * autoReturns.realReturnPremiePension +
+       privatePensionAssets * autoReturns.realReturnPrivatePension) / totalPensionValue;
+    realReturnPension = Number.isFinite(weightedReturn) ? weightedReturn : 0.07;
+  } else if (occPensionAssets > 0 || premiePensionAssets > 0 || privatePensionAssets > 0) {
+    // Om vi har pensionsassets men totalen är 0 (t.ex. negativa värden), använd medelvärde
+    const returns = [
+      occPensionAssets > 0 ? autoReturns.realReturnOccPension : null,
+      premiePensionAssets > 0 ? autoReturns.realReturnPremiePension : null,
+      privatePensionAssets > 0 ? autoReturns.realReturnPrivatePension : null
+    ].filter((r): r is number => r !== null);
+    if (returns.length > 0) {
+      realReturnPension = returns.reduce((sum, r) => sum + r, 0) / returns.length;
+    }
+  }
+
   // Testa baseResult.yearsToFire och sedan +1, +2, ... år
   for (let i = 0; i <= maxAdditionalYears; i++) {
     const candidateYearsToFire = baseResult.yearsToFire + i;
@@ -97,7 +118,7 @@ export function findSafeFireYear({
       pensionLockedAtStart,
       totalMonthlySavings,
       autoReturns.realReturnAvailable,
-      autoReturns.realReturnPension,
+      realReturnPension,
       customMonthlyExpenses * 12,
       averageAge,
       pensionStartAge,
