@@ -2,6 +2,8 @@
 
 **Navigera hushållets ekonomi genom livets olika rikedomsnivåer.**
 
+<!-- CI/CD test commit -->
+
 En pedagogisk webapp som hjälper hushåll att förstå sin ekonomiska ställning, följa sin utveckling och utforska livets rikedomsnivåer – inspirerad av Nick Maggiullis *The Wealth Ladder* och anpassad för svenska förhållanden.
 
 ## 🎯 Vad är Förmögenhetskollen?
