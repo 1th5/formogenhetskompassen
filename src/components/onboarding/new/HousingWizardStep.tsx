@@ -75,7 +75,7 @@ export default function HousingWizardStep({ onComplete, onSkip }: HousingWizardS
             Ja, jag äger annan bostad
           </Button>
           <Button 
-            variant="outline"
+            variant="secondary"
             onClick={() => {
               setHasHousing(false);
               onComplete(null);

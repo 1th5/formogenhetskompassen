@@ -276,7 +276,7 @@ export default function PensionPerPersonStep({
             <p className="text-xs font-medium text-primary/90 mb-2">Var hittar jag detta?</p>
             <p className="text-xs text-primary/70 mb-2">{whereToFind}</p>
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               className="flex items-center gap-2 mt-2"
               onClick={() => window.open('https://minpension.se', '_blank')}

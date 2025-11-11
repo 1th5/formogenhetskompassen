@@ -301,7 +301,7 @@ export default function SalaryCalculatorPage() {
                           <h3 className="text-lg font-serif font-semibold text-primary">Dina pensionsavsättningar</h3>
                           <Button
                             onClick={handleReset}
-                            variant="outline"
+                            variant="secondary"
                             size="sm"
                             className="flex items-center gap-2"
                           >

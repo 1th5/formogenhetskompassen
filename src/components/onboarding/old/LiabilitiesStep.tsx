@@ -86,7 +86,7 @@ export default function LiabilitiesStep({ onNext, onPrevious }: LiabilitiesStepP
                 </CardTitle>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={() => remove(index)}
                   className="text-red-600 hover:text-red-700"
@@ -198,14 +198,14 @@ export default function LiabilitiesStep({ onNext, onPrevious }: LiabilitiesStepP
       <div className="flex justify-between">
         <Button
           type="button"
-          variant="outline"
+          variant="secondary"
           onClick={addLiability}
         >
           + Lägg till skuld
         </Button>
         
         <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={onPrevious}>
+          <Button type="button" variant="secondary" onClick={onPrevious}>
             ← Tillbaka
           </Button>
           <Button type="submit">

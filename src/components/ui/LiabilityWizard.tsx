@@ -218,7 +218,7 @@ export default function LiabilityWizard({ onAddLiability, onSkip }: LiabilityWiz
         <DialogFooter className="flex justify-end">
           <div className="flex space-x-2">
             {step > 1 && (
-              <Button variant="outline" onClick={handleBack}>
+              <Button variant="secondary" onClick={handleBack}>
                 Tillbaka
               </Button>
             )}

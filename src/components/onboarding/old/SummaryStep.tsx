@@ -185,7 +185,7 @@ export default function SummaryStep({ onComplete, onPrevious }: SummaryStepProps
       
       {/* Knappar */}
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onPrevious}>
+        <Button variant="secondary" onClick={onPrevious}>
           ← Tillbaka
         </Button>
         

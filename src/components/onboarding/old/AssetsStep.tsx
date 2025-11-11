@@ -116,7 +116,7 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
                 </CardTitle>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={() => remove(index)}
                   className="text-red-600 hover:text-red-700"
@@ -251,14 +251,14 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
         <div className="flex gap-2">
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={addAsset}
           >
             + Lägg till tillgång
           </Button>
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={() => setShowPensionHelp(true)}
             className="text-blue-600 hover:text-blue-700"
           >
@@ -267,7 +267,7 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
         </div>
         
         <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={onPrevious}>
+          <Button type="button" variant="secondary" onClick={onPrevious}>
             ← Tillbaka
           </Button>
           <Button 

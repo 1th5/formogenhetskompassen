@@ -98,7 +98,7 @@ export default function LiabilitiesForm({ liabilities, onUpdate, assets = [] }: 
                 </CardTitle>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   size="sm"
                   onClick={() => remove(index)}
                   className="text-red-600 hover:text-red-700"
@@ -301,7 +301,7 @@ export default function LiabilitiesForm({ liabilities, onUpdate, assets = [] }: 
         <div className="flex justify-between">
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={addLiability}
           >
             + Lägg till skuld
