@@ -44,10 +44,23 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
   const [showWizard, setShowWizard] = useState(false);
   const [showPensionHelp, setShowPensionHelp] = useState(false);
   
+  // Filtrera bort pensionsassets eftersom de hanteras separat
+  // och inte ingår i assetSchema
+  const pensionCategories: AssetCategory[] = [
+    'Tjänstepension',
+    'Premiepension',
+    'Privat pensionssparande (IPS)',
+    'Marknadsbaserad pension',
+    'Trygghetsbaserad pension (Statlig)'
+  ];
+  const filteredAssets = initialData.assets.filter(
+    asset => !pensionCategories.includes(asset.category)
+  );
+  
   const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      assets: initialData.assets.length > 0 ? initialData.assets : []
+      assets: filteredAssets.length > 0 ? filteredAssets : []
     }
   });
   
