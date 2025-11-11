@@ -29,10 +29,17 @@ export default function LiabilitiesWizardStep({ onComplete, onSkip }: Liabilitie
   const [liabilityType, setLiabilityType] = useState<LiabilityType>('Annat');
   
   const handleAddLiability = () => {
-    if (principal !== '' && principal > 0 && label.trim()) {
+    if (principal !== '' && principal > 0) {
+      // Använd generiskt namn baserat på typ om inget anges
+      const liabilityNumber = liabilities.filter(l => l.liability_type === liabilityType).length + 1;
+      const defaultLabel = liabilityType === 'Bostadslån' ? `Bostadslån ${liabilityNumber}` :
+                          liabilityType === 'Billån' ? `Billån ${liabilityNumber}` :
+                          `Skuld ${liabilityNumber}`;
+      const finalLabel = label.trim() || defaultLabel;
+      
       const newLiability: Liability = {
         id: Date.now().toString(),
-        label: label.trim(),
+        label: finalLabel,
         principal: principal as number,
         amortization_rate_apy: amortizationRate,
         liability_type: liabilityType
@@ -142,7 +149,7 @@ export default function LiabilitiesWizardStep({ onComplete, onSkip }: Liabilitie
         
         <div>
           <Label htmlFor="liability-label" className="text-base">
-            Beskrivning (t.ex. "Bostadslån", "Billån", "Kreditkort")
+            Beskrivning (valfritt, t.ex. "Bostadslån", "Billån", "Kreditkort")
           </Label>
           <Input
             id="liability-label"
@@ -196,18 +203,25 @@ export default function LiabilitiesWizardStep({ onComplete, onSkip }: Liabilitie
           </p>
         </div>
         
-        {principal !== '' && principal > 0 && label.trim() && (
-          <Card className="bg-red-50 border-red-200">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-red-600" />
-                <span className="font-medium text-red-900">
-                  {label}: {formatCurrency(principal as number)} ({(amortizationRate * 100).toFixed(1)}%/år)
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {principal !== '' && principal > 0 && (() => {
+          const liabilityNumber = liabilities.filter(l => l.liability_type === liabilityType).length + 1;
+          const defaultLabel = liabilityType === 'Bostadslån' ? `Bostadslån ${liabilityNumber}` :
+                              liabilityType === 'Billån' ? `Billån ${liabilityNumber}` :
+                              `Skuld ${liabilityNumber}`;
+          const displayLabel = label.trim() || defaultLabel;
+          return (
+            <Card className="bg-red-50 border-red-200">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-red-600" />
+                  <span className="font-medium text-red-900">
+                    {displayLabel}: {formatCurrency(principal as number)} ({(amortizationRate * 100).toFixed(1)}%/år)
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
       </div>
       
       <div className="flex flex-col sm:flex-row gap-3">
@@ -216,7 +230,7 @@ export default function LiabilitiesWizardStep({ onComplete, onSkip }: Liabilitie
         </Button>
         <Button 
           onClick={handleAddLiability}
-          disabled={principal === '' || principal <= 0 || !label.trim()}
+          disabled={principal === '' || principal <= 0}
           className="flex-1"
         >
           Lägg till lån

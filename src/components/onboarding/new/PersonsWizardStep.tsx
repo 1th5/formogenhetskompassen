@@ -172,10 +172,15 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
   };
   
   const handleAddIncome = () => {
-    if (incomeAmount !== '' && incomeAmount > 0 && incomeLabel.trim()) {
+    if (incomeAmount !== '' && incomeAmount > 0) {
+      // Använd generiskt namn om inget anges
+      const incomeNumber = incomes.length + 1;
+      const defaultLabel = incomeType === 'job' ? `Jobb ${incomeNumber}` : `Inkomst ${incomeNumber}`;
+      const finalLabel = incomeLabel.trim() || defaultLabel;
+      
       const newIncome: Income = {
         id: Date.now().toString(),
-        label: incomeLabel.trim(),
+        label: finalLabel,
         monthly_income: incomeAmount as number, // Alla inkomster sparas som månadsinkomst
         income_type: incomeType,
         pension_type: incomeType === 'job' ? pensionType : undefined,
@@ -210,11 +215,15 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
   };
   
   const handleAddPerson = () => {
-    // Tillåt att lägga till person om namnet är ifyllt, även om både inkomster och övrigt sparande är 0
-    if (name.trim() && (incomes.length > 0 || otherSavings !== '' || (typeof otherSavings === 'number' && otherSavings === 0))) {
+    // Tillåt att lägga till person även om namnet inte är ifyllt, om det finns inkomster eller övrigt sparande
+    if (incomes.length > 0 || otherSavings !== '' || (typeof otherSavings === 'number' && otherSavings === 0)) {
+      // Använd generiskt namn om inget anges
+      const personNumber = persons.length + 1;
+      const finalName = name.trim() || `Person ${personNumber}`;
+      
       const person: Person = {
         id: Date.now().toString(),
-        name: name.trim(),
+        name: finalName,
         birth_year: birthYear,
         incomes: incomes,
         other_savings_monthly: otherSavings === '' ? 0 : otherSavings,
@@ -478,7 +487,7 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
         
         <div className="space-y-4">
           <div>
-            <Label htmlFor="person-name" className="text-base">Namn</Label>
+            <Label htmlFor="person-name" className="text-base">Namn (valfritt)</Label>
             <Input
               id="person-name"
               value={name}
@@ -511,7 +520,6 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
           </Button>
           <Button 
             onClick={() => setStep('income-choice')}
-            disabled={!name.trim()}
             className="flex-1"
           >
             Nästa →
@@ -716,7 +724,7 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
         
         <div className="space-y-4">
           <div>
-            <Label htmlFor="income-label" className="text-base">Beskrivning (t.ex. "Huvudjobb", "Deltidsjobb")</Label>
+            <Label htmlFor="income-label" className="text-base">Beskrivning (valfritt, t.ex. "Huvudjobb", "Deltidsjobb")</Label>
             <Input
               id="income-label"
               value={incomeLabel}
@@ -741,13 +749,13 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
             </p>
           </div>
           
-          {incomeAmount !== '' && incomeAmount > 0 && incomeLabel.trim() && (
+          {incomeAmount !== '' && incomeAmount > 0 && (
             <Card className="bg-green-50 border-green-200">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600" />
                   <span className="font-medium text-green-900">
-                    {incomeLabel}: {formatCurrency(incomeAmount as number)}/mån
+                    {incomeLabel.trim() || (incomeType === 'job' ? `Jobb ${incomes.length + 1}` : `Inkomst ${incomes.length + 1}`)}: {formatCurrency(incomeAmount as number)}/mån
                   </span>
                 </div>
               </CardContent>
@@ -765,7 +773,7 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
               setPensionAnswers({});
               setStep('pension-wizard');
             }}
-            disabled={incomeAmount === '' || incomeAmount <= 0 || !incomeLabel.trim()}
+            disabled={incomeAmount === '' || incomeAmount <= 0}
             className="flex-1"
           >
             Nästa: Pensionsavtal →
@@ -789,7 +797,7 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
         
         <div className="space-y-4">
           <div>
-            <Label htmlFor="income-label-other" className="text-base">Beskrivning (t.ex. "Hyresintäkt", "Bidrag")</Label>
+            <Label htmlFor="income-label-other" className="text-base">Beskrivning (valfritt, t.ex. "Hyresintäkt", "Bidrag")</Label>
             <Input
               id="income-label-other"
               value={incomeLabel}
@@ -811,13 +819,13 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
             />
           </div>
           
-          {incomeAmount !== '' && incomeAmount > 0 && incomeLabel.trim() && (
+          {incomeAmount !== '' && incomeAmount > 0 && (
             <Card className="bg-green-50 border-green-200">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600" />
                   <span className="font-medium text-green-900">
-                    {incomeLabel}: {formatCurrency(incomeAmount as number)}/mån
+                    {incomeLabel.trim() || (incomeType === 'job' ? `Jobb ${incomes.length + 1}` : `Inkomst ${incomes.length + 1}`)}: {formatCurrency(incomeAmount as number)}/mån
                   </span>
                 </div>
               </CardContent>
@@ -833,7 +841,7 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
             onClick={() => {
               handleAddIncome();
             }}
-            disabled={incomeAmount === '' || incomeAmount <= 0 || !incomeLabel.trim()}
+            disabled={incomeAmount === '' || incomeAmount <= 0}
             className="flex-1"
           >
             Lägg till inkomst
@@ -1121,7 +1129,7 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
           </Button>
           <Button 
             onClick={handleAddPerson}
-            disabled={!name.trim() || (incomes.length === 0 && otherSavings === '' && ipsMonthly === '')}
+            disabled={incomes.length === 0 && otherSavings === '' && ipsMonthly === ''}
             className="flex-1"
           >
             Lägg till person

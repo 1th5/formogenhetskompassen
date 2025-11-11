@@ -120,8 +120,9 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
 
       {/* CTA */}
       <div className="pt-4 flex justify-center">
-        <Button onClick={onNext} className="w-full sm:w-auto">
-          Här börjar du – Fyll i hushållets personer och inkomster
+        <Button onClick={onNext} className="w-full sm:w-auto text-sm sm:text-base">
+          <span className="sm:hidden">Kom igång</span>
+          <span className="hidden sm:inline">Här börjar du – Fyll i hushållets personer och inkomster</span>
         </Button>
       </div>
     </div>

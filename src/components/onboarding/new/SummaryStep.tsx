@@ -89,8 +89,9 @@ export default function SummaryStep({ persons, assets, liabilities, onComplete, 
         <Button variant="secondary" onClick={onBack} className="flex-1 sm:flex-initial">
           Tillbaka
         </Button>
-        <Button onClick={onComplete} className="flex-1 sm:flex-initial">
-          Klar – Visa min förmögenhetsöversikt →
+        <Button onClick={onComplete} className="flex-1 sm:flex-initial text-sm sm:text-base">
+          <span className="sm:hidden">Klar →</span>
+          <span className="hidden sm:inline">Klar – Visa min förmögenhetsöversikt →</span>
         </Button>
       </div>
 

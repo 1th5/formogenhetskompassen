@@ -49,10 +49,16 @@ export default function SpecificLiabilityWizardStep({
       return;
     }
     
-    if (principal !== '' && principal > 0 && label.trim()) {
+    if (principal !== '' && principal > 0) {
+      // Använd generiskt namn om inget anges
+      const defaultLabel = liabilityType === 'Bostadslån' ? 'Bostadslån 1' :
+                          liabilityType === 'Billån' ? 'Billån 1' :
+                          'Skuld 1';
+      const finalLabel = label.trim() || defaultLabel;
+      
       const newLiability: Liability = {
         id: Date.now().toString(),
-        label: label.trim(),
+        label: finalLabel,
         principal: principal as number,
         amortization_rate_apy: amortizationRate,
         liability_type: liabilityType
@@ -113,7 +119,7 @@ export default function SpecificLiabilityWizardStep({
         <div className="space-y-4">
           <div>
             <Label htmlFor="liability-label" className="text-base">
-              Beskrivning (t.ex. "{liabilityType === 'Bostadslån' ? 'Bostadslån' : 'Billån'}")
+              Beskrivning (valfritt, t.ex. "{liabilityType === 'Bostadslån' ? 'Bostadslån' : 'Billån'}")
             </Label>
             <Input
               id="liability-label"
@@ -171,18 +177,24 @@ export default function SpecificLiabilityWizardStep({
             </p>
           </div>
           
-          {principal !== '' && principal > 0 && label.trim() && (
-            <Card className="bg-red-50 border-red-200">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-red-600" />
-                  <span className="font-medium text-red-900">
-                    {label}: {formatCurrency(principal as number)} ({(amortizationRate * 100).toFixed(1)}%/år)
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {principal !== '' && principal > 0 && (() => {
+            const defaultLabel = liabilityType === 'Bostadslån' ? 'Bostadslån 1' :
+                                liabilityType === 'Billån' ? 'Billån 1' :
+                                'Skuld 1';
+            const displayLabel = label.trim() || defaultLabel;
+            return (
+              <Card className="bg-red-50 border-red-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-red-600" />
+                    <span className="font-medium text-red-900">
+                      {displayLabel}: {formatCurrency(principal as number)} ({(amortizationRate * 100).toFixed(1)}%/år)
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3">
@@ -191,7 +203,7 @@ export default function SpecificLiabilityWizardStep({
           </Button>
           <Button 
             onClick={handleComplete}
-            disabled={principal === '' || principal <= 0 || !label.trim()}
+            disabled={principal === '' || principal <= 0}
             className="flex-1"
           >
             Fortsätt →

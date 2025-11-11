@@ -30,15 +30,20 @@ export default function SavingsInvestmentWizardStep({ onComplete, onSkip }: Savi
   const [value, setValue] = useState<number | ''>('');
   
   const handleAddInvestment = () => {
-    if (value !== '' && value > 0 && label.trim() && selectedType) {
+    if (value !== '' && value > 0 && selectedType) {
       const category: AssetCategory = selectedType === 'savings' 
         ? 'Sparkonto & Kontanter' 
         : 'Fonder & Aktier';
       
+      // Använd generiskt namn om inget anges
+      const investmentNumber = savingsInvestments.length + 1;
+      const defaultLabel = selectedType === 'savings' ? `Investeringar ${investmentNumber}` : `Investeringar ${investmentNumber}`;
+      const finalLabel = label.trim() || defaultLabel;
+      
       const newAsset: Asset = {
         id: Date.now().toString(),
         category,
-        label: label.trim(),
+        label: finalLabel,
         value: value as number,
         expected_apy: getDefaultReturnRate(category)
       };
@@ -205,7 +210,7 @@ export default function SavingsInvestmentWizardStep({ onComplete, onSkip }: Savi
       <div className="space-y-4">
         <div>
           <Label htmlFor="investment-label" className="text-base">
-            Beskrivning (t.ex. "Nordea sparkonto", "Avanza fonder")
+            Beskrivning (valfritt, t.ex. "Nordea sparkonto", "Avanza fonder")
           </Label>
           <Input
             id="investment-label"
@@ -228,13 +233,13 @@ export default function SavingsInvestmentWizardStep({ onComplete, onSkip }: Savi
           />
         </div>
         
-        {value !== '' && value > 0 && label.trim() && (
+        {value !== '' && value > 0 && (
           <Card className="bg-green-50 border-green-200">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <span className="font-medium text-green-900">
-                  {label}: {formatCurrency(value as number)}
+                  {label.trim() || `Investeringar ${savingsInvestments.length + 1}`}: {formatCurrency(value as number)}
                 </span>
               </div>
             </CardContent>
@@ -248,7 +253,7 @@ export default function SavingsInvestmentWizardStep({ onComplete, onSkip }: Savi
         </Button>
         <Button 
           onClick={handleAddInvestment}
-          disabled={value === '' || value <= 0 || !label.trim()}
+          disabled={value === '' || value <= 0}
           className="flex-1"
         >
           Lägg till tillgång

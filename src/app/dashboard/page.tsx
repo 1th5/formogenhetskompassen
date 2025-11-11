@@ -50,8 +50,10 @@ export default function DashboardPage() {
   const [showWelcomeSection, setShowWelcomeSection] = useState(false);
   const [hasSeenWelcome, setHasSeenWelcome] = useState(false);
   const [showScrollUpButton, setShowScrollUpButton] = useState(false);
-  const [showSkipButton, setShowSkipButton] = useState(true);
+  const [showSkipButton, setShowSkipButton] = useState(false);
+  const [skipButtonOpacity, setSkipButtonOpacity] = useState(0);
   const welcomeSectionRef = useRef<HTMLDivElement>(null);
+  const welcomeTitleRef = useRef<HTMLHeadingElement>(null);
   const dashboardSectionRef = useRef<HTMLDivElement>(null);
   const scrollLockRef = useRef(false);
   
@@ -73,7 +75,7 @@ export default function DashboardPage() {
       setShowWelcomeSection(true);
       setShowHeroSection(true);
       setHasSeenWelcome(true);
-      setShowSkipButton(true); // Visa knappen när välkomstsektionen visas
+      // showSkipButton och skipButtonOpacity hanteras av scroll-hanteraren
       // Scrolla till toppen när välkomstsektionen visas första gången
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'auto' });
@@ -97,36 +99,56 @@ export default function DashboardPage() {
     if (isLevelZero) {
       setShowHeroSection(true);
     }
-    setShowSkipButton(true); // Visa knappen när man scrollar upp till välkomstsektionen
+    // showSkipButton och skipButtonOpacity hanteras av scroll-hanteraren
     // Vänta lite så att sektionen renderas, sedan scrolla med animation
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 100);
   };
   
-  // Hantera fade-out för "Hoppa över"-knappen när man närmar sig slutet av välkomstsektionen
+  // Hantera fade-in/fade-out för "Hoppa över"-knappen baserat på scroll-position
+  // Knappen ska fadea in när man skrollar ner förbi "Välkommen till Förmögenhetskollen"-texten
+  // och fadea ut när man skrollar upp över den texten
   useEffect(() => {
-    if (!showWelcomeSection) return;
+    if (!showWelcomeSection) {
+      setShowSkipButton(false);
+      setSkipButtonOpacity(0);
+      return;
+    }
     
     const handleScroll = () => {
-      const welcomeElement = welcomeSectionRef.current;
-      if (!welcomeElement) return;
+      const welcomeTitleElement = welcomeTitleRef.current;
+      if (!welcomeTitleElement) {
+        setShowSkipButton(false);
+        setSkipButtonOpacity(0);
+        return;
+      }
       
-      const welcomeBottom = welcomeElement.offsetTop + welcomeElement.offsetHeight;
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
+      const titleTop = welcomeTitleElement.offsetTop;
+      const titleBottom = titleTop + welcomeTitleElement.offsetHeight;
       
-      // Fadea bort knappen när man är nära "Redo att komma igång?"-texten
-      // (cirka 200px från slutet av välkomstsektionen)
-      const distanceToEnd = welcomeBottom - scrollY - windowHeight;
-      if (distanceToEnd < 200) {
-        setShowSkipButton(false);
-      } else {
+      // Beräkna om titeln har passerat toppen av skärmen
+      const titleHasPassed = scrollY > titleBottom;
+      
+      if (titleHasPassed) {
+        // Fadea in knappen när titeln har passerat
         setShowSkipButton(true);
+        // Använd en smooth transition för opacity
+        const fadeInProgress = Math.min(1, (scrollY - titleBottom) / 100);
+        setSkipButtonOpacity(fadeInProgress);
+      } else {
+        // Fadea ut knappen när man scrollar upp över titeln
+        const fadeOutProgress = Math.max(0, 1 - (titleBottom - scrollY) / 100);
+        setSkipButtonOpacity(fadeOutProgress);
+        if (fadeOutProgress <= 0) {
+          setShowSkipButton(false);
+        }
       }
     };
     
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // Kolla initial position
     
     return () => window.removeEventListener('scroll', handleScroll);
@@ -437,7 +459,10 @@ export default function DashboardPage() {
               }}
             />
           </div>
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-neutral-900 mb-4">
+          <h1 
+            ref={welcomeTitleRef}
+            className="font-serif text-4xl sm:text-5xl md:text-6xl text-neutral-900 mb-4"
+          >
             Välkommen till Förmögenhetskollen
           </h1>
           <p className="text-lg sm:text-xl text-neutral-700 max-w-2xl mx-auto font-light mb-6">
@@ -454,9 +479,12 @@ export default function DashboardPage() {
             </p>
           </div>
           
-          {/* Hoppa över-knapp för mobil - fixed och följer med */}
+          {/* Hoppa över-knapp för mobil - fixed och följer med, fadeas in/ut baserat på scroll */}
           {showSkipButton && (
-            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-30 sm:hidden transition-opacity duration-300">
+            <div 
+              className="fixed top-4 left-1/2 -translate-x-1/2 z-30 sm:hidden transition-opacity duration-300"
+              style={{ opacity: skipButtonOpacity }}
+            >
               <Button
                 onClick={() => {
                   const dashboardElement = dashboardSectionRef.current;
@@ -471,7 +499,7 @@ export default function DashboardPage() {
                   }
                 }}
                 variant="ghost"
-                className="text-xs text-primary/60 hover:text-primary/80 border border-primary/20 hover:border-primary/40 bg-white/70 backdrop-blur-sm shadow-sm transition-opacity duration-300"
+                className="text-xs text-primary/60 hover:text-primary/80 border border-primary/20 hover:border-primary/40 bg-white/70 backdrop-blur-sm shadow-sm"
                 size="sm"
               >
                 Hoppa över →
@@ -1050,20 +1078,16 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8 lg:mb-10">
           <div className="flex items-center gap-3">
-            {!effectiveIsLevelZero && (
-              <div className="hidden sm:block">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 flex items-center justify-center">
-                  <img 
-                    src="/design/app-icon-bw-1.png" 
-                    alt="Förmögenhetskollen logotyp" 
-                    className="w-full h-full object-contain"
-                    style={{ 
-                      mixBlendMode: 'darken'
-                    }}
-                  />
-                </div>
-              </div>
-            )}
+            <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 flex items-center justify-center flex-shrink-0">
+              <img 
+                src="/design/app-icon-bw-1.png" 
+                alt="Förmögenhetskollen logotyp" 
+                className="w-full h-full object-contain"
+                style={{ 
+                  mixBlendMode: 'darken'
+                }}
+              />
+            </div>
           <div>
               <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl mb-1 text-primary">Förmögenhetskollen</h1>
               <p className="font-sans text-xs sm:text-sm text-primary/70">

@@ -32,12 +32,16 @@ export default function HousingWizardStep({ onComplete, onSkip }: HousingWizardS
       return;
     }
     
-    if (housingType && label.trim() && value !== '' && value > 0) {
+    if (housingType && value !== '' && value > 0) {
       const category: AssetCategory = housingType === 'bostad' ? 'Bostad' : 'Semesterbostad';
+      // Använd generiskt namn om inget anges
+      const defaultLabel = housingType === 'bostad' ? 'Bostad 1' : 'Semesterbostad 1';
+      const finalLabel = label.trim() || defaultLabel;
+      
       const asset: Asset = {
         id: Date.now().toString(),
         category,
-        label: label.trim(),
+        label: finalLabel,
         value: value as number,
         expected_apy: getDefaultReturnRate(category)
       };
@@ -145,7 +149,7 @@ export default function HousingWizardStep({ onComplete, onSkip }: HousingWizardS
         <div className="space-y-4">
           <div>
             <Label htmlFor="housing-label" className="text-base">
-              Beskrivning (t.ex. "Bostadsrätt på Södermalm", "Fritidshus i Småland")
+              Beskrivning (valfritt, t.ex. "Bostadsrätt på Södermalm", "Fritidshus i Småland")
             </Label>
             <Input
               id="housing-label"
@@ -171,13 +175,13 @@ export default function HousingWizardStep({ onComplete, onSkip }: HousingWizardS
             </p>
           </div>
           
-          {value !== '' && value > 0 && label.trim() && (
+          {value !== '' && value > 0 && (
             <Card className="bg-green-50 border-green-200">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-600" />
                   <span className="font-medium text-green-900">
-                    {label}: {formatCurrency(value as number)}
+                    {label.trim() || (housingType === 'bostad' ? 'Bostad 1' : 'Semesterbostad 1')}: {formatCurrency(value as number)}
                   </span>
                 </div>
               </CardContent>
@@ -191,7 +195,7 @@ export default function HousingWizardStep({ onComplete, onSkip }: HousingWizardS
           </Button>
           <Button 
             onClick={handleComplete}
-            disabled={value === '' || value <= 0 || !label.trim()}
+            disabled={value === '' || value <= 0}
             className="flex-1"
           >
             Fortsätt till övriga tillgångar →

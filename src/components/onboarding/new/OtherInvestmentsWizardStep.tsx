@@ -40,11 +40,17 @@ export default function OtherInvestmentsWizardStep({ onComplete, onSkip }: Other
   const [value, setValue] = useState<number | ''>('');
   
   const handleAddInvestment = () => {
-    if (value !== '' && value > 0 && label.trim() && selectedCategory) {
+    if (value !== '' && value > 0 && selectedCategory) {
+      // Använd generiskt namn baserat på kategori om inget anges
+      const categoryLabel = ALL_CATEGORIES.find(c => c.value === selectedCategory)?.label || 'Tillgång';
+      const investmentNumber = otherInvestments.filter(a => a.category === selectedCategory).length + 1;
+      const defaultLabel = `${categoryLabel} ${investmentNumber}`;
+      const finalLabel = label.trim() || defaultLabel;
+      
       const newAsset: Asset = {
         id: Date.now().toString(),
         category: selectedCategory,
-        label: label.trim(),
+        label: finalLabel,
         value: value as number,
         expected_apy: getDefaultReturnRate(selectedCategory)
       };
@@ -173,7 +179,7 @@ export default function OtherInvestmentsWizardStep({ onComplete, onSkip }: Other
       
       <div className="space-y-4">
         <div>
-          <Label htmlFor="other-label" className="text-base">Beskrivning</Label>
+          <Label htmlFor="other-label" className="text-base">Beskrivning (valfritt)</Label>
           <Input
             id="other-label"
             value={label}
@@ -195,18 +201,23 @@ export default function OtherInvestmentsWizardStep({ onComplete, onSkip }: Other
           />
         </div>
         
-        {value !== '' && value > 0 && label.trim() && (
-          <Card className="bg-green-50 border-green-200">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="font-medium text-green-900">
-                  {label}: {formatCurrency(value as number)}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {value !== '' && value > 0 && (() => {
+          const categoryLabel = ALL_CATEGORIES.find(c => c.value === selectedCategory)?.label || 'Tillgång';
+          const investmentNumber = otherInvestments.filter(a => a.category === selectedCategory).length + 1;
+          const displayLabel = label.trim() || `${categoryLabel} ${investmentNumber}`;
+          return (
+            <Card className="bg-green-50 border-green-200">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="font-medium text-green-900">
+                    {displayLabel}: {formatCurrency(value as number)}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
       </div>
       
       <div className="flex flex-col sm:flex-row gap-3">
@@ -215,7 +226,7 @@ export default function OtherInvestmentsWizardStep({ onComplete, onSkip }: Other
         </Button>
         <Button 
           onClick={handleAddInvestment}
-          disabled={value === '' || value <= 0 || !label.trim()}
+          disabled={value === '' || value <= 0}
           className="flex-1"
         >
           Lägg till tillgång
