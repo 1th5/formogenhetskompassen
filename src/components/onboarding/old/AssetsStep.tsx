@@ -55,7 +55,7 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
   ];
   const filteredAssets = initialData.assets.filter(
     asset => !pensionCategories.includes(asset.category)
-  );
+  ) as FormData['assets'];
   
   const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -72,7 +72,8 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
   const watchedAssets = watch('assets');
 
   const handleWizardAdd = (asset: { category: AssetCategory; label: string; value: number; expected_apy: number }) => {
-    append(asset);
+    // Type assertion eftersom vi filtrerar bort pensionsassets
+    append(asset as FormData['assets'][0]);
     setShowWizard(false);
   };
 
@@ -81,12 +82,13 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
   };
 
   const handlePensionHelpAdd = (pensionData: { label: string; value: number; expected_apy: number; category: 'Trygghetsbaserad pension (Statlig)' | 'Marknadsbaserad pension' }) => {
+    // Type assertion eftersom pensionsassets är tillåtna i assetSchema
     append({
-      category: pensionData.category as AssetCategory,
+      category: pensionData.category,
       label: pensionData.label,
       value: pensionData.value,
       expected_apy: pensionData.expected_apy
-    });
+    } as FormData['assets'][0]);
     setShowPensionHelp(false);
   };
 
@@ -103,7 +105,8 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
   };
   
   const updateCategory = (index: number, category: AssetCategory) => {
-    setValue(`assets.${index}.category`, category);
+    // Type assertion eftersom vi begränsar till kategorier som finns i assetSchema
+    setValue(`assets.${index}.category`, category as FormData['assets'][0]['category']);
     setValue(`assets.${index}.expected_apy`, getDefaultReturnRate(category));
   };
   
@@ -251,11 +254,23 @@ export default function AssetsStep({ onNext, onPrevious }: AssetsStepProps) {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h4 className="text-sm font-medium text-red-800 mb-2">Vänligen korrigera följande fel:</h4>
           <ul className="text-sm text-red-700 space-y-1">
-            {errors.assets?.map((assetError, index) => (
-              <li key={index}>
-                Tillgång {index + 1}: {Object.values(assetError || {}).map(error => error?.message).filter(Boolean).join(', ')}
-              </li>
-            ))}
+            {errors.assets && Array.isArray(errors.assets) ? errors.assets.map((assetError, index) => {
+              if (!assetError) return null;
+              const errorMessages = Object.values(assetError)
+                .map(error => {
+                  if (typeof error === 'object' && error !== null && 'message' in error) {
+                    return error.message;
+                  }
+                  return typeof error === 'string' ? error : null;
+                })
+                .filter(Boolean)
+                .join(', ');
+              return (
+                <li key={index}>
+                  Tillgång {index + 1}: {errorMessages}
+                </li>
+              );
+            }) : null}
           </ul>
         </div>
       )}
