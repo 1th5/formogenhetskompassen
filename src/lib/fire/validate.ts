@@ -69,6 +69,18 @@ export function findSafeFireYear({
   const statePensionPayoutYears = baseResult.statePensionPayoutYears ?? 20;
   const statePensionAnnualIncome = baseResult.statePensionAnnualIncome ?? 0;
 
+  // Beräkna pensionLockedAtStart från assets (marknadsbaserad pension)
+  const occPensionAssets = assets
+    .filter(asset => asset.category === 'Tjänstepension')
+    .reduce((sum, asset) => sum + asset.value, 0);
+  const premiePensionAssets = assets
+    .filter(asset => asset.category === 'Premiepension')
+    .reduce((sum, asset) => sum + asset.value, 0);
+  const privatePensionAssets = assets
+    .filter(asset => asset.category === 'Privat pensionssparande (IPS)')
+    .reduce((sum, asset) => sum + asset.value, 0);
+  const pensionLockedAtStart = occPensionAssets + premiePensionAssets + privatePensionAssets;
+
   // Testa baseResult.yearsToFire och sedan +1, +2, ... år
   for (let i = 0; i <= maxAdditionalYears; i++) {
     const candidateYearsToFire = baseResult.yearsToFire + i;
@@ -82,7 +94,7 @@ export function findSafeFireYear({
     // Kör simulering med samma parametrar som i simulatorn
     const simulation = simulatePortfolio(
       baseResult.availableAtStart,
-      baseResult.pensionLockedAtStart,
+      pensionLockedAtStart,
       totalMonthlySavings,
       autoReturns.realReturnAvailable,
       autoReturns.realReturnPension,
