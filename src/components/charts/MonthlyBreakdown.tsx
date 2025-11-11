@@ -261,9 +261,6 @@ export default function MonthlyBreakdown({ breakdown, assets = [], liabilities =
             outerRadius={100}
             dataKey="value"
             onClick={handlePieClick}
-            // Sätt activeIndex bara när det inte finns hover (för mobil)
-            // activeIndex blockeras när hover är aktiv eftersom Recharts prioriterar hover
-            activeIndex={undefined}
           >
             {data.map((entry, index) => (
               <Cell 
