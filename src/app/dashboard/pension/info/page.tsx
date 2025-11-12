@@ -302,36 +302,23 @@ export default function PensionInfoPage() {
                 <div>
                   <p className="font-semibold text-amber-900 mb-1">Varför är IPS inte lika förmånligt längre?</p>
                   <p className="text-sm text-amber-800 mb-2">
-                    IPS har blivit mindre förmånligt på senare år på grund av flera faktorer:
+                    IPS har blivit mindre förmånligt av tre huvudskäl:
                   </p>
                   <ul className="text-sm text-amber-800 space-y-1.5 list-disc list-inside ml-2">
                     <li>
-                      <strong>Lägre skattereduktion:</strong> Skattereduktionen på IPS har minskat över tid. 
-                      Tidigare kunde du få upp till 75% av insättningen i skattereduktion, men detta har justerats neråt.
+                      <strong>ISK är bättre:</strong> ISK (Investeringssparkonto) ger ofta lägre skatt och du kan spara hur mycket du vill. 
+                      IPS har en maxgräns per år.
                     </li>
                     <li>
-                      <strong>ISK-alternativet:</strong> ISK (Investeringssparkonto) har blivit ett mer attraktivt alternativ 
-                      för de flesta. ISK är ett konto där du kan spara i fonder och aktier med låg skatt (schablonskatt) och ingen 
-                      vinstskatt när du säljer. Till skillnad från IPS finns det inget tak (maxgräns) på hur mycket du kan spara på ISK – 
-                      du kan spara så mycket du vill. IPS har däremot en maxgräns per år. För de flesta är ISK mer förmånligt än IPS eftersom 
-                      du har mer flexibilitet och ofta lägre total skatt över tid.
+                      <strong>Låsta pengar:</strong> Pengarna i IPS är låsta tills du är 55 år. Med ISK kan du ta ut pengarna när du vill.
                     </li>
                     <li>
-                      <strong>Låsta pengar:</strong> Pengarna i IPS är låsta tills du är 55 år, vilket begränsar flexibiliteten. 
-                      Med ISK kan du ta ut pengarna när du vill utan skatteskäl.
-                    </li>
-                    <li>
-                      <strong>Begränsningar:</strong> Det finns tak på hur mycket du kan sätta in i IPS per år, 
-                      och reglerna kan ändras över tid.
+                      <strong>Mindre skatteförmån:</strong> Skattereduktionen på IPS har minskat över tid.
                     </li>
                   </ul>
                   <p className="text-sm text-amber-800 mt-2">
-                    <strong>Rekommendation:</strong> För de flesta är ISK (Investeringssparkonto) ett bättre val för långsiktigt sparande idag. 
-                    ISK är ett konto där du kan spara i fonder och aktier med låg skatt. Det finns inget tak på hur mycket du kan spara på ISK 
-                    – du kan spara så mycket du vill. För de allra flesta är ISK mer än tillräckligt för deras sparande och ger bättre flexibilitet 
-                    än IPS. IPS kan fortfarande vara värt att överväga om du har mycket hög inkomst och sparar så mycket att du vill ha ytterligare 
-                    ett sparalternativ utöver ISK (t.ex. om du redan sparar mycket på ISK och vill spara ännu mer), eller om du specifikt vill ha 
-                    pengarna låsta tills 55 års ålder för att undvika frestelsen att använda dem tidigare.
+                    <strong>Rekommendation:</strong> För de flesta är ISK ett bättre val. IPS kan vara värt att överväga om du har mycket hög inkomst 
+                    och redan sparar mycket på ISK, eller om du specifikt vill ha pengarna låsta tills 55 års ålder.
                   </p>
                 </div>
               </div>
@@ -414,7 +401,7 @@ export default function PensionInfoPage() {
         <div className="text-center">
           <Button
             onClick={() => router.back()}
-            variant="outline"
+            variant="secondary"
             size="lg"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
