@@ -735,6 +735,15 @@ export default function FIREPage() {
     const pensionAge = sliderPensionAge[0];
     const bridgeYears = fireAge !== null ? Math.max(0, pensionAge - fireAge) : 0;
     
+    // Beräkna när uttag faktiskt börjar (efter Coast FIRE om aktivt)
+    const coastYears = useCoastFire && coastFireYears[0] > 0 ? coastFireYears[0] : 0;
+    const withdrawalStartAge = fireAge !== null && coastYears > 0 
+      ? Math.min(fireAge + coastYears, pensionAge)
+      : fireAge;
+    const actualWithdrawalYears = withdrawalStartAge !== null && pensionAge > withdrawalStartAge
+      ? pensionAge - withdrawalStartAge
+      : 0;
+    
     // Beräkna årsutgifter från månadsutgifter
     const annualExpenses = dMonthlyExpenses * 12;
     
@@ -743,31 +752,49 @@ export default function FIREPage() {
       ? simulation.data.find(d => d.age === fireAge) 
       : null;
     
+    // Hitta data för när uttag faktiskt börjar
+    const withdrawalStartData = withdrawalStartAge !== null
+      ? simulation.data.find(d => d.age === withdrawalStartAge)
+      : null;
+    
     // Hitta data för pensionsåldern
     const pensionYearData = simulation.data.find(d => d.age === pensionAge);
     
-    // Analysera withdrawal rate vid FIRE
+    // Analysera withdrawal rate vid faktisk uttagsstart (efter coast om aktivt)
+    const withdrawalRateAtStart = withdrawalStartData && withdrawalStartData.available > 0 && annualExpenses > 0
+      ? (annualExpenses / withdrawalStartData.available) * 100
+      : null;
+    
+    // Analysera withdrawal rate vid FIRE (för jämförelse)
     const withdrawalRateAtFire = fireYearData && fireYearData.available > 0 && annualExpenses > 0
       ? (annualExpenses / fireYearData.available) * 100
       : null;
     
-    // Hitta lägsta tillgängliga kapital under bridge-perioden
+    // Hitta lägsta tillgängliga kapital under faktisk uttagsperiod (efter coast)
+    const withdrawalPeriodData = withdrawalStartAge !== null && pensionAge > withdrawalStartAge
+      ? simulation.data.filter(d => d.age >= withdrawalStartAge && d.age <= pensionAge)
+      : [];
+    const minAvailableDuringWithdrawal = withdrawalPeriodData.length > 0
+      ? Math.min(...withdrawalPeriodData.map(d => d.available))
+      : null;
+    const minAvailableAge = minAvailableDuringWithdrawal !== null
+      ? withdrawalPeriodData.find(d => d.available === minAvailableDuringWithdrawal)?.age
+      : null;
+    
+    // Hitta lägsta tillgängliga kapital under hela bridge-perioden (för jämförelse)
     const bridgeData = fireAge !== null && pensionAge > fireAge
       ? simulation.data.filter(d => d.age >= fireAge && d.age <= pensionAge)
       : [];
     const minAvailableDuringBridge = bridgeData.length > 0
       ? Math.min(...bridgeData.map(d => d.available))
       : null;
-    const minAvailableAge = minAvailableDuringBridge !== null
-      ? bridgeData.find(d => d.available === minAvailableDuringBridge)?.age
-      : null;
     
-    // Beräkna genomsnittlig withdrawal rate under bridge
-    const avgWithdrawalRate = bridgeData.length > 0 && annualExpenses > 0
-      ? bridgeData.reduce((sum, d) => {
+    // Beräkna genomsnittlig withdrawal rate under faktisk uttagsperiod
+    const avgWithdrawalRate = withdrawalPeriodData.length > 0 && annualExpenses > 0
+      ? withdrawalPeriodData.reduce((sum, d) => {
           const rate = d.available > 0 ? (annualExpenses / d.available) * 100 : 0;
           return sum + rate;
-        }, 0) / bridgeData.length
+        }, 0) / withdrawalPeriodData.length
       : null;
     
     // Kolla om kapitalet växer eller minskar under bridge
@@ -775,20 +802,55 @@ export default function FIREPage() {
       ? ((pensionYearData.available - fireYearData.available) / fireYearData.available) * 100
       : null;
     
-    // Beräkna hur mycket kapitalet behöver växa för att nå 4%-kravet
-    const capitalNeededToGrow = fireYearData && requiredAtPensionLive > fireYearData.available
-      ? ((requiredAtPensionLive - fireYearData.available) / fireYearData.available) * 100
+    // Kolla kapitaltillväxt under faktisk uttagsperiod
+    const capitalGrowthDuringWithdrawal = withdrawalStartData && pensionYearData
+      ? ((pensionYearData.available - withdrawalStartData.available) / withdrawalStartData.available) * 100
       : null;
+    
+    // Beräkna hur mycket kapitalet behöver växa för att nå 4%-kravet
+    // Om Coast FIRE täcker hela bridge-perioden, kolla om kapitalet vid pensionsåldern redan överstiger kravet
+    // Annars beräkna från när uttag faktiskt börjar
+    const coastCoversFullBridgeCheck = coastYears > 0 && bridgeYears > 0 && coastYears >= bridgeYears;
+    const capitalNeededToGrow = (() => {
+      if (coastCoversFullBridgeCheck && fireYearData && pensionYearData) {
+        // Om Coast FIRE täcker hela bridge-perioden, kolla om kapitalet vid pensionsåldern redan överstiger 4%-kravet
+        // Om det gör det, returnera null (ingen varning behövs)
+        // Om det inte gör det, beräkna från FIRE-året (men detta reflekterar att kapitalet har växt under Coast FIRE)
+        if (pensionYearData.available >= requiredAtPensionLive) {
+          // Kapitalet vid pensionsåldern överstiger redan 4%-kravet - ingen varning behövs
+          return null;
+        }
+        // Kapitalet har växt från FIRE-året till pensionsåldern, men räcker fortfarande inte
+        // Beräkna hur mycket mer det behöver växa från nuvarande värde vid pensionsåldern
+        return requiredAtPensionLive > pensionYearData.available
+          ? ((requiredAtPensionLive - pensionYearData.available) / pensionYearData.available) * 100
+      : null;
+      } else if (withdrawalStartData) {
+        // Annars beräkna från när uttag faktiskt börjar
+        return requiredAtPensionLive > withdrawalStartData.available
+          ? ((requiredAtPensionLive - withdrawalStartData.available) / withdrawalStartData.available) * 100
+          : null;
+      }
+      return null;
+    })();
     
     // Kolla om statlig pension hjälper
     const statePensionHelps = pensionYearData && pensionYearData.statePensionIncome 
       ? pensionYearData.statePensionIncome > 0
       : false;
     
-    // Beräkna hur nära kapitalet är att ta slut (procent av ursprungligt)
-    const capitalBuffer = minAvailableDuringBridge !== null && fireYearData
-      ? (minAvailableDuringBridge / fireYearData.available) * 100
+    // Beräkna hur nära kapitalet är att ta slut (procent av startvärdet vid faktisk uttagsstart)
+    const capitalBuffer = minAvailableDuringWithdrawal !== null && withdrawalStartData
+      ? (minAvailableDuringWithdrawal / withdrawalStartData.available) * 100
       : null;
+    
+    // Kolla om Coast FIRE täcker hela bridge-perioden
+    const coastCoversFullBridge = coastYears > 0 && bridgeYears > 0 && coastYears >= bridgeYears;
+    
+    // Kolla om Coast FIRE förbättrar situationen signifikant
+    const coastSignificantlyHelps = coastYears > 0 && withdrawalStartData && fireYearData
+      ? withdrawalStartData.available > fireYearData.available * 1.1 // Minst 10% mer kapital efter coast
+      : false;
     
     return {
       fireAge,
@@ -797,15 +859,24 @@ export default function FIREPage() {
       fireYearData,
       pensionYearData,
       withdrawalRateAtFire,
+      withdrawalRateAtStart, // Ny: withdrawal rate vid faktisk uttagsstart
+      withdrawalStartAge, // Ny: ålder när uttag faktiskt börjar
+      actualWithdrawalYears, // Ny: antal år med faktiska uttag
+      withdrawalStartData, // Ny: data vid faktisk uttagsstart
       minAvailableDuringBridge,
+      minAvailableDuringWithdrawal, // Ny: lägsta kapital under faktisk uttagsperiod
       minAvailableAge,
       avgWithdrawalRate,
       capitalGrowthDuringBridge,
+      capitalGrowthDuringWithdrawal, // Ny: kapitaltillväxt under faktisk uttagsperiod
       capitalNeededToGrow,
       statePensionHelps,
-      capitalBuffer
+      capitalBuffer,
+      coastYears, // Ny: antal år med Coast FIRE
+      coastCoversFullBridge, // Ny: om Coast FIRE täcker hela bridge-perioden
+      coastSignificantlyHelps // Ny: om Coast FIRE förbättrar situationen signifikant
     };
-  }, [simulation.data, effectiveFireYear, averageAge, sliderPensionAge, dMonthlyExpenses, requiredAtPensionLive]);
+  }, [simulation.data, effectiveFireYear, averageAge, sliderPensionAge, dMonthlyExpenses, requiredAtPensionLive, useCoastFire, coastFireYears]);
 
   // Preparera data för graf - begränsa till 80 år på mobil
   const chartData = useMemo(() => {
@@ -1027,9 +1098,25 @@ export default function FIREPage() {
                           <>
                             <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
                               • Den <strong>blå linjen (Tillgängligt)</strong> visar ditt kapital som kan användas före pension. 
-                              Vid {graphAnalysis.fireAge} år börjar du ta ut från denna linje för att täcka utgifter.
+                              {graphAnalysis.coastYears > 0 ? (
+                                <>Vid {graphAnalysis.fireAge} år börjar Coast FIRE-perioden där du jobbar deltid. Utag från denna linje börjar vid {graphAnalysis.withdrawalStartAge !== null ? graphAnalysis.withdrawalStartAge : graphAnalysis.fireAge} år{graphAnalysis.coastCoversFullBridge ? ' (efter hela bridge-perioden)' : ''}.</>
+                              ) : (
+                                <>Vid {graphAnalysis.fireAge} år börjar du ta ut från denna linje för att täcka utgifter.</>
+                              )}
                             </p>
-                            {graphAnalysis.capitalGrowthDuringBridge !== null && (
+                            {graphAnalysis.coastYears > 0 && !graphAnalysis.coastCoversFullBridge && graphAnalysis.capitalGrowthDuringWithdrawal !== null && (
+                              <p className={
+                                graphAnalysis.capitalGrowthDuringWithdrawal > 0 
+                                  ? (fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700')
+                                  : 'text-red-700'
+                              }>
+                                • Under uttagsperioden{graphAnalysis.withdrawalStartAge !== null && graphAnalysis.pensionAge > graphAnalysis.withdrawalStartAge ? ` (mellan ${graphAnalysis.withdrawalStartAge}-${graphAnalysis.pensionAge} år, ${graphAnalysis.actualWithdrawalYears} år)` : ` (${graphAnalysis.actualWithdrawalYears} år)`} {graphAnalysis.capitalGrowthDuringWithdrawal > 0 ? 'växer' : 'minskar'} ditt tillgängliga kapital med {Math.abs(graphAnalysis.capitalGrowthDuringWithdrawal).toFixed(1)}%.
+                                {graphAnalysis.capitalGrowthDuringWithdrawal < 0 && (
+                                  <span className="font-semibold text-red-800"> ⚠️ Detta är en varning – kapitalet minskar snabbare än det växer.</span>
+                                )}
+                              </p>
+                            )}
+                            {graphAnalysis.coastYears === 0 && graphAnalysis.capitalGrowthDuringBridge !== null && (
                               <p className={
                                 graphAnalysis.capitalGrowthDuringBridge > 0 
                                   ? (fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700')
@@ -1041,9 +1128,20 @@ export default function FIREPage() {
                           )}
                         </p>
                             )}
-                            {graphAnalysis.minAvailableAge && graphAnalysis.minAvailableAge !== graphAnalysis.fireAge && (
+                            {graphAnalysis.coastYears > 0 && graphAnalysis.coastCoversFullBridge && (
+                              <p className="text-green-700">
+                                • Under hela bridge-perioden ({graphAnalysis.bridgeYears} år) växer ditt kapital eftersom du täcker utgifter med deltidsarbete istället för uttag.
+                              </p>
+                            )}
+                            {graphAnalysis.minAvailableAge && graphAnalysis.minAvailableAge !== graphAnalysis.fireAge && graphAnalysis.minAvailableDuringWithdrawal !== null && (
                               <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
-                                • Kapitalet når sitt lägsta värde vid {graphAnalysis.minAvailableAge} år ({formatCurrency(graphAnalysis.minAvailableDuringBridge || 0)}), 
+                                • Kapitalet når sitt lägsta värde vid {graphAnalysis.minAvailableAge} år ({formatCurrency(graphAnalysis.minAvailableDuringWithdrawal)}), 
+                                sedan växer det igen när uttagen minskar eller avkastningen ökar.
+                              </p>
+                            )}
+                            {graphAnalysis.minAvailableAge && graphAnalysis.minAvailableAge !== graphAnalysis.fireAge && graphAnalysis.minAvailableDuringWithdrawal === null && graphAnalysis.minAvailableDuringBridge !== null && (
+                              <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
+                                • Kapitalet når sitt lägsta värde vid {graphAnalysis.minAvailableAge} år ({formatCurrency(graphAnalysis.minAvailableDuringBridge)}), 
                                 sedan växer det igen när uttagen minskar eller avkastningen ökar.
                               </p>
                             )}
@@ -1082,70 +1180,148 @@ export default function FIREPage() {
                           ⚠️ Vad ska du tänka på?
                         </p>
                         <div className="text-xs space-y-2">
-                          {/* Withdrawal rate varning */}
-                          {graphAnalysis.withdrawalRateAtFire !== null && (
-                            <div className={graphAnalysis.withdrawalRateAtFire > 5 ? 'text-red-700 bg-red-50 p-2 rounded' : graphAnalysis.withdrawalRateAtFire > 4 ? 'text-orange-700 bg-orange-50 p-2 rounded' : 'text-green-700'}>
+                          {/* Coast FIRE info - visa först om aktivt */}
+                          {graphAnalysis.coastYears > 0 && effectiveFireYear !== null && (
+                            <div className={graphAnalysis.coastCoversFullBridge 
+                              ? 'text-green-700 bg-green-50 p-2 rounded' 
+                              : graphAnalysis.coastSignificantlyHelps 
+                              ? 'text-blue-700 bg-blue-50 p-2 rounded'
+              : 'text-blue-700 bg-blue-50 p-2 rounded'}>
                               <p>
-                                <strong>Uttagsnivå vid FIRE{graphAnalysis.fireAge !== null && graphAnalysis.pensionAge > graphAnalysis.fireAge ? ` (mellan ${graphAnalysis.fireAge}-${graphAnalysis.pensionAge} år)` : ''}:</strong> Du tar ut {graphAnalysis.withdrawalRateAtFire.toFixed(1)}% per år från ditt tillgängliga kapital.
-                                {graphAnalysis.withdrawalRateAtFire > 5 && (
-                                  <span className="block mt-1 font-semibold">⚠️ Detta är högt! Över 5% per år ökar risken att kapitalet tar slut. Överväg att spara mer eller jobba längre.</span>
-                              )}
-                                {graphAnalysis.withdrawalRateAtFire > 4 && graphAnalysis.withdrawalRateAtFire <= 5 && (
-                                  <span className="block mt-1">💡 Detta är över den säkra 4%-regeln. Om marknaden går dåligt kan det bli tufft. Överväg en buffert.</span>
+                                <strong>🌊 Coast FIRE-period ({graphAnalysis.coastYears} år):</strong> Under de första {graphAnalysis.coastYears} åren efter {graphAnalysis.fireAge} år jobbar du deltid för att täcka utgifter. 
+                                Kapitalet växer utan uttag, vilket hjälper till att nå 4%-kravet.
+                                {graphAnalysis.coastCoversFullBridge ? (
+                                  <span className="block mt-1 font-semibold">✅ Du täcker hela bridge-perioden med deltidsarbete! Detta eliminerar risken för uttag under bridge-perioden.</span>
+                                ) : graphAnalysis.coastSignificantlyHelps ? (
+                                  <span className="block mt-1">💡 Detta minskar risken betydligt eftersom kapitalet får växa i början av bridge-perioden innan uttag börjar.</span>
+                                ) : (
+                                  <span className="block mt-1">💡 Detta minskar risken eftersom kapitalet får växa i början av bridge-perioden.</span>
                                 )}
-                                {graphAnalysis.withdrawalRateAtFire <= 4 && (
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Withdrawal rate varning - använd faktisk uttagsstart om Coast FIRE är aktivt */}
+                          {(() => {
+                            // Välj vilken withdrawal rate som ska visas
+                            const withdrawalRate = graphAnalysis.withdrawalRateAtStart !== null ? graphAnalysis.withdrawalRateAtStart : graphAnalysis.withdrawalRateAtFire;
+                            const withdrawalStartAge = graphAnalysis.withdrawalStartAge !== null ? graphAnalysis.withdrawalStartAge : graphAnalysis.fireAge;
+                            const withdrawalPeriodText = withdrawalStartAge !== null && graphAnalysis.pensionAge > withdrawalStartAge 
+                              ? ` (mellan ${withdrawalStartAge}-${graphAnalysis.pensionAge} år)`
+                              : graphAnalysis.fireAge !== null && graphAnalysis.pensionAge > graphAnalysis.fireAge 
+                              ? ` (mellan ${graphAnalysis.fireAge}-${graphAnalysis.pensionAge} år)`
+                              : '';
+                            
+                            // Visa inte varning om Coast FIRE täcker hela bridge-perioden
+                            if (graphAnalysis.coastCoversFullBridge) return null;
+                            
+                            // Visa inte varning om withdrawal rate är null eller om det inte finns någon faktisk uttagsperiod
+                            if (withdrawalRate === null || graphAnalysis.actualWithdrawalYears === 0) return null;
+                            
+                            return (
+                              <div className={withdrawalRate > 5 ? 'text-red-700 bg-red-50 p-2 rounded' : withdrawalRate > 4 ? 'text-orange-700 bg-orange-50 p-2 rounded' : 'text-green-700'}>
+                                <p>
+                                  <strong>Uttagsnivå{withdrawalPeriodText}:</strong> Du tar ut {withdrawalRate.toFixed(1)}% per år från ditt tillgängliga kapital{graphAnalysis.coastYears > 0 ? ` efter Coast FIRE-perioden` : ''}.
+                                  {withdrawalRate > 5 && (
+                                    <span className="block mt-1 font-semibold">⚠️ Detta är högt! Över 5% per år ökar risken att kapitalet tar slut. Överväg att spara mer, jobba längre, eller öka Coast FIRE-perioden.</span>
+                                  )}
+                                  {withdrawalRate > 4 && withdrawalRate <= 5 && (
+                                    <span className="block mt-1">💡 Detta är över den säkra 4%-regeln. Om marknaden går dåligt kan det bli tufft. Överväg en buffert eller längre Coast FIRE-period.</span>
+                                  )}
+                                  {withdrawalRate <= 4 && (
                                   <span className="block mt-1">✅ Detta är inom den säkra 4%-regeln. Bra!</span>
                           )}
                         </p>
                       </div>
-                          )}
+                            );
+                          })()}
 
-                          {/* Capital buffer varning */}
-                          {graphAnalysis.capitalBuffer !== null && graphAnalysis.capitalBuffer < 50 && (
+                          {/* Capital buffer varning - använd faktisk uttagsperiod */}
+                          {(() => {
+                            // Visa inte varning om Coast FIRE täcker hela bridge-perioden
+                            if (graphAnalysis.coastCoversFullBridge) return null;
+                            
+                            // Visa inte om det inte finns någon faktisk uttagsperiod
+                            if (graphAnalysis.actualWithdrawalYears === 0) return null;
+                            
+                            if (graphAnalysis.capitalBuffer !== null && graphAnalysis.capitalBuffer < 50) {
+                              const withdrawalStartAge = graphAnalysis.withdrawalStartAge !== null ? graphAnalysis.withdrawalStartAge : graphAnalysis.fireAge;
+                              const withdrawalPeriodText = withdrawalStartAge !== null && graphAnalysis.pensionAge > withdrawalStartAge 
+                                ? ` (mellan ${withdrawalStartAge}-${graphAnalysis.pensionAge} år)`
+                                : '';
+                              
+                              return (
                             <div className="text-red-700 bg-red-50 p-2 rounded">
                               <p>
-                                <strong>Liten kapitalbuffert{graphAnalysis.fireAge !== null && graphAnalysis.pensionAge > graphAnalysis.fireAge ? ` (mellan ${graphAnalysis.fireAge}-${graphAnalysis.pensionAge} år)` : ''}:</strong> Ditt kapital kan sjunka till {graphAnalysis.capitalBuffer.toFixed(0)}% av startvärdet under bridge-perioden.
-                                <span className="block mt-1 font-semibold">⚠️ Detta är riskabelt! En marknadskrasch tidigt i bridge-perioden kan tömma kapitalet. Överväg att spara mer eller jobba längre.</span>
+                                    <strong>Liten kapitalbuffert{withdrawalPeriodText}:</strong> Ditt kapital kan sjunka till {graphAnalysis.capitalBuffer.toFixed(0)}% av startvärdet under uttagsperioden.
+                                    <span className="block mt-1 font-semibold">⚠️ Detta är riskabelt! En marknadskrasch tidigt i uttagsperioden kan tömma kapitalet. Överväg att spara mer, jobba längre, eller öka Coast FIRE-perioden.</span>
                               </p>
                     </div>
-                          )}
+                              );
+                            }
+                            return null;
+                          })()}
 
-                          {/* Capital growth behövs */}
-                          {graphAnalysis.capitalNeededToGrow !== null && graphAnalysis.capitalNeededToGrow > 50 && (
+                          {/* Capital growth behövs - visa även om Coast FIRE täcker hela bridge-perioden om det finns fog */}
+                          {(() => {
+                            if (graphAnalysis.capitalNeededToGrow !== null && graphAnalysis.capitalNeededToGrow > 50) {
+                              // Om Coast FIRE täcker hela bridge-perioden, använd bridge-perioden för beräkning
+                              const isCoastFullBridge = graphAnalysis.coastCoversFullBridge;
+                              const periodYears = isCoastFullBridge ? graphAnalysis.bridgeYears : graphAnalysis.actualWithdrawalYears;
+                              const periodStartAge = isCoastFullBridge ? graphAnalysis.fireAge : (graphAnalysis.withdrawalStartAge !== null ? graphAnalysis.withdrawalStartAge : graphAnalysis.fireAge);
+                              const periodText = periodStartAge !== null && graphAnalysis.pensionAge > periodStartAge 
+                                ? ` (mellan ${periodStartAge}-${graphAnalysis.pensionAge} år)`
+                                : '';
+                              const avgReturnNeeded = periodYears > 0 
+                                ? (graphAnalysis.capitalNeededToGrow / periodYears).toFixed(1)
+                                : '0.0';
+                              
+                              return (
                             <div className={graphAnalysis.capitalNeededToGrow > 100 ? 'text-red-700 bg-red-50 p-2 rounded' : 'text-orange-700 bg-orange-50 p-2 rounded'}>
                               <p>
-                                <strong>Stor tillväxt krävs{graphAnalysis.fireAge !== null && graphAnalysis.pensionAge > graphAnalysis.fireAge ? ` (mellan ${graphAnalysis.fireAge}-${graphAnalysis.pensionAge} år)` : ''}:</strong> Ditt kapital behöver växa med {graphAnalysis.capitalNeededToGrow.toFixed(0)}% under bridge-perioden för att nå 4%-kravet.
+                                    <strong>Stor tillväxt krävs{periodText}:</strong> {isCoastFullBridge 
+                                      ? `Ditt kapital vid pensionsåldern behöver växa med ${graphAnalysis.capitalNeededToGrow.toFixed(0)}% från nuvarande värde för att nå 4%-kravet.`
+                                      : `Ditt kapital behöver växa med ${graphAnalysis.capitalNeededToGrow.toFixed(0)}% under uttagsperioden för att nå 4%-kravet.`
+                                    }
                                 {graphAnalysis.capitalNeededToGrow > 100 && (
-                                  <span className="block mt-1 font-semibold">⚠️ Detta är mycket! Det kräver en genomsnittlig real avkastning på över {(graphAnalysis.capitalNeededToGrow / graphAnalysis.bridgeYears).toFixed(1)}% per år. Överväg att spara mer.</span>
+                                      <span className="block mt-1 font-semibold">⚠️ Detta är mycket! Det kräver en genomsnittlig real avkastning på över {avgReturnNeeded}% per år. Överväg att spara mer{isCoastFullBridge ? ' eller jobba längre' : ' eller öka Coast FIRE-perioden'}.</span>
                                 )}
                                 {graphAnalysis.capitalNeededToGrow <= 100 && graphAnalysis.capitalNeededToGrow > 50 && (
-                                  <span className="block mt-1">💡 Detta kräver en genomsnittlig real avkastning på {(graphAnalysis.capitalNeededToGrow / graphAnalysis.bridgeYears).toFixed(1)}% per år. Det är möjligt men inte garanterat.</span>
+                                      <span className="block mt-1">💡 Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded}% per år. Det är möjligt men inte garanterat{isCoastFullBridge ? '. Överväg att spara mer eller jobba längre' : '. Överväg att öka Coast FIRE-perioden'}.</span>
                                 )}
                               </p>
                             </div>
-                          )}
+                              );
+                            }
+                            return null;
+                          })()}
 
-                          {/* Positiv feedback */}
-                          {graphAnalysis.capitalNeededToGrow !== null && graphAnalysis.capitalNeededToGrow <= 30 && fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] && (
+                          {/* Positiv feedback - visa även om Coast FIRE täcker hela bridge-perioden om situationen är bra */}
+                          {(() => {
+                            if (graphAnalysis.capitalNeededToGrow !== null && graphAnalysis.capitalNeededToGrow <= 30 && fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]) {
+                              // Om Coast FIRE täcker hela bridge-perioden, använd bridge-perioden för beräkning
+                              const isCoastFullBridge = graphAnalysis.coastCoversFullBridge;
+                              const periodYears = isCoastFullBridge ? graphAnalysis.bridgeYears : graphAnalysis.actualWithdrawalYears;
+                              const periodStartAge = isCoastFullBridge ? graphAnalysis.fireAge : (graphAnalysis.withdrawalStartAge !== null ? graphAnalysis.withdrawalStartAge : graphAnalysis.fireAge);
+                              const periodText = periodStartAge !== null && graphAnalysis.pensionAge > periodStartAge 
+                                ? ` (mellan ${periodStartAge}-${graphAnalysis.pensionAge} år)`
+                                : '';
+                              const avgReturnNeeded = periodYears > 0 
+                                ? (graphAnalysis.capitalNeededToGrow / periodYears).toFixed(1)
+                                : '0.0';
+                              
+                              return (
                             <div className="text-green-700 bg-green-50 p-2 rounded">
                               <p>
-                                <strong>Bra läge{graphAnalysis.fireAge !== null && graphAnalysis.pensionAge > graphAnalysis.fireAge ? ` (mellan ${graphAnalysis.fireAge}-${graphAnalysis.pensionAge} år)` : ''}:</strong> Ditt kapital behöver bara växa med {graphAnalysis.capitalNeededToGrow.toFixed(0)}% för att nå 4%-kravet, 
-                                vilket är rimligt med en genomsnittlig real avkastning på {(graphAnalysis.capitalNeededToGrow / graphAnalysis.bridgeYears).toFixed(1)}% per år.
+                                    <strong>Bra läge{periodText}:</strong> Ditt kapital behöver bara växa med {graphAnalysis.capitalNeededToGrow.toFixed(0)}% för att nå 4%-kravet, 
+                                    vilket är rimligt med en genomsnittlig real avkastning på {avgReturnNeeded}% per år.
                                 <span className="block mt-1">✅ Detta är en hållbar plan!</span>
                         </p>
                       </div>
-                    )}
-
-                          {/* Coast FIRE info */}
-                          {useCoastFire && coastFireYears[0] > 0 && effectiveFireYear !== null && (
-                            <div className="text-blue-700 bg-blue-50 p-2 rounded">
-                              <p>
-                                <strong>🌊 Coast FIRE-period ({coastFireYears[0]} år):</strong> Under de första {coastFireYears[0]} åren efter {averageAge + effectiveFireYear} år jobbar du deltid för att täcka utgifter. 
-                                Kapitalet växer utan uttag, vilket hjälper till att nå 4%-kravet.
-                                <span className="block mt-1">💡 Detta minskar risken eftersom kapitalet får växa i början av bridge-perioden.</span>
-                              </p>
-                            </div>
-                          )}
+                              );
+                            }
+                            return null;
+                          })()}
 
                           {/* Manual adjustment info */}
                           {manualFireYear !== null && dynamicFireResult.yearsToFire !== null && 
@@ -1356,10 +1532,62 @@ export default function FIREPage() {
                             }
                           }
                           if (payload.pensionReturn !== undefined && payload.pensionReturn !== 0) {
-                            // Använd genomsnittlig avkastning för marknadsbaserad pension
-                            const avgPensionReturn = (realReturns.realReturnOccPension + realReturns.realReturnPremiePension + realReturns.realReturnPrivatePension) / 3;
-                            const pensionPercent = (avgPensionReturn * 100).toFixed(1);
-                            details += `\n+ Avkastning (${pensionPercent}%): ${formatCurrency(payload.pensionReturn)}`;
+                            // Beräkna viktad avkastning baserat på faktiska värden
+                            const occPension = payload.occPension || 0;
+                            const premiePension = payload.premiePension || 0;
+                            const privatePension = payload.privatePension || 0;
+                            const totalPensionValue = occPension + premiePension + privatePension;
+                            
+                            // Om vi har separata avkastningar, visa dem separat för bättre transparens
+                            const occReturn = payload.occPensionReturn || 0;
+                            const premieReturn = payload.premiePensionReturn || 0;
+                            const privateReturn = payload.privatePensionReturn || 0;
+                            
+                            // Kolla om vi har separata avkastningar att visa
+                            const hasSeparateReturns = (occReturn !== 0 || premieReturn !== 0 || privateReturn !== 0) && 
+                                                       (occPension > 0 || premiePension > 0 || privatePension > 0);
+                            
+                            if (hasSeparateReturns) {
+                              // Visa separata avkastningar för varje pensionsdel
+                              details += `\n+ Avkastning: ${formatCurrency(payload.pensionReturn)}`;
+                              const returnParts: string[] = [];
+                              
+                              if (occPension > 0 && occReturn !== 0) {
+                                // Beräkna procent från kapitalet före avkastning och avsättningar
+                                const occContrib = payload.occPensionContrib || 0;
+                                const prevOccPension = occPension - occReturn - occContrib;
+                                const occPercent = prevOccPension > 0.01 ? ((occReturn / prevOccPension) * 100).toFixed(1) : '0.0';
+                                returnParts.push(`Tjänste: ${occPercent}%`);
+                              }
+                              
+                              if (premiePension > 0 && premieReturn !== 0) {
+                                const premieContrib = payload.premiePensionContrib || 0;
+                                const prevPremiePension = premiePension - premieReturn - premieContrib;
+                                const premiePercent = prevPremiePension > 0.01 ? ((premieReturn / prevPremiePension) * 100).toFixed(1) : '0.0';
+                                returnParts.push(`Premie: ${premiePercent}%`);
+                              }
+                              
+                              if (privatePension > 0 && privateReturn !== 0) {
+                                const privateContrib = payload.privatePensionContrib || 0;
+                                const prevPrivatePension = privatePension - privateReturn - privateContrib;
+                                const privatePercent = prevPrivatePension > 0.01 ? ((privateReturn / prevPrivatePension) * 100).toFixed(1) : '0.0';
+                                returnParts.push(`IPS: ${privatePercent}%`);
+                              }
+                              
+                              if (returnParts.length > 0) {
+                                details += `\n  (${returnParts.join(', ')})`;
+                              }
+                            } else {
+                              // Fallback: beräkna viktad avkastning om vi inte har separata värden
+                              const pensionContrib = payload.pensionContrib || 0;
+                              const prevTotalPension = totalPensionValue - payload.pensionReturn - pensionContrib;
+                              if (prevTotalPension > 0.01) {
+                                const weightedPercent = ((payload.pensionReturn / prevTotalPension) * 100).toFixed(1);
+                                details += `\n+ Avkastning (${weightedPercent}%): ${formatCurrency(payload.pensionReturn)}`;
+                              } else {
+                                details += `\n+ Avkastning: ${formatCurrency(payload.pensionReturn)}`;
+                              }
+                            }
                           }
                           if (age >= sliderPensionAge[0]) {
                             details += `\nℹ️ Slås ihop vid pension`;
@@ -2238,6 +2466,87 @@ export default function FIREPage() {
           
           {/* Kontroller - sidebar på desktop, dold på mobil */}
           <div className="space-y-6 hidden lg:block">
+            {/* Översikt över utgångskapital (startvärden) - kompakt */}
+            {(() => {
+              // Beräkna utgångsvärden från assets
+              const startAvailable = availableAtStart || 0;
+              const startOccPension = assets
+                .filter(a => a.category === 'Tjänstepension')
+                .reduce((sum, a) => sum + a.value, 0);
+              const startPremiePension = assets
+                .filter(a => a.category === 'Premiepension')
+                .reduce((sum, a) => sum + a.value, 0);
+              const startPrivatePension = assets
+                .filter(a => a.category === 'Privat pensionssparande (IPS)')
+                .reduce((sum, a) => sum + a.value, 0);
+              const startTotalPension = startOccPension + startPremiePension + startPrivatePension;
+              // Hämta statlig pension från fireResult eller dynamicFireResult
+              const isPristine = manualFireYear === null;
+              const sourceForStatePension = isPristine ? fireResult : dynamicFireResult;
+              const startStatePension = sourceForStatePension?.statePensionAtStart || 0;
+              
+              // Visa bara om det finns något kapital
+              if (startAvailable > 0 || startTotalPension > 0 || startStatePension > 0) {
+                return (
+                  <div className="bg-white rounded-lg border border-gray-200 p-3 mb-4">
+                    <p className="text-xs font-semibold mb-2 text-gray-700">
+                      Utgångskapital
+                    </p>
+                    <div className="space-y-1.5 text-xs">
+                      {/* Tillgängligt */}
+                      {startAvailable > 0 && (
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-[#C47A2C] flex-shrink-0"></div>
+                            <span className="text-gray-600">Tillgängligt</span>
+                          </div>
+                          <span className="text-gray-900 font-medium">{formatCurrency(startAvailable)}</span>
+                        </div>
+                      )}
+                      
+                      {/* Marknadsbaserad pension - visa separata delar */}
+                      {startTotalPension > 0 && (
+                        <>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-2 h-2 rounded-full bg-[#4A84C1] flex-shrink-0"></div>
+                              <span className="text-gray-600">Marknadsbaserad pension</span>
+                            </div>
+                            <span className="text-gray-900 font-medium">{formatCurrency(startTotalPension)}</span>
+                          </div>
+                          {(startOccPension > 0 || startPremiePension > 0 || startPrivatePension > 0) && (
+                            <div className="pl-3.5 space-y-0.5 text-[0.65rem] text-gray-500">
+                              {startOccPension > 0 && (
+                                <div>• Tjänste: {formatCurrency(startOccPension)}</div>
+                              )}
+                              {startPremiePension > 0 && (
+                                <div>• Premie: {formatCurrency(startPremiePension)}</div>
+                              )}
+                              {startPrivatePension > 0 && (
+                                <div>• IPS: {formatCurrency(startPrivatePension)}</div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
+                      
+                      {/* Statlig pension */}
+                      {startStatePension > 0 && (
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-[#60a5fa] flex-shrink-0"></div>
+                            <span className="text-gray-600">Statlig pension</span>
+                          </div>
+                          <span className="text-gray-900 font-medium">{formatCurrency(startStatePension)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+            
             <div>
               <h3 className="font-semibold text-gray-900 mb-4 text-base md:text-lg">Justera antaganden</h3>
               

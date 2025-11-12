@@ -1677,8 +1677,62 @@ export default function StandaloneFIREPage() {
                             details += `\n${pensionParts.join(' + ')}`;
                           }
                           if (payload.pensionReturn !== undefined && payload.pensionReturn !== 0) {
-                            const pensionPercent = (realReturns.realReturnPension * 100).toFixed(1);
-                            details += `\n+ Avkastning (${pensionPercent}%): ${formatCurrency(payload.pensionReturn)}`;
+                            // Beräkna viktad avkastning baserat på faktiska värden
+                            const occPension = payload.occPension || 0;
+                            const premiePension = payload.premiePension || 0;
+                            const privatePension = payload.privatePension || 0;
+                            const totalPensionValue = occPension + premiePension + privatePension;
+                            
+                            // Om vi har separata avkastningar, visa dem separat för bättre transparens
+                            const occReturn = payload.occPensionReturn || 0;
+                            const premieReturn = payload.premiePensionReturn || 0;
+                            const privateReturn = payload.privatePensionReturn || 0;
+                            
+                            // Kolla om vi har separata avkastningar att visa
+                            const hasSeparateReturns = (occReturn !== 0 || premieReturn !== 0 || privateReturn !== 0) && 
+                                                       (occPension > 0 || premiePension > 0 || privatePension > 0);
+                            
+                            if (hasSeparateReturns) {
+                              // Visa separata avkastningar för varje pensionsdel
+                              details += `\n+ Avkastning: ${formatCurrency(payload.pensionReturn)}`;
+                              const returnParts: string[] = [];
+                              
+                              if (occPension > 0 && occReturn !== 0) {
+                                // Beräkna procent från kapitalet före avkastning och avsättningar
+                                const occContrib = payload.occPensionContrib || 0;
+                                const prevOccPension = occPension - occReturn - occContrib;
+                                const occPercent = prevOccPension > 0.01 ? ((occReturn / prevOccPension) * 100).toFixed(1) : '0.0';
+                                returnParts.push(`Tjänste: ${occPercent}%`);
+                              }
+                              
+                              if (premiePension > 0 && premieReturn !== 0) {
+                                const premieContrib = payload.premiePensionContrib || 0;
+                                const prevPremiePension = premiePension - premieReturn - premieContrib;
+                                const premiePercent = prevPremiePension > 0.01 ? ((premieReturn / prevPremiePension) * 100).toFixed(1) : '0.0';
+                                returnParts.push(`Premie: ${premiePercent}%`);
+                              }
+                              
+                              if (privatePension > 0 && privateReturn !== 0) {
+                                const privateContrib = payload.privatePensionContrib || 0;
+                                const prevPrivatePension = privatePension - privateReturn - privateContrib;
+                                const privatePercent = prevPrivatePension > 0.01 ? ((privateReturn / prevPrivatePension) * 100).toFixed(1) : '0.0';
+                                returnParts.push(`IPS: ${privatePercent}%`);
+                              }
+                              
+                              if (returnParts.length > 0) {
+                                details += `\n  (${returnParts.join(', ')})`;
+                              }
+                            } else {
+                              // Fallback: beräkna viktad avkastning om vi inte har separata värden
+                              const pensionContrib = payload.pensionContrib || 0;
+                              const prevTotalPension = totalPensionValue - payload.pensionReturn - pensionContrib;
+                              if (prevTotalPension > 0.01) {
+                                const weightedPercent = ((payload.pensionReturn / prevTotalPension) * 100).toFixed(1);
+                                details += `\n+ Avkastning (${weightedPercent}%): ${formatCurrency(payload.pensionReturn)}`;
+                              } else {
+                                details += `\n+ Avkastning: ${formatCurrency(payload.pensionReturn)}`;
+                              }
+                            }
                           }
                           return details;
                         } else if (name === 'Statlig pension') {
