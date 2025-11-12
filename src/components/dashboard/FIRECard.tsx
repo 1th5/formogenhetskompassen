@@ -549,6 +549,14 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
                   </div>
                 )}
                 <p className="text-lg font-bold text-gray-900">{formatCurrency(fireResult.currentMonthlyExpenses)}</p>
+                {/* Varning om orimligt låga utgifter */}
+                {fireResult.currentMonthlyExpenses > 0 && fireResult.currentMonthlyExpenses < 5000 && (
+                  <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                    <p className="text-xs text-amber-800 leading-relaxed">
+                      ⚠️ <strong>Låga utgifter:</strong> Dina beräknade utgifter verkar orimligt låga. Kontrollera att allt stämmer under <button onClick={() => router.push('/household')} className="underline font-semibold text-amber-900 hover:text-amber-700">Redigera hushåll</button>.
+                    </p>
+                  </div>
+                )}
               </div>
               <div className={`bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-white/60 shadow-md hover:shadow-lg transition-shadow relative tooltip-container ${showPortfolioTooltip ? 'z-50' : ''}`}>
                 <div className="flex items-center gap-1 mb-1.5">

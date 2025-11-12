@@ -265,6 +265,57 @@ export default function FIREPage() {
     return calculateAutoReturns(assets, inflation, fallbackNominal, liabilities);
   }, [assets, dSliderInflation]);
   
+  // Beräkna dynamiska min/max-värden för sliders baserat på autoReturns
+  const sliderBounds = useMemo(() => {
+    const DEFAULT_MIN = -5;
+    const DEFAULT_MAX = 15;
+    const MARGIN = 2; // Marginal för att ge lite utrymme
+    
+    if (!autoReturns) {
+      return {
+        available: { min: DEFAULT_MIN, max: DEFAULT_MAX },
+        pension: { min: DEFAULT_MIN, max: DEFAULT_MAX },
+        occPension: { min: DEFAULT_MIN, max: DEFAULT_MAX },
+        premiePension: { min: DEFAULT_MIN, max: DEFAULT_MAX },
+        privatePension: { min: DEFAULT_MIN, max: DEFAULT_MAX }
+      };
+    }
+    
+    // Samla alla autoReturns-värden för att hitta min/max
+    const allReturns = [
+      autoReturns.nomAvailable * 100,
+      autoReturns.nomOccPension * 100,
+      autoReturns.nomPremiePension * 100,
+      autoReturns.nomPrivatePension * 100
+    ].filter(v => Number.isFinite(v));
+    
+    const globalMin = allReturns.length > 0 ? Math.min(...allReturns) : DEFAULT_MIN;
+    const globalMax = allReturns.length > 0 ? Math.max(...allReturns) : DEFAULT_MAX;
+    
+    // Beräkna bounds för varje slider med marginal
+    const calculateBounds = (value: number) => ({
+      min: Math.min(DEFAULT_MIN, Math.floor(value) - MARGIN),
+      max: Math.max(DEFAULT_MAX, Math.ceil(value) + MARGIN)
+    });
+    
+    const availableBounds = calculateBounds(autoReturns.nomAvailable * 100);
+    const occBounds = calculateBounds(autoReturns.nomOccPension * 100);
+    const premieBounds = calculateBounds(autoReturns.nomPremiePension * 100);
+    const privateBounds = calculateBounds(autoReturns.nomPrivatePension * 100);
+    
+    // För pensionstillgångar (genomsnitt), använd den bredaste bounds
+    const pensionMin = Math.min(occBounds.min, premieBounds.min, privateBounds.min);
+    const pensionMax = Math.max(occBounds.max, premieBounds.max, privateBounds.max);
+    
+    return {
+      available: availableBounds,
+      pension: { min: pensionMin, max: pensionMax },
+      occPension: occBounds,
+      premiePension: premieBounds,
+      privatePension: privateBounds
+    };
+  }, [autoReturns]);
+
   // State för separata avkastningar (kan överstyra auto)
   const [sliderReturnAvailable, setSliderReturnAvailable] = useState(() => 
     autoReturns ? [autoReturns.nomAvailable * 100] : [7]
@@ -318,6 +369,52 @@ export default function FIREPage() {
       setSliderReturnPrivatePension([basePrivate * 100]);
     }
   }, [useAutoReturns, assets, dSliderInflation, liabilities]);
+  
+  // Justera slider-värden om de är utanför bounds när bounds ändras (endast om de faktiskt är utanför)
+  useEffect(() => {
+    // Justera available slider
+    const currentAvailable = sliderReturnAvailable[0];
+    if (currentAvailable < sliderBounds.available.min || currentAvailable > sliderBounds.available.max) {
+      const clamped = Math.max(sliderBounds.available.min, Math.min(sliderBounds.available.max, currentAvailable));
+      if (clamped !== currentAvailable) {
+        setSliderReturnAvailable([clamped]);
+      }
+    }
+    
+    // Justera pension slider
+    const currentPension = sliderReturnPension[0];
+    if (currentPension < sliderBounds.pension.min || currentPension > sliderBounds.pension.max) {
+      const clamped = Math.max(sliderBounds.pension.min, Math.min(sliderBounds.pension.max, currentPension));
+      if (clamped !== currentPension) {
+        setSliderReturnPension([clamped]);
+      }
+    }
+    
+    // Justera separata pensionssliders
+    const currentOcc = sliderReturnOccPension[0];
+    if (currentOcc < sliderBounds.occPension.min || currentOcc > sliderBounds.occPension.max) {
+      const clamped = Math.max(sliderBounds.occPension.min, Math.min(sliderBounds.occPension.max, currentOcc));
+      if (clamped !== currentOcc) {
+        setSliderReturnOccPension([clamped]);
+      }
+    }
+    
+    const currentPremie = sliderReturnPremiePension[0];
+    if (currentPremie < sliderBounds.premiePension.min || currentPremie > sliderBounds.premiePension.max) {
+      const clamped = Math.max(sliderBounds.premiePension.min, Math.min(sliderBounds.premiePension.max, currentPremie));
+      if (clamped !== currentPremie) {
+        setSliderReturnPremiePension([clamped]);
+      }
+    }
+    
+    const currentPrivate = sliderReturnPrivatePension[0];
+    if (currentPrivate < sliderBounds.privatePension.min || currentPrivate > sliderBounds.privatePension.max) {
+      const clamped = Math.max(sliderBounds.privatePension.min, Math.min(sliderBounds.privatePension.max, currentPrivate));
+      if (clamped !== currentPrivate) {
+        setSliderReturnPrivatePension([clamped]);
+      }
+    }
+  }, [sliderBounds]);
   
   // Beräkna månadsvis pensionsavsättning från personer (separerat per kategori)
   const occPensionContribMonthly = useMemo(() => {
@@ -1986,8 +2083,8 @@ export default function FIREPage() {
                     <Slider
                       value={sliderReturnAvailable}
                       onValueChange={setSliderReturnAvailable}
-                      min={-5}
-                      max={15}
+                      min={sliderBounds.available.min}
+                      max={sliderBounds.available.max}
                       step={0.1}
                       className="w-full"
                       disabled={useAutoReturns}
@@ -2009,8 +2106,8 @@ export default function FIREPage() {
                     <Slider
                       value={sliderReturnPension}
                       onValueChange={setSliderReturnPension}
-                      min={-5}
-                      max={15}
+                      min={sliderBounds.pension.min}
+                      max={sliderBounds.pension.max}
                       step={0.1}
                       className="w-full"
                         disabled={true}
@@ -2041,8 +2138,8 @@ export default function FIREPage() {
                         <Slider
                           value={sliderReturnOccPension}
                           onValueChange={setSliderReturnOccPension}
-                          min={-5}
-                          max={15}
+                          min={sliderBounds.occPension.min}
+                          max={sliderBounds.occPension.max}
                           step={0.1}
                           className="w-full"
                         />
@@ -2068,8 +2165,8 @@ export default function FIREPage() {
                         <Slider
                           value={sliderReturnPremiePension}
                           onValueChange={setSliderReturnPremiePension}
-                          min={-5}
-                          max={15}
+                          min={sliderBounds.premiePension.min}
+                          max={sliderBounds.premiePension.max}
                           step={0.1}
                           className="w-full"
                         />
@@ -2095,8 +2192,8 @@ export default function FIREPage() {
                         <Slider
                           value={sliderReturnPrivatePension}
                           onValueChange={setSliderReturnPrivatePension}
-                          min={-5}
-                          max={15}
+                          min={sliderBounds.privatePension.min}
+                          max={sliderBounds.privatePension.max}
                           step={0.1}
                           className="w-full"
                         />
@@ -2286,6 +2383,14 @@ export default function FIREPage() {
                     }}
                     className="w-full bg-white"
                   />
+                  {/* Varning om orimligt låga utgifter */}
+                  {monthlyExpenses > 0 && monthlyExpenses < 5000 && (
+                    <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                      <p className="text-xs text-amber-800 leading-relaxed">
+                        ⚠️ <strong>Låga utgifter:</strong> Dina utgifter verkar orimligt låga. Kontrollera att allt stämmer under <button onClick={() => router.push('/household')} className="underline font-semibold text-amber-900 hover:text-amber-700">Redigera hushåll</button>.
+                      </p>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Månadssparande */}
@@ -2584,8 +2689,8 @@ export default function FIREPage() {
                   <Slider
                     value={sliderReturnAvailable}
                     onValueChange={setSliderReturnAvailable}
-                    min={-5}
-                    max={15}
+                    min={sliderBounds.available.min}
+                    max={sliderBounds.available.max}
                     step={0.1}
                     className="w-full"
                     disabled={useAutoReturns}
@@ -2607,8 +2712,8 @@ export default function FIREPage() {
                   <Slider
                     value={sliderReturnPension}
                     onValueChange={setSliderReturnPension}
-                    min={-5}
-                    max={15}
+                    min={sliderBounds.pension.min}
+                    max={sliderBounds.pension.max}
                     step={0.1}
                     className="w-full"
                       disabled={true}
@@ -2639,8 +2744,8 @@ export default function FIREPage() {
                       <Slider
                         value={sliderReturnOccPension}
                         onValueChange={setSliderReturnOccPension}
-                        min={-5}
-                        max={15}
+                        min={sliderBounds.occPension.min}
+                        max={sliderBounds.occPension.max}
                         step={0.1}
                         className="w-full"
                       />
@@ -2666,8 +2771,8 @@ export default function FIREPage() {
                       <Slider
                         value={sliderReturnPremiePension}
                         onValueChange={setSliderReturnPremiePension}
-                        min={-5}
-                        max={15}
+                        min={sliderBounds.premiePension.min}
+                        max={sliderBounds.premiePension.max}
                         step={0.1}
                         className="w-full"
                       />
@@ -2693,8 +2798,8 @@ export default function FIREPage() {
                       <Slider
                         value={sliderReturnPrivatePension}
                         onValueChange={setSliderReturnPrivatePension}
-                        min={-5}
-                        max={15}
+                        min={sliderBounds.privatePension.min}
+                        max={sliderBounds.privatePension.max}
                         step={0.1}
                         className="w-full"
                       />
@@ -2878,6 +2983,14 @@ export default function FIREPage() {
                   }}
                   className="w-full bg-white"
                 />
+                {/* Varning om orimligt låga utgifter */}
+                {monthlyExpenses > 0 && monthlyExpenses < 5000 && (
+                  <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                    <p className="text-xs text-amber-800 leading-relaxed">
+                      ⚠️ <strong>Låga utgifter:</strong> Dina utgifter verkar orimligt låga. Kontrollera att allt stämmer under <button onClick={() => router.push('/household')} className="underline font-semibold text-amber-900 hover:text-amber-700">Redigera hushåll</button>.
+                    </p>
+                  </div>
+                )}
               </div>
               
               {/* Månadssparande */}
