@@ -372,12 +372,15 @@ export default function StandaloneFIREPage() {
   }, [formValues.premiePensionContrib, showPensionDetails, premiePensionContrib, totalPensionContribMonthly, premiePensionPercent]);
   
   const privatePensionContribMonthly = useMemo(() => {
+    // IPS-avsättning ska vara 0 som standard (både i Quick och Avancerat läge)
+    // Användaren kan ange ett värde i Avancerat läge om de vill
     if (formValues.ipsPensionContrib > 0) return formValues.ipsPensionContrib;
     if (showPensionDetails && ipsPensionContrib) {
       return toNumber(ipsPensionContrib);
     }
-    return totalPensionContribMonthly * (ipsPensionPercent / 100);
-  }, [formValues.ipsPensionContrib, showPensionDetails, ipsPensionContrib, totalPensionContribMonthly, ipsPensionPercent]);
+    // Default: 0 (inte beräkna från procent)
+    return 0;
+  }, [formValues.ipsPensionContrib, showPensionDetails, ipsPensionContrib]);
   
   // Statlig pension - beräkning från lön
   const calculatedStatePensionContrib = useMemo(() => {
@@ -881,13 +884,13 @@ export default function StandaloneFIREPage() {
                     Vad är FIRE?
                   </h3>
                   <p className="text-sm text-primary/80 mb-3">
-                    <strong>FIRE</strong> (Financial Independence, Retire Early) är en strategi för att nå ekonomisk frihet så att du kan välja när och hur du vill arbeta. Fokus ligger på frihet och valfrihet – inte bara "tidigt pensionerad".
+                    <strong>FIRE</strong> (Financial Independence, Retire Early) är en strategi för att nå ekonomisk frihet så att du kan välja när och hur du vill arbeta. Fokus ligger på frihet och valfrihet – inte bara "tidigt pensionerad". När du når FIRE har du tillräckligt kapital för att täcka dina utgifter utan att behöva arbeta heltid.
                   </p>
                   <p className="text-sm text-primary/80 mb-3">
-                    <strong>Hur fungerar simulatorn?</strong> Den simulerar hur ditt kapital växer över tid baserat på ditt sparande, avkastning och utgifter. Den visar när du kan nå ekonomisk frihet enligt 4%-regeln (att kunna leva på 4% av ditt kapital per år) och hur kapitalet utvecklas genom både sparande och pension.
+                    <strong>Hur fungerar simulatorn?</strong> Den simulerar hur ditt kapital växer över tid baserat på ditt sparande, avkastning och utgifter. Den visar när du kan nå ekonomisk frihet enligt <strong>4%-regeln</strong> – att kunna leva på 4% av ditt kapital per år (vilket motsvarar 25 gånger dina årsutgifter). Simulatorn visar också hur kapitalet utvecklas genom både sparande och pension över din livstid.
                   </p>
                   <p className="text-sm text-primary/80 mb-3">
-                    <strong>Bridge-period:</strong> Tiden mellan ekonomisk frihet och pension kallas "bridge-period" – när ditt tillgängliga kapital (exkl. pension) används för att täcka utgifter tills pensionen börjar.
+                    <strong>Bridge-period:</strong> Tiden mellan ekonomisk frihet och pension kallas "bridge-period" – när ditt tillgängliga kapital (exkl. pension) används för att täcka utgifter tills pensionen börjar. Under denna period växer dina pensionspengar medan du använder ditt övriga kapital. Ju längre bridge-period, desto mer kapital behöver du vid FIRE.
                   </p>
                   <div className="mt-4 pt-4 border-t border-blue-300">
                     <p className="text-sm font-semibold text-primary mb-2">
@@ -900,6 +903,20 @@ export default function StandaloneFIREPage() {
                       <strong>Obs:</strong> Denna fristående kalkylator har inte stöd för Coast FIRE-simulering. Om du vill testa och simulera Coast FIRE kan du använda Förmögenhetskollen (se länk längre ner på sidan) där det finns fullt stöd för Coast FIRE med möjlighet att välja deltidsperiod och se hur det påverkar din ekonomiska frihet.
                     </p>
                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Info om Quick vs Avancerat */}
+          <Card className="mb-4 bg-gray-50 border-gray-200">
+            <CardContent className="pt-4 pb-3">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-700">
+                    <strong>Quick-läge:</strong> Fyll i grundläggande information (ålder, lön, sparande, kapital) och låt kalkylatorn beräkna resten automatiskt. Perfekt för en snabb översikt. <strong>Avancerat läge:</strong> Ange exakta värden för alla pensionshinkar och avsättningar individuellt. Byt läge med knappen nedan.
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -1689,87 +1706,204 @@ export default function StandaloneFIREPage() {
                     }`}>
                       <span className="flex items-center gap-1">
                         4%-krav: {formatCurrency(requiredAtPensionLive)}
-                        <span 
-                          className="cursor-help text-primary/60 hover:text-primary"
-                          title="Beräknat som (utgifter – statlig pension) × 25"
-                        >
-                          ℹ️
-                        </span>
+                        <InfoIcon
+                          title="4%-kravet"
+                          description="4%-kravet beräknas som: (Årsutgifter – Statlig pension) × 25\n\nDetta är det kapital du behöver vid pensionsstart för att kunna leva på 4% av kapitalet per år. Statlig pension dras av eftersom den minskar dina uttag från övrigt kapital.\n\n4%-regeln säger att du kan ta ut 4% av ditt kapital per år utan att riskera att det tar slut. Om dina årsutgifter är 240 000 kr och statlig pension ger 60 000 kr/år, behöver du (240 000 - 60 000) × 25 = 4 500 000 kr."
+                        />
                       </span>
                     </div>
                   </div>
                 </div>
                 
-                {/* Utökad information om vad det betyder */}
-                {effectiveFireYear !== null && simulation.capitalDepletedYear === null && (
-                  <div className={`mt-3 pt-3 border-t ${
-                    fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
-                      ? 'border-green-200'
-                      : 'border-orange-200'
-                  }`}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                      <div>
-                        <p className={`font-medium mb-1 ${
+                {/* Dynamisk analys av grafen */}
+                {effectiveFireYear !== null && simulation.capitalDepletedYear === null && (() => {
+                  const fireAge = averageAge + effectiveFireYear;
+                  const bridgeYears = sliderPensionAge[0] - fireAge;
+                  const fireYearData = simulation.data.find(d => d.age === fireAge);
+                  const pensionYearData = simulation.data.find(d => d.age === sliderPensionAge[0]);
+                  const annualExpenses = monthlyExpenses * 12;
+                  
+                  // Beräkna uttagsnivå vid FIRE
+                  const withdrawalRateAtFire = fireYearData && fireYearData.available > 0 && annualExpenses > 0
+                    ? (annualExpenses / fireYearData.available) * 100
+                    : null;
+                  
+                  // Beräkna kapitaltillväxt under bridge-perioden
+                  const capitalGrowthDuringBridge = fireYearData && pensionYearData && fireYearData.available > 0
+                    ? ((pensionYearData.available - fireYearData.available) / fireYearData.available) * 100
+                    : null;
+                  
+                  // Hitta lägsta kapital under bridge-perioden
+                  const bridgeData = simulation.data.filter(d => d.age >= fireAge && d.age <= sliderPensionAge[0]);
+                  const minAvailableDuringBridge = bridgeData.length > 0 
+                    ? Math.min(...bridgeData.map(d => d.available))
+                    : null;
+                  const minAvailableAge = minAvailableDuringBridge !== null
+                    ? bridgeData.find(d => d.available === minAvailableDuringBridge)?.age || null
+                    : null;
+                  
+                  // Beräkna hur mycket kapital som behöver växa
+                  const capitalNeededToGrow = portfolioAtFire < requiredAtPensionLive
+                    ? requiredAtPensionLive - portfolioAtFire
+                    : null;
+                  const growthNeededPercent = capitalNeededToGrow && portfolioAtFire > 0
+                    ? (capitalNeededToGrow / portfolioAtFire) * 100
+                    : null;
+                  
+                  // Beräkna genomsnittlig avkastning som behövs
+                  const avgReturnNeeded = growthNeededPercent && bridgeYears > 0
+                    ? (Math.pow(1 + growthNeededPercent / 100, 1 / bridgeYears) - 1) * 100
+                    : null;
+                  
+                  return (
+                    <div className={`mt-3 pt-3 border-t ${
+                      fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
+                        ? 'border-green-200'
+                        : 'border-orange-200'
+                    }`}>
+                      {/* Vad ser du i grafen just nu? */}
+                      {bridgeYears > 0 && (
+                        <div className="mb-3">
+                          <p className={`text-xs font-semibold mb-2 ${
+                            fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
+                              ? 'text-green-800'
+                              : 'text-orange-800'
+                          }`}>
+                            📊 Vad ser du i grafen just nu?
+                          </p>
+                          <div className="text-xs space-y-1.5">
+                            <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
+                              • Den <strong>blå linjen (Tillgängligt)</strong> visar ditt kapital som kan användas före pension. 
+                              Vid {fireAge} år börjar du ta ut från denna linje för att täcka utgifter.
+                            </p>
+                            {capitalGrowthDuringBridge !== null && (
+                              <p className={
+                                capitalGrowthDuringBridge > 0 
+                                  ? (fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700')
+                                  : 'text-red-700'
+                              }>
+                                • Under bridge-perioden (mellan {fireAge}-{sliderPensionAge[0]} år, {bridgeYears} år) {capitalGrowthDuringBridge > 0 ? 'växer' : 'minskar'} ditt tillgängliga kapital med {Math.abs(capitalGrowthDuringBridge).toFixed(1)}%.
+                                {capitalGrowthDuringBridge < 0 && (
+                                  <span className="font-semibold text-red-800"> ⚠️ Detta är en varning – kapitalet minskar snabbare än det växer.</span>
+                                )}
+                              </p>
+                            )}
+                            {minAvailableAge && minAvailableAge !== fireAge && minAvailableDuringBridge !== null && (
+                              <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
+                                • Kapitalet når sitt lägsta värde vid {minAvailableAge} år ({formatCurrency(minAvailableDuringBridge)}), 
+                                sedan växer det igen när uttagen minskar eller avkastningen ökar.
+                              </p>
+                            )}
+                            <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
+                              • Den <strong>gröna linjen (Marknadsbaserad pension)</strong> växer hela tiden tills den slås ihop med tillgängligt vid {sliderPensionAge[0]} år.
+                            </p>
+                            {dynamicFireResult?.statePensionAnnualIncome && dynamicFireResult.statePensionAnnualIncome > 0 && (
+                              <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
+                                • Den <strong>blå streckade linjen (Statlig pension)</strong> visar inkomstpensionen som minskar ditt behov av uttag efter {sliderPensionAge[0]} år.
+                              </p>
+                            )}
+                            <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
+                              • Den <strong>svarta linjen (Total)</strong> visar summan av allt. Den ska överskrida 4%-kravet ({formatCurrency(requiredAtPensionLive)}) vid eller före {sliderPensionAge[0]} år.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Riskvarningar och vad man ska tänka på */}
+                      {bridgeYears > 0 && (
+                        <div className={`mt-3 pt-3 border-t ${
                           fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
-                            ? 'text-green-800'
-                            : 'text-orange-800'
+                            ? 'border-green-200'
+                            : 'border-orange-200'
                         }`}>
-                          Vad betyder "Portfölj vid frihet"?
-                        </p>
-                        <p className={`${
-                          fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
-                            ? 'text-green-700'
-                            : 'text-orange-700'
-                        }`}>
-                          Detta är det tillgängliga kapitalet (exkl. pension) du behöver vid {averageAge + effectiveFireYear} år för att täcka utgifter fram till pension ({sliderPensionAge[0]} år) via uttag. 
-                          {fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] && (
-                            <span className="block mt-1">
-                              Eftersom 4%-regeln nås vid {fourPercentRuleMetYear} år kommer ditt kapital att växa tillräckligt under bridge-perioden.
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={`font-medium mb-1 ${
-                          fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
-                            ? 'text-green-800'
-                            : 'text-orange-800'
-                        }`}>
-                          Vad betyder skillnaden?
-                        </p>
-                        <p className={`${
-                          fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
-                            ? 'text-green-700'
-                            : 'text-orange-700'
-                        }`}>
-                          {portfolioAtFire < requiredAtPensionLive ? (
-                            <>
-                              Skillnaden mellan portfölj vid frihet och 4%-kravet ({formatCurrency(requiredAtPensionLive - portfolioAtFire)}) kommer att växa fram genom avkastning under bridge-perioden ({sliderPensionAge[0] - (averageAge + effectiveFireYear)} år).
-                            </>
-                          ) : (
-                            <>
-                              Din portfölj vid frihet överstiger redan 4%-kravet, vilket innebär att du kan leva på avkastningen direkt utan att behöva vänta på pension.
-                            </>
-                          )}
-                        </p>
-                      </div>
+                          <p className={`text-xs font-semibold mb-2 ${
+                            fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
+                              ? 'text-green-800'
+                              : 'text-orange-800'
+                          }`}>
+                            ⚠️ Vad ska du tänka på?
+                          </p>
+                          <div className="text-xs space-y-2">
+                            {/* Withdrawal rate varning */}
+                            {withdrawalRateAtFire !== null && (
+                              <div className={withdrawalRateAtFire > 5 ? 'text-red-700 bg-red-50 p-2 rounded' : withdrawalRateAtFire > 4 ? 'text-orange-700 bg-orange-50 p-2 rounded' : 'text-green-700'}>
+                                <p>
+                                  <strong>Uttagsnivå (mellan {fireAge}-{sliderPensionAge[0]} år):</strong> Du tar ut {withdrawalRateAtFire.toFixed(1)}% per år från ditt tillgängliga kapital.
+                                  {withdrawalRateAtFire > 5 && (
+                                    <span className="block mt-1 font-semibold">⚠️ Detta är högt! Över 5% per år ökar risken att kapitalet tar slut. Överväg att spara mer eller jobba längre.</span>
+                                  )}
+                                  {withdrawalRateAtFire > 4 && withdrawalRateAtFire <= 5 && (
+                                    <span className="block mt-1">💡 Detta är över den säkra 4%-regeln. Om marknaden går dåligt kan det bli tufft. Överväg en buffert eller högre avkastning.</span>
+                                  )}
+                                  {withdrawalRateAtFire <= 4 && (
+                                    <span className="block mt-1">✅ Detta är inom den säkra 4%-regeln. Bra!</span>
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* Capital needed to grow varning */}
+                            {capitalNeededToGrow !== null && capitalNeededToGrow > 0 && (
+                              <div className={avgReturnNeeded && avgReturnNeeded > 10 ? 'text-red-700 bg-red-50 p-2 rounded' : avgReturnNeeded && avgReturnNeeded > 7 ? 'text-orange-700 bg-orange-50 p-2 rounded' : 'text-blue-700 bg-blue-50 p-2 rounded'}>
+                                <p>
+                                  <strong>Stor tillväxt krävs (mellan {fireAge}-{sliderPensionAge[0]} år):</strong> Ditt kapital behöver växa med {growthNeededPercent?.toFixed(1)}% under bridge-perioden för att nå 4%-kravet.
+                                  {avgReturnNeeded && avgReturnNeeded > 10 && (
+                                    <span className="block mt-1 font-semibold">⚠️ Detta är mycket! Det kräver en genomsnittlig real avkastning på över {avgReturnNeeded.toFixed(1)}% per år. Överväg att spara mer.</span>
+                                  )}
+                                  {avgReturnNeeded && avgReturnNeeded > 7 && avgReturnNeeded <= 10 && (
+                                    <span className="block mt-1">💡 Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded.toFixed(1)}% per år, vilket är högt men möjligt med rätt investeringar.</span>
+                                  )}
+                                  {avgReturnNeeded && avgReturnNeeded <= 7 && (
+                                    <span className="block mt-1">✅ Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded.toFixed(1)}% per år, vilket är rimligt.</span>
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* Capital buffer */}
+                            {portfolioAtFire >= requiredAtPensionLive && (
+                              <div className="text-green-700 bg-green-50 p-2 rounded">
+                                <p>
+                                  <strong>✅ Buffert:</strong> Din portfölj vid frihet överstiger redan 4%-kravet med {formatCurrency(portfolioAtFire - requiredAtPensionLive)}. 
+                                  Detta ger dig en säkerhetsmarginal om marknaden går dåligt.
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* 4% rule timing */}
+                            {fourPercentRuleMetYear !== null && (
+                              <div className={fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700 bg-green-50 p-2 rounded' : 'text-orange-700 bg-orange-50 p-2 rounded'}>
+                                <p>
+                                  <strong>4%-regeln nås vid {fourPercentRuleMetYear} år</strong>
+                                  {fourPercentRuleMetYear < fireAge ? (
+                                    <span className="block mt-1">✅ Redan innan ekonomisk frihet! Du har en stor säkerhetsmarginal.</span>
+                                  ) : fourPercentRuleMetYear === fireAge ? (
+                                    <span className="block mt-1">✅ Exakt vid ekonomisk frihet! Perfekt timing.</span>
+                                  ) : fourPercentRuleMetYear <= sliderPensionAge[0] ? (
+                                    <span className="block mt-1">✅ Under bridge-perioden. Ditt kapital växer tillräckligt för hållbara uttag.</span>
+                                  ) : (
+                                    <span className="block mt-1">⚠️ Efter pensionsstart. Överväg att spara mer eller jobba längre.</span>
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* General tips */}
+                            <div className="text-gray-700 bg-gray-50 p-2 rounded">
+                              <p className="font-medium mb-1">💡 Allmänna tips:</p>
+                              <ul className="list-disc list-inside space-y-1">
+                                <li>Ju lägre utgifter, desto mindre kapital behöver du. Överväg att minska utgifter för att nå FIRE tidigare.</li>
+                                <li>Högre avkastning kan hjälpa, men kom ihåg att högre avkastning innebär högre risk.</li>
+                                <li>Om du kan jobba längre eller spara mer, minskar risken betydligt.</li>
+                                <li>Dessa beräkningar är baserade på antaganden – verkligheten kan avvika.</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    {effectiveFireYear !== null && sliderPensionAge[0] > averageAge + effectiveFireYear && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <p className="text-xs font-medium text-gray-700 mb-1">
-                          Bridge-period: {sliderPensionAge[0] - (averageAge + effectiveFireYear)} år
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          Tiden mellan ekonomisk frihet ({averageAge + effectiveFireYear} år) och pension ({sliderPensionAge[0]} år). 
-                          Under denna period använder du ditt tillgängliga kapital för att täcka utgifter, medan pensionstillgångarna fortsätter växa. 
-                          {fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] && (
-                            <span>Vid {fourPercentRuleMetYear} år når ditt totala kapital 4%-kravet, vilket säkerställer hållbar uttagsnivå.</span>
-                          )}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             </div>
             
@@ -1917,6 +2051,27 @@ export default function StandaloneFIREPage() {
                             // Visa resultatet
                             details += `\n${pensionParts.join(' + ')}`;
                           }
+                          
+                          // Visa avsättningar om de finns
+                          const occContrib = payload.occPensionContrib || 0;
+                          const premieContrib = payload.premiePensionContrib || 0;
+                          const privateContrib = payload.privatePensionContrib || 0;
+                          const totalContrib = occContrib + premieContrib + privateContrib;
+                          
+                          if (totalContrib > 0) {
+                            const contribParts: string[] = [];
+                            if (occContrib > 0) contribParts.push(`Tjänste: ${formatCurrency(occContrib)}`);
+                            if (premieContrib > 0) contribParts.push(`Premie: ${formatCurrency(premieContrib)}`);
+                            if (privateContrib > 0) contribParts.push(`IPS: ${formatCurrency(privateContrib)}`);
+                            
+                            if (contribParts.length > 0) {
+                              details += `\n+ Avsättning: ${formatCurrency(totalContrib)}/år`;
+                              if (contribParts.length > 1) {
+                                details += `\n  (${contribParts.join(', ')})`;
+                              }
+                            }
+                          }
+                          
                           if (payload.pensionReturn !== undefined && payload.pensionReturn !== 0) {
                             // Beräkna viktad avkastning baserat på faktiska värden
                             const occPension = payload.occPension || 0;
@@ -2270,14 +2425,15 @@ export default function StandaloneFIREPage() {
                   </div>
                 </div>
                 
-                {!showPensionDetails && (
+                {/* Quick-läge: visa en slider för alla pensionsavkastningar */}
+                {quickMode && (
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Label className="text-sm">Pensionstillgångar (nominell)</Label>
                       <InfoIcon 
                         title="Avkastning på pensionstillgångar"
-                        description="Detta är den förväntade årliga avkastningen (före inflation) på alla dina pensionssparanden - tjänstepension, premiepension och IPS.\n\nPensionssparanden har ofta lägre avkastning än övriga tillgångar eftersom de ofta är mer konservativt förvaltade. Standardvärdet är 5% nominell avkastning.\n\nDetta reglage sätter avkastningen för alla pensionssparanden samtidigt. Om du vill justera dem individuellt, expandera 'Pensionsfördelning' ovan."
+                        description="Detta är den förväntade årliga avkastningen (före inflation) på alla dina pensionssparanden - tjänstepension, premiepension och IPS.\n\nPensionssparanden har ofta lägre avkastning än övriga tillgångar eftersom de ofta är mer konservativt förvaltade. Standardvärdet är 5% nominell avkastning.\n\nDetta reglage sätter avkastningen för alla pensionssparanden samtidigt."
                       />
                     </div>
                     <span className="text-sm font-medium">
@@ -2300,6 +2456,89 @@ export default function StandaloneFIREPage() {
                   />
                   <div className="text-xs text-gray-500 mt-1">
                       Real: {(realReturns.realReturnPension * 100).toFixed(1)}% (sätter alla pensionsavkastningar)
+                  </div>
+                </div>
+                )}
+                
+                {/* Avancerat läge: visa tre separata sliders */}
+                {!quickMode && (
+                <div className="mb-4 space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm">Tjänstepension (nominell)</Label>
+                        <InfoIcon 
+                          title="Avkastning på tjänstepension"
+                          description="Detta är den förväntade årliga avkastningen (före inflation) på din tjänstepension.\n\nTjänstepension har ofta lägre avkastning än övriga tillgångar eftersom den ofta är mer konservativt förvaltad. Standardvärdet är 7% nominell avkastning."
+                        />
+                      </div>
+                      <span className="text-sm font-medium">
+                        {sliderReturnOccPension[0].toFixed(1)}%
+                      </span>
+                    </div>
+                    <Slider
+                      value={sliderReturnOccPension}
+                      onValueChange={setSliderReturnOccPension}
+                      min={-5}
+                      max={15}
+                      step={0.1}
+                      className="w-full"
+                    />
+                    <div className="text-xs text-gray-500 mt-1">
+                      Real: {(realReturns.realReturnOccPension * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm">Premiepension (nominell)</Label>
+                        <InfoIcon 
+                          title="Avkastning på premiepension"
+                          description="Detta är den förväntade årliga avkastningen (före inflation) på din premiepension.\n\nPremiepension har ofta lägre avkastning än övriga tillgångar eftersom den ofta är mer konservativt förvaltad. Standardvärdet är 5% nominell avkastning."
+                        />
+                      </div>
+                      <span className="text-sm font-medium">
+                        {sliderReturnPremiePension[0].toFixed(1)}%
+                      </span>
+                    </div>
+                    <Slider
+                      value={sliderReturnPremiePension}
+                      onValueChange={setSliderReturnPremiePension}
+                      min={-5}
+                      max={15}
+                      step={0.1}
+                      className="w-full"
+                    />
+                    <div className="text-xs text-gray-500 mt-1">
+                      Real: {(realReturns.realReturnPremiePension * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm">IPS (nominell)</Label>
+                        <InfoIcon 
+                          title="Avkastning på IPS"
+                          description="Detta är den förväntade årliga avkastningen (före inflation) på ditt IPS (Individuellt Pensionssparande).\n\nIPS kan ha samma avkastning som övriga tillgångar eftersom du själv väljer hur det ska investeras. Standardvärdet är 7% nominell avkastning."
+                        />
+                      </div>
+                      <span className="text-sm font-medium">
+                        {sliderReturnIpsPension[0].toFixed(1)}%
+                      </span>
+                    </div>
+                    <Slider
+                      value={sliderReturnIpsPension}
+                      onValueChange={setSliderReturnIpsPension}
+                      min={-5}
+                      max={15}
+                      step={0.1}
+                      className="w-full"
+                    />
+                    <div className="text-xs text-gray-500 mt-1">
+                      Real: {(realReturns.realReturnPrivatePension * 100).toFixed(1)}%
+                    </div>
                   </div>
                 </div>
                 )}
@@ -2331,7 +2570,7 @@ export default function StandaloneFIREPage() {
                       <Label className="text-sm">Pensionsstartålder</Label>
                       <InfoIcon 
                         title="Pensionsstartålder"
-                        description="Detta är åldern när du planerar att börja ta ut din statliga pension och marknadsbaserade pensioner.\n\nBridge-perioden är tiden mellan när du når ekonomisk frihet (FIRE) och när pensionen börjar. Ju längre bridge-period, desto mer kapital behöver du vid FIRE för att täcka utgifterna.\n\nStandardvärdet är 63 år, vilket är den tidigaste åldern du kan ta ut statlig pension i Sverige. Du kan öka detta om du planerar att jobba längre."
+                        description="Detta är åldern när du planerar att börja ta ut din statliga pension och marknadsbaserade pensioner.\n\nBridge-perioden är tiden mellan när du når ekonomisk frihet (FIRE) och när pensionen börjar. Ju längre bridge-period, desto mer kapital behöver du vid FIRE för att täcka utgifterna.\n\nStandardvärdet är 63 år (om du är under 63) eller 67 år (om du är 63 eller äldre), vilket är den tidigaste åldern du kan ta ut statlig pension i Sverige. Du kan öka detta om du planerar att jobba längre.\n\nTjänstepension och IPS kan tas ut tidigare (från 55 år) via sliders längre ner."
                       />
                     </div>
                     <span className="text-sm font-medium">{sliderPensionAge[0]} år</span>
@@ -2344,54 +2583,6 @@ export default function StandaloneFIREPage() {
                     step={1}
                     className="w-full"
                   />
-                </div>
-                
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Label className="text-sm">Månadssparande</Label>
-                      <InfoIcon 
-                        title="Månadssparande"
-                        description="Detta är det totala beloppet du sparar varje månad, inklusive amorteringar på lån.\n\nJu mer du sparar, desto snabbare når du ekonomisk frihet. Varje krona du sparar växer med avkastning över tid och hjälper dig att nå ditt mål tidigare.\n\nExempel: Om du sparar 10 000 kr/mån istället för 5 000 kr/mån, kan du nå FIRE flera år tidigare."
-                      />
-                    </div>
-                    <span className="text-sm font-medium">{formatCurrency(sliderMonthlySavings[0])}</span>
-                  </div>
-                  <Slider
-                    value={sliderMonthlySavings}
-                    onValueChange={setSliderMonthlySavings}
-                    min={0}
-                    max={monthlySavingsMax}
-                    step={500}
-                    className="w-full"
-                  />
-                  <div className="mt-2">
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      value={sliderMonthlySavings[0] === 0 ? '' : Math.floor(sliderMonthlySavings[0]).toString()}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === '') {
-                          setSliderMonthlySavings([0]);
-                        } else {
-                          const num = parseInt(val.replace(/[^\d]/g, ''), 10);
-                          if (!isNaN(num) && num >= 0) {
-                            const clamped = Math.min(num, INPUT_MAX);
-                            if (clamped > monthlySavingsMax && clamped <= INPUT_MAX) {
-                              // Would need to update monthlySavingsMax here if we had it as state
-                            }
-                            setSliderMonthlySavings([clamped]);
-                          }
-                        }
-                      }}
-                      className="w-full bg-white"
-                    />
-                    <p className="text-[11px] text-primary/60 mt-1">
-                      Tillåtet intervall: 0 – {formatCurrency(INPUT_MAX)}/mån
-                    </p>
-                  </div>
                 </div>
                 
                 {/* Pensionsavsättning/mån */}
@@ -2577,14 +2768,15 @@ export default function StandaloneFIREPage() {
                 </div>
               </div>
               
-              {!showPensionDetails && (
+              {/* Quick-läge: visa en slider för alla pensionsavkastningar */}
+              {quickMode && (
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Label className="text-sm">Pensionstillgångar (nominell)</Label>
                     <InfoIcon 
                       title="Avkastning på pensionstillgångar"
-                      description="Detta är den förväntade årliga avkastningen (före inflation) på alla dina pensionssparanden - tjänstepension, premiepension och IPS.\n\nPensionssparanden har ofta lägre avkastning än övriga tillgångar eftersom de ofta är mer konservativt förvaltade. Standardvärdet är 5% nominell avkastning.\n\nDetta reglage sätter avkastningen för alla pensionssparanden samtidigt. Om du vill justera dem individuellt, expandera 'Pensionsfördelning' ovan."
+                      description="Detta är den förväntade årliga avkastningen (före inflation) på alla dina pensionssparanden - tjänstepension, premiepension och IPS.\n\nPensionssparanden har ofta lägre avkastning än övriga tillgångar eftersom de ofta är mer konservativt förvaltade. Standardvärdet är 5% nominell avkastning.\n\nDetta reglage sätter avkastningen för alla pensionssparanden samtidigt."
                     />
                   </div>
                   <span className="text-sm font-medium">
@@ -2607,6 +2799,89 @@ export default function StandaloneFIREPage() {
                 />
                 <div className="text-xs text-gray-500 mt-1">
                     Real: {(realReturns.realReturnPension * 100).toFixed(1)}% (sätter alla pensionsavkastningar)
+                </div>
+              </div>
+              )}
+              
+              {/* Avancerat läge: visa tre separata sliders */}
+              {!quickMode && (
+              <div className="mb-4 space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm">Tjänstepension (nominell)</Label>
+                      <InfoIcon 
+                        title="Avkastning på tjänstepension"
+                        description="Detta är den förväntade årliga avkastningen (före inflation) på din tjänstepension.\n\nTjänstepension har ofta lägre avkastning än övriga tillgångar eftersom den ofta är mer konservativt förvaltad. Standardvärdet är 7% nominell avkastning."
+                      />
+                    </div>
+                    <span className="text-sm font-medium">
+                      {sliderReturnOccPension[0].toFixed(1)}%
+                    </span>
+                  </div>
+                  <Slider
+                    value={sliderReturnOccPension}
+                    onValueChange={setSliderReturnOccPension}
+                    min={-5}
+                    max={15}
+                    step={0.1}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-gray-500 mt-1">
+                    Real: {(realReturns.realReturnOccPension * 100).toFixed(1)}%
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm">Premiepension (nominell)</Label>
+                      <InfoIcon 
+                        title="Avkastning på premiepension"
+                        description="Detta är den förväntade årliga avkastningen (före inflation) på din premiepension.\n\nPremiepension har ofta lägre avkastning än övriga tillgångar eftersom den ofta är mer konservativt förvaltad. Standardvärdet är 5% nominell avkastning."
+                      />
+                    </div>
+                    <span className="text-sm font-medium">
+                      {sliderReturnPremiePension[0].toFixed(1)}%
+                    </span>
+                  </div>
+                  <Slider
+                    value={sliderReturnPremiePension}
+                    onValueChange={setSliderReturnPremiePension}
+                    min={-5}
+                    max={15}
+                    step={0.1}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-gray-500 mt-1">
+                    Real: {(realReturns.realReturnPremiePension * 100).toFixed(1)}%
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm">IPS (nominell)</Label>
+                      <InfoIcon 
+                        title="Avkastning på IPS"
+                        description="Detta är den förväntade årliga avkastningen (före inflation) på ditt IPS (Individuellt Pensionssparande).\n\nIPS kan ha samma avkastning som övriga tillgångar eftersom du själv väljer hur det ska investeras. Standardvärdet är 7% nominell avkastning."
+                      />
+                    </div>
+                    <span className="text-sm font-medium">
+                      {sliderReturnIpsPension[0].toFixed(1)}%
+                    </span>
+                  </div>
+                  <Slider
+                    value={sliderReturnIpsPension}
+                    onValueChange={setSliderReturnIpsPension}
+                    min={-5}
+                    max={15}
+                    step={0.1}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-gray-500 mt-1">
+                    Real: {(realReturns.realReturnPrivatePension * 100).toFixed(1)}%
+                  </div>
                 </div>
               </div>
               )}
@@ -2638,7 +2913,7 @@ export default function StandaloneFIREPage() {
                       <Label className="text-sm">Pensionsstartålder</Label>
                       <InfoIcon 
                         title="Pensionsstartålder"
-                        description="Detta är åldern när du planerar att börja ta ut din statliga pension och marknadsbaserade pensioner.\n\nBridge-perioden är tiden mellan när du når ekonomisk frihet (FIRE) och när pensionen börjar. Ju längre bridge-period, desto mer kapital behöver du vid FIRE för att täcka utgifterna.\n\nStandardvärdet är 63 år, vilket är den tidigaste åldern du kan ta ut statlig pension i Sverige. Du kan öka detta om du planerar att jobba längre."
+                        description="Detta är åldern när du planerar att börja ta ut din statliga pension och marknadsbaserade pensioner.\n\nBridge-perioden är tiden mellan när du når ekonomisk frihet (FIRE) och när pensionen börjar. Ju längre bridge-period, desto mer kapital behöver du vid FIRE för att täcka utgifterna.\n\nStandardvärdet är 63 år (om du är under 63) eller 67 år (om du är 63 eller äldre), vilket är den tidigaste åldern du kan ta ut statlig pension i Sverige. Du kan öka detta om du planerar att jobba längre.\n\nTjänstepension och IPS kan tas ut tidigare (från 55 år) via sliders längre ner."
                       />
                     </div>
                     <span className="text-sm font-medium">{sliderPensionAge[0]} år</span>
@@ -2652,51 +2927,6 @@ export default function StandaloneFIREPage() {
                     className="w-full"
                   />
                 </div>
-              
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Label className="text-sm">Månadssparande</Label>
-                    <InfoIcon 
-                      title="Månadssparande"
-                      description="Detta är det totala beloppet du sparar varje månad, inklusive amorteringar på lån.\n\nJu mer du sparar, desto snabbare når du ekonomisk frihet. Varje krona du sparar växer med avkastning över tid och hjälper dig att nå ditt mål tidigare.\n\nExempel: Om du sparar 10 000 kr/mån istället för 5 000 kr/mån, kan du nå FIRE flera år tidigare."
-                    />
-                  </div>
-                  <span className="text-sm font-medium">{formatCurrency(sliderMonthlySavings[0])}</span>
-                </div>
-                <Slider
-                  value={sliderMonthlySavings}
-                  onValueChange={setSliderMonthlySavings}
-                  min={0}
-                  max={monthlySavingsMax}
-                  step={500}
-                  className="w-full"
-                />
-                  <div className="mt-2">
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      value={sliderMonthlySavings[0] === 0 ? '' : Math.floor(sliderMonthlySavings[0]).toString()}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === '') {
-                          setSliderMonthlySavings([0]);
-                        } else {
-                          const num = parseInt(val.replace(/[^\d]/g, ''), 10);
-                          if (!isNaN(num) && num >= 0) {
-                            const clamped = Math.min(num, INPUT_MAX);
-                            setSliderMonthlySavings([clamped]);
-                          }
-                        }
-                      }}
-                      className="w-full bg-white"
-                    />
-                  <p className="text-[11px] text-primary/60 mt-1">
-                    Tillåtet intervall: 0 – {formatCurrency(INPUT_MAX)}/mån
-                  </p>
-                </div>
-              </div>
               
               {/* Pensionsavsättning/mån */}
               <div className="mb-6 p-3 bg-green-50 rounded-lg border border-green-200">

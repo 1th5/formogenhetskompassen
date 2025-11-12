@@ -138,8 +138,8 @@ export function QuickForm({ data, onChange, onOpenAdvanced }: QuickFormProps) {
         <div className="flex items-center gap-2 mb-2">
           <Label htmlFor="quick-gross-salary" className="text-sm">Bruttolön/mån</Label>
           <InfoIcon
-            title="Bruttolön"
-            description="Din månadslön före skatt. Används för att beräkna nettolön och pensionsavsättningar automatiskt."
+            title="Bruttolön per månad"
+            description="Din månadslön före skatt (före avdrag för skatt och sociala avgifter).\n\nDetta värde används för att:\n• Beräkna din nettolön (efter skatt)\n• Beräkna pensionsavsättningar automatiskt (tjänstepension, premiepension, statlig pension)\n• Beräkna dina månadsutgifter (nettolön - sparande)\n\nOm du inte vet din exakta bruttolön kan du uppskatta den eller hoppa över detta fält och ange utgifter manuellt i avancerat läge."
           />
         </div>
         <NumberInput
@@ -165,7 +165,7 @@ export function QuickForm({ data, onChange, onOpenAdvanced }: QuickFormProps) {
           <Label htmlFor="quick-savings" className="text-sm">Sparande/mån (total, inkl. amorteringar)</Label>
           <InfoIcon
             title="Sparande per månad"
-            description="Totalt sparande per månad, inklusive amorteringar på lån. Detta är beloppet som går till investeringar och skuldbetalningar."
+            description="Totalt sparande per månad, inklusive:\n• Direkta investeringar (fonder, aktier, sparkonton)\n• Amorteringar på lån (bostadslån, etc.)\n• Övriga skuldbetalningar som bygger kapital\n\nJu mer du sparar, desto snabbare växer ditt kapital och desto tidigare kan du nå ekonomisk frihet. Varje krona du sparar växer med avkastning över tid.\n\nExempel: Om du sparar 10 000 kr/mån istället för 5 000 kr/mån, kan du nå FIRE flera år tidigare."
           />
         </div>
         <NumberInput
@@ -185,8 +185,8 @@ export function QuickForm({ data, onChange, onOpenAdvanced }: QuickFormProps) {
         <div className="flex items-center gap-2 mb-2">
           <Label className="text-sm">Utgifter/mån (beräknat)</Label>
           <InfoIcon
-            title="Utgifter per månad"
-            description="Beräknas automatiskt som: Nettolön - Sparande. Detta är beloppet du behöver täcka efter ekonomisk frihet. I avancerat läge kan du redigera detta värde manuellt."
+            title="Utgifter per månad (beräknat)"
+            description="Beräknas automatiskt som: Nettolön - Sparande\n\nDetta är beloppet du behöver täcka varje månad efter ekonomisk frihet. Enligt 4%-regeln behöver du 25 gånger dina årsutgifter i kapital för att nå FIRE.\n\nExempel: Om dina utgifter är 20 000 kr/mån (240 000 kr/år), behöver du 6 miljoner kr för att nå FIRE.\n\nJu lägre dina utgifter, desto mindre kapital behöver du. Detta är en av de viktigaste faktorerna för att nå ekonomisk frihet tidigt.\n\nI avancerat läge kan du redigera detta värde manuellt om beräkningen inte stämmer med din verkliga situation."
           />
         </div>
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
@@ -211,8 +211,8 @@ export function QuickForm({ data, onChange, onOpenAdvanced }: QuickFormProps) {
         <div className="flex items-center gap-2 mb-2">
           <Label htmlFor="quick-available-capital" className="text-sm">Tillgängligt kapital idag</Label>
           <InfoIcon
-            title="Tillgängligt kapital"
-            description="Fonder, aktier, sparkonton, etc. som du kan använda för FIRE."
+            title="Tillgängligt kapital idag"
+            description="Ditt nuvarande kapital som du kan använda för FIRE, inklusive:\n• Fonder och aktier\n• Sparkonton\n• Övriga investeringar\n• Likvida tillgångar\n\nDetta är kapitalet som växer med avkastning och som du kan ta ut från när du når ekonomisk frihet. Pensionskapital räknas separat eftersom det är låst tills pensionsstart.\n\nJu mer tillgängligt kapital du har idag, desto tidigare kan du nå FIRE, eftersom kapitalet har mer tid att växa."
           />
         </div>
         <NumberInput
@@ -232,8 +232,8 @@ export function QuickForm({ data, onChange, onOpenAdvanced }: QuickFormProps) {
         <div className="flex items-center gap-2 mb-2">
           <Label htmlFor="quick-pension-capital" className="text-sm">Pensionskapital (låst) totalt</Label>
           <InfoIcon
-            title="Pensionskapital"
-            description="Totalt pensionskapital som är låst tills pensionsstart. Fördelas automatiskt enligt 65% Tjänstepension, 20% Premiepension, 10% IPS, 5% Statlig pension (grundbelopp). Statlig pensionsavsättning beräknas även från lön."
+            title="Pensionskapital (låst) totalt"
+            description="Totalt pensionskapital som är låst tills pensionsstart.\n\nDetta fördelas automatiskt enligt:\n• 60% Tjänstepension\n• 20% Premiepension\n• 10% IPS (Individuellt Pensionssparande)\n• 10% Statlig pension (grundbelopp för inkomstpension)\n\nStatlig pensionsavsättning beräknas även automatiskt från din bruttolön.\n\nPensionskapitalet växer med avkastning över tid men kan inte användas förrän vid pensionsstart (eller tidigare uttag från 55 år för tjänstepension och IPS). I avancerat läge kan du justera fördelningen och ange exakta värden."
           />
         </div>
         <NumberInput

@@ -120,10 +120,10 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
         <h4 className="text-sm font-semibold text-primary mb-3">Tillgängligt kapital idag</h4>
         <div className="flex items-center gap-2 mb-2">
           <Label htmlFor="advanced-available" className="text-sm">Tillgängligt kapital (kr)</Label>
-          <InfoIcon
-            title="Tillgängligt kapital"
-            description="Fonder, aktier, sparkonton, etc. som du kan använda för FIRE."
-          />
+              <InfoIcon
+                title="Tillgängligt kapital idag"
+                description="Ditt nuvarande kapital som du kan använda för FIRE, inklusive:\n• Fonder och aktier\n• Sparkonton\n• Övriga investeringar\n• Likvida tillgångar\n\nDetta är kapitalet som växer med avkastning och som du kan ta ut från när du når ekonomisk frihet. Pensionskapital räknas separat eftersom det är låst tills pensionsstart.\n\nJu mer tillgängligt kapital du har idag, desto tidigare kan du nå FIRE, eftersom kapitalet har mer tid att växa."
+              />
         </div>
         <NumberInput
           id="advanced-available"
@@ -146,7 +146,7 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
               <Label htmlFor="advanced-occ-capital" className="text-sm">Tjänstepension (kr)</Label>
               <InfoIcon
                 title="Tjänstepension kapital"
-                description="Ditt nuvarande kapital i tjänstepension."
+                description="Ditt nuvarande kapital i tjänstepension (arbetsgivarens pensionsförsäkring, t.ex. ITP1, ITP2, KPA, etc.).\n\nTjänstepension kan ofta tas ut från 55 år, vilket gör den användbar för bridge-perioden innan statlig pension börjar. Om du tar ut tidigt flyttas kapitalet till dina tillgängliga tillgångar.\n\nKapitalet växer med avkastning över tid. Du kan justera avkastningen separat i sliders längre ner på sidan."
               />
             </div>
             <NumberInput
@@ -165,7 +165,7 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
               <Label htmlFor="advanced-premie-capital" className="text-sm">Premiepension (kr)</Label>
               <InfoIcon
                 title="Premiepension kapital"
-                description="Ditt nuvarande kapital i premiepension."
+                description="Ditt nuvarande kapital i premiepension (den del av allmän pension som du själv kan välja fonder för).\n\nPremiepensionen kan tas ut från 55 år men är normalt låst tills statlig pensionsålder. Den växer med avkastning över tid baserat på dina fondval.\n\nDu kan justera avkastningen separat i sliders längre ner på sidan."
               />
             </div>
             <NumberInput
@@ -184,7 +184,7 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
               <Label htmlFor="advanced-ips-capital" className="text-sm">IPS (kr)</Label>
               <InfoIcon
                 title="IPS kapital"
-                description="Ditt nuvarande kapital i IPS (Individuellt Pensionssparande)."
+                description="Ditt nuvarande kapital i IPS (Individuellt Pensionssparande).\n\nIPS är ett frivilligt pensionssparande där du själv väljer hur det ska investeras. Det kan tas ut från 55 år, vilket gör det användbart för bridge-perioden innan statlig pension börjar.\n\nOm du tar ut tidigt flyttas kapitalet till dina tillgängliga tillgångar. Du kan justera avkastningen separat i sliders längre ner på sidan."
               />
             </div>
             <NumberInput
@@ -222,8 +222,8 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
             <div className="flex items-center gap-2 mb-2">
               <Label htmlFor="advanced-occ-contrib" className="text-sm">Tjänstepension/mån (kr)</Label>
               <InfoIcon
-                title="Tjänstepension avsättning"
-                description="Belopp per månad som arbetsgivare/allmän pension sätter av. Kan anges manuellt om du vet exakt."
+                title="Tjänstepension avsättning per månad"
+                description="Belopp per månad som arbetsgivaren sätter av till din tjänstepension.\n\nDetta beror på ditt pensionsavtal (t.ex. ITP1, ITP2, KPA). Vanligtvis är det cirka 4,5% av lönen upp till 7,5 IBB (inkomstbasbelopp) plus 30% över taket.\n\nOm du vet ditt exakta belopp kan du ange det här. Annars kan du använda Quick-läget där det beräknas automatiskt från din bruttolön."
               />
             </div>
             <NumberInput
@@ -245,8 +245,8 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
             <div className="flex items-center gap-2 mb-2">
               <Label htmlFor="advanced-premie-contrib" className="text-sm">Premiepension/mån (kr)</Label>
               <InfoIcon
-                title="Premiepension avsättning"
-                description="Belopp per månad som allmän pension sätter av. Kan anges manuellt om du vet exakt."
+                title="Premiepension avsättning per månad"
+                description="Belopp per månad som allmän pension sätter av till din premiepension.\n\nDetta är normalt cirka 2,5% av din PGI (pensionsgrundande inkomst, ungefär 93% av din lön).\n\nOm du vet ditt exakta belopp kan du ange det här. Annars kan du använda Quick-läget där det beräknas automatiskt från din bruttolön."
               />
             </div>
             <NumberInput
@@ -268,8 +268,8 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
             <div className="flex items-center gap-2 mb-2">
               <Label htmlFor="advanced-ips-contrib" className="text-sm">IPS/mån (kr)</Label>
               <InfoIcon
-                title="IPS avsättning"
-                description="Belopp per månad som du sparar i IPS. Kan anges manuellt om du vet exakt."
+                title="IPS avsättning per månad"
+                description="Belopp per månad som du själv sparar i IPS (Individuellt Pensionssparande).\n\nIPS är frivilligt och standardvärdet är 0 kr/mån. Om du sparar i IPS kan du ange beloppet här.\n\nIPS kan tas ut från 55 år, vilket gör det användbart för bridge-perioden innan statlig pension börjar."
               />
             </div>
             <NumberInput
@@ -313,7 +313,7 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
               <Label htmlFor="advanced-state-capital" className="text-sm">Statlig pension kapital (kr)</Label>
               <InfoIcon
                 title="Statlig pension kapital"
-                description="Ditt nuvarande kapital i statlig pension (inkomstpension)."
+                description="Ditt nuvarande kapital i statlig inkomstpension (grundbelopp).\n\nStatlig pension byggs upp genom avsättningar från din lön (cirka 18,5% av din PGI). Detta kapital växer med cirka 3% nominell avkastning per år.\n\nFrån pensionsstart betalas statlig pension ut som en månadsinkomst som minskar dina uttag från övrigt kapital. Du kan justera utbetalningsperioden i sliders längre ner på sidan."
               />
             </div>
             <NumberInput
@@ -331,8 +331,8 @@ export function AdvancedForm({ data, onChange }: AdvancedFormProps) {
             <div className="flex items-center gap-2 mb-2">
               <Label htmlFor="advanced-state-contrib" className="text-sm">Statlig pension/mån (kr)</Label>
               <InfoIcon
-                title="Statlig pension avsättning"
-                description="Belopp per månad som allmän pension sätter av. Kan anges manuellt om du vet exakt."
+                title="Statlig pension avsättning per månad"
+                description="Belopp per månad som allmän pension sätter av till din statliga inkomstpension.\n\nDetta är normalt cirka 18,5% av din PGI (pensionsgrundande inkomst, ungefär 93% av din lön).\n\nOm du vet ditt exakta belopp kan du ange det här. Annars kan du använda Quick-läget där det beräknas automatiskt från din bruttolön."
               />
             </div>
             <NumberInput
