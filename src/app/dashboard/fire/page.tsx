@@ -1401,10 +1401,10 @@ export default function FIREPage() {
                                   <strong>Uttagsnivå{withdrawalPeriodText}:</strong> Du tar ut {withdrawalRate.toFixed(1)}% per år från ditt tillgängliga kapital{graphAnalysis.coastYears > 0 ? ` efter Coast FIRE-perioden` : ''}.
                                   {withdrawalRate > 5 && (
                                     <span className="block mt-1 font-semibold">⚠️ Detta är högt! Över 5% per år ökar risken att kapitalet tar slut. Överväg att spara mer, jobba längre, eller öka Coast FIRE-perioden.</span>
-                                  )}
+                              )}
                                   {withdrawalRate > 4 && withdrawalRate <= 5 && (
                                     <span className="block mt-1">💡 Detta är över den säkra 4%-regeln. Om marknaden går dåligt kan det bli tufft. Överväg en buffert eller längre Coast FIRE-period.</span>
-                                  )}
+                                )}
                                   {withdrawalRate <= 4 && (
                                   <span className="block mt-1">✅ Detta är inom den säkra 4%-regeln. Bra!</span>
                           )}
@@ -2400,7 +2400,7 @@ export default function FIREPage() {
                 )}
                 
                 {/* Tidig uttagsålder för IPS */}
-                {privatePensionContribMonthly > 0 && (
+                {(privatePensionContribMonthly > 0 || (assets && assets.filter(a => a.category === 'Privat pensionssparande (IPS)').reduce((sum, a) => sum + a.value, 0) > 0)) && (
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -3006,7 +3006,7 @@ export default function FIREPage() {
               )}
               
               {/* Tidig uttagsålder för IPS */}
-              {privatePensionContribMonthly > 0 && (
+              {(privatePensionContribMonthly > 0 || (assets && assets.filter(a => a.category === 'Privat pensionssparande (IPS)').reduce((sum, a) => sum + a.value, 0) > 0)) && (
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">

@@ -25,6 +25,7 @@ import FIRECard from '@/components/dashboard/FIRECard';
 import CurrentLevelInsight from '@/components/dashboard/CurrentLevelInsight';
 import { TrendingUp, Wallet, Gauge, ArrowUpRight, Sparkles, Zap, Coins, CircleDollarSign, Landmark, Calculator, ExternalLink, ArrowDown, ArrowUp, ChevronDown, BookOpen, Target, BarChart3, TrendingDown, AlertTriangle } from 'lucide-react';
 import SavingsCard from '@/components/dashboard/SavingsCard';
+import PensionOverviewCard from '@/components/dashboard/PensionOverviewCard';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -1392,6 +1393,15 @@ export default function DashboardPage() {
             liabilities={effectiveIsLevelZero ? [] : (draftHousehold?.liabilities || [])}
             persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
             totalNetWorth={displayNetWorth}
+            isLocked={effectiveIsLevelZero}
+          />
+        </div>
+        
+        {/* Pensionstillgångar kort */}
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <PensionOverviewCard
+            assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
+            persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
             isLocked={effectiveIsLevelZero}
           />
         </div>

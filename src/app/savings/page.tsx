@@ -46,6 +46,11 @@ interface SavingsPlan {
   };
 }
 
+// Konvertera årlig avkastning till månatlig (geometrisk)
+function annualToMonthlyRate(annualRate: number): number {
+  return Math.pow(1 + annualRate, 1/12) - 1;
+}
+
 // Beräkna ränta-på-ränta effekt med stöd för "vad händer om"-scenarier
 function calculateCompoundInterest(
   monthlyContribution: number,
@@ -54,7 +59,7 @@ function calculateCompoundInterest(
   initialAmount: number = 0,
   whatIf?: { increaseAfterYears: number; increaseAmount: number }
 ): CompoundInterestResult {
-  const monthlyReturn = annualReturn / 12;
+  const monthlyReturn = annualToMonthlyRate(annualReturn);
   const months = years * 12;
   let currentAmount = initialAmount;
   const yearByYear: CompoundInterestResult['yearByYear'] = [];

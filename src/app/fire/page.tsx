@@ -1756,19 +1756,19 @@ export default function StandaloneFIREPage() {
                     : null;
                   
                   return (
-                    <div className={`mt-3 pt-3 border-t ${
-                      fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
-                        ? 'border-green-200'
-                        : 'border-orange-200'
-                    }`}>
+                  <div className={`mt-3 pt-3 border-t ${
+                    fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
+                      ? 'border-green-200'
+                      : 'border-orange-200'
+                  }`}>
                       {/* Vad ser du i grafen just nu? */}
                       {bridgeYears > 0 && (
                         <div className="mb-3">
                           <p className={`text-xs font-semibold mb-2 ${
-                            fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
-                              ? 'text-green-800'
-                              : 'text-orange-800'
-                          }`}>
+                          fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
+                            ? 'text-green-800'
+                            : 'text-orange-800'
+                        }`}>
                             📊 Vad ser du i grafen just nu?
                           </p>
                           <div className="text-xs space-y-1.5">
@@ -1804,8 +1804,8 @@ export default function StandaloneFIREPage() {
                             )}
                             <p className={fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0] ? 'text-green-700' : 'text-orange-700'}>
                               • Den <strong>svarta linjen (Total)</strong> visar summan av allt. Den ska överskrida 4%-kravet ({formatCurrency(requiredAtPensionLive)}) vid eller före {sliderPensionAge[0]} år.
-                            </p>
-                          </div>
+                        </p>
+                      </div>
                         </div>
                       )}
                       
@@ -1817,12 +1817,12 @@ export default function StandaloneFIREPage() {
                             : 'border-orange-200'
                         }`}>
                           <p className={`text-xs font-semibold mb-2 ${
-                            fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
-                              ? 'text-green-800'
-                              : 'text-orange-800'
-                          }`}>
+                          fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
+                            ? 'text-green-800'
+                            : 'text-orange-800'
+                        }`}>
                             ⚠️ Vad ska du tänka på?
-                          </p>
+                        </p>
                           <div className="text-xs space-y-2">
                             {/* Withdrawal rate varning */}
                             {withdrawalRateAtFire !== null && (
@@ -1837,9 +1837,9 @@ export default function StandaloneFIREPage() {
                                   )}
                                   {withdrawalRateAtFire <= 4 && (
                                     <span className="block mt-1">✅ Detta är inom den säkra 4%-regeln. Bra!</span>
-                                  )}
-                                </p>
-                              </div>
+                          )}
+                        </p>
+                      </div>
                             )}
                             
                             {/* Capital needed to grow varning */}
@@ -1857,7 +1857,7 @@ export default function StandaloneFIREPage() {
                                     <span className="block mt-1">✅ Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded.toFixed(1)}% per år, vilket är rimligt.</span>
                                   )}
                                 </p>
-                              </div>
+                    </div>
                             )}
                             
                             {/* Capital buffer */}
@@ -1866,7 +1866,7 @@ export default function StandaloneFIREPage() {
                                 <p>
                                   <strong>✅ Buffert:</strong> Din portfölj vid frihet överstiger redan 4%-kravet med {formatCurrency(portfolioAtFire - requiredAtPensionLive)}. 
                                   Detta ger dig en säkerhetsmarginal om marknaden går dåligt.
-                                </p>
+                        </p>
                               </div>
                             )}
                             
@@ -1883,10 +1883,10 @@ export default function StandaloneFIREPage() {
                                     <span className="block mt-1">✅ Under bridge-perioden. Ditt kapital växer tillräckligt för hållbara uttag.</span>
                                   ) : (
                                     <span className="block mt-1">⚠️ Efter pensionsstart. Överväg att spara mer eller jobba längre.</span>
-                                  )}
-                                </p>
-                              </div>
-                            )}
+                          )}
+                        </p>
+                      </div>
+                    )}
                             
                             {/* General tips */}
                             <div className="text-gray-700 bg-gray-50 p-2 rounded">
@@ -1899,8 +1899,8 @@ export default function StandaloneFIREPage() {
                               </ul>
                             </div>
                           </div>
-                        </div>
-                      )}
+                  </div>
+                )}
                     </div>
                   );
                 })()}
@@ -2118,7 +2118,7 @@ export default function StandaloneFIREPage() {
                               if (returnParts.length > 0) {
                                 details += `\n  (${returnParts.join(', ')})`;
                               }
-                            } else {
+                          } else {
                               // Fallback: beräkna viktad avkastning om vi inte har separata värden
                               const pensionContrib = payload.pensionContrib || 0;
                               const prevTotalPension = totalPensionValue - payload.pensionReturn - pensionContrib;
@@ -2158,7 +2158,7 @@ export default function StandaloneFIREPage() {
                             let details = `${formatCurrency(annualIncome)}/år`;
                             details += `\n(${formatCurrency(monthlyIncome)}/mån)`;
                             details += `\nℹ️ Utbetalning per år (minskar uttag)`;
-                            return details;
+                          return details;
                           }
                           // Om inget kapital eller inkomst finns, visa ändå avkastningsprocenten om det finns avsättning
                           if (payload.statePensionContrib !== undefined && payload.statePensionContrib > 0) {
@@ -2653,7 +2653,7 @@ export default function StandaloneFIREPage() {
                 )}
                 
                 {/* Tidig uttagsålder för IPS */}
-                {privatePensionContribMonthly > 0 && (
+                {(privatePensionContribMonthly > 0 || privatePensionAtStart > 0) && (
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -2926,7 +2926,7 @@ export default function StandaloneFIREPage() {
                     step={1}
                     className="w-full"
                   />
-                </div>
+              </div>
               
               {/* Pensionsavsättning/mån */}
               <div className="mb-6 p-3 bg-green-50 rounded-lg border border-green-200">
