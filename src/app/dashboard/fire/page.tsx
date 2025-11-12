@@ -1052,6 +1052,86 @@ export default function FIREPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Graf - större på desktop */}
           <div className="lg:col-span-2 flex flex-col lg:block space-y-6">
+            {/* Utgångskapital - mobilversion (visas ovanför grafen på mobil) */}
+            {(() => {
+              // Beräkna utgångsvärden från assets
+              const startAvailable = availableAtStart || 0;
+              const startOccPension = assets
+                .filter(a => a.category === 'Tjänstepension')
+                .reduce((sum, a) => sum + a.value, 0);
+              const startPremiePension = assets
+                .filter(a => a.category === 'Premiepension')
+                .reduce((sum, a) => sum + a.value, 0);
+              const startPrivatePension = assets
+                .filter(a => a.category === 'Privat pensionssparande (IPS)')
+                .reduce((sum, a) => sum + a.value, 0);
+              const startTotalPension = startOccPension + startPremiePension + startPrivatePension;
+              // Hämta statlig pension från fireResult eller dynamicFireResult
+              const isPristine = manualFireYear === null;
+              const sourceForStatePension = isPristine ? fireResult : dynamicFireResult;
+              const startStatePension = sourceForStatePension?.statePensionAtStart || 0;
+              
+              // Visa bara om det finns något kapital och bara på mobil
+              if ((startAvailable > 0 || startTotalPension > 0 || startStatePension > 0)) {
+                return (
+                  <div className="lg:hidden bg-white rounded-lg border border-gray-200 p-3 mb-4">
+                    <p className="text-xs font-semibold mb-2 text-gray-700">
+                      Utgångskapital
+                    </p>
+                    <div className="space-y-1.5 text-xs">
+                      {/* Tillgängligt */}
+                      {startAvailable > 0 && (
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-[#C47A2C] flex-shrink-0"></div>
+                            <span className="text-gray-600">Tillgängligt</span>
+                          </div>
+                          <span className="text-gray-900 font-medium">{formatCurrency(startAvailable)}</span>
+                        </div>
+                      )}
+                      
+                      {/* Marknadsbaserad pension - visa separata delar */}
+                      {startTotalPension > 0 && (
+                        <>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-2 h-2 rounded-full bg-[#4A84C1] flex-shrink-0"></div>
+                              <span className="text-gray-600">Marknadsbaserad pension</span>
+                            </div>
+                            <span className="text-gray-900 font-medium">{formatCurrency(startTotalPension)}</span>
+                          </div>
+                          {(startOccPension > 0 || startPremiePension > 0 || startPrivatePension > 0) && (
+                            <div className="pl-3.5 space-y-0.5 text-[0.65rem] text-gray-500">
+                              {startOccPension > 0 && (
+                                <div>• Tjänste: {formatCurrency(startOccPension)}</div>
+                              )}
+                              {startPremiePension > 0 && (
+                                <div>• Premie: {formatCurrency(startPremiePension)}</div>
+                              )}
+                              {startPrivatePension > 0 && (
+                                <div>• IPS: {formatCurrency(startPrivatePension)}</div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
+                      
+                      {/* Statlig pension */}
+                      {startStatePension > 0 && (
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-[#60a5fa] flex-shrink-0"></div>
+                            <span className="text-gray-600">Statlig pension</span>
+                          </div>
+                          <span className="text-gray-900 font-medium">{formatCurrency(startStatePension)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
             {/* Dynamisk ekonomisk frihet-indikator */}
             <div className={`p-4 md:p-6 rounded-lg border ${
               simulation.capitalDepletedYear !== null 
@@ -3076,11 +3156,11 @@ export default function FIREPage() {
               </h3>
               <p className="text-xs md:text-sm text-primary/70 leading-relaxed mb-2">
                 <strong className="text-primary/80">Denna simulator är gjord för att experimentera</strong> med olika antaganden om avkastning, inflation, sparande och utgifter. 
-                Alla beräkningar baseras på antaganden och är inte en garanti för framtida resultat.
+                Alla beräkningar baseras på antaganden, generaliseringar och förenklingar och är inte en garanti för framtida resultat.
               </p>
               <p className="text-xs md:text-sm text-primary/70 leading-relaxed mb-2">
                 <strong className="text-primary/80">Tidigare utveckling är ingen garanti för framtiden.</strong> Historisk avkastning, inflation och ekonomiska trender kan och kommer att variera. 
-                Detta är en förenklad simulering i dagens penningvärde. Skatt och pension kan avvika från verkligheten.
+                Detta är en förenklad simulering i dagens penningvärde med generaliseringar och förenklingar. Skatt och pension kan avvika från verkligheten.
               </p>
               <p className="text-xs md:text-sm text-primary/70 leading-relaxed">
                 <strong className="text-primary/80">Om du funderar på att göra FIRE eller liknande måste du göra egna beräkningar utifrån dina specifika förhållanden.</strong> 

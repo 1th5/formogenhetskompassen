@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useDeferredValue } from 'react';
+import { useState, useMemo, useEffect, useDeferredValue, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer, ReferenceArea } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -9,14 +9,16 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils/format';
+import { toNumber } from '@/lib/utils/number';
 import { simulatePortfolio, YearData } from '@/lib/fire/simulate';
 import { calculateFIRE, FIREResult, calculateAutoReturns, toReal } from '@/lib/fire/calc';
 import { ArrowLeft, Info, Calculator, ChevronDown, ChevronUp } from 'lucide-react';
 import { calculateIncomePension, calculateOccupationalPension, calculatePremiePension } from '@/lib/wealth/calc';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { FIREFormWrapper, FIREFormValues } from '@/components/fire/FIREFormWrapper';
 
-// Hjälpkomponent för info-ikoner med pedagogisk information
+// Hjälpkomponent för info-ikoner med pedagogisk information (behålls för bakåtkompatibilitet)
 function InfoIcon({ title, description }: { title: string; description: string }) {
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -91,7 +93,30 @@ export default function StandaloneFIREPage() {
   // Lägesval: snabbstart vs avancerat
   const [quickMode, setQuickMode] = useState(true);
   
-  // Standalone inputs - grunddata
+  // Form values från FIREFormWrapper
+  // Automatisk sättning av pensionsålder baserat på ålder
+  const getDefaultPensionAge = (age: number): number => {
+    if (age < 63) return 63;
+    return 67;
+  };
+
+  const [formValues, setFormValues] = useState<FIREFormValues>({
+    age: 40,
+    pensionAge: getDefaultPensionAge(40),
+    monthlyExpenses: 30000,
+    monthlySavings: 10000,
+    availableCapital: 300000,
+    occPensionCapital: 0,
+    premiePensionCapital: 0,
+    ipsPensionCapital: 0,
+    occPensionContrib: 0,
+    premiePensionContrib: 0,
+    ipsPensionContrib: 0,
+    statePensionCapital: 0,
+    statePensionContrib: 0,
+  });
+  
+  // Standalone inputs - grunddata (behålls för bakåtkompatibilitet tills vidare)
   const [standaloneAssets, setStandaloneAssets] = useState<string>('300000');
   const [standalonePension, setStandalonePension] = useState<string>('300000');
   const [standaloneAge, setStandaloneAge] = useState<string>('35');
@@ -122,8 +147,8 @@ export default function StandaloneFIREPage() {
   const [statePensionCalcAge, setStatePensionCalcAge] = useState<string>('');
   
   // Tidiga uttag
-  const [occPensionEarlyStartAge, setOccPensionEarlyStartAge] = useState([55]);
-  const [ipsEarlyStartAge, setIpsEarlyStartAge] = useState([55]);
+  const [occPensionEarlyStartAge, setOccPensionEarlyStartAge] = useState<number>(55);
+  const [ipsEarlyStartAge, setIpsEarlyStartAge] = useState<number>(55);
   
   // Simulator controls (same as dashboard version)
   const [sliderReturnAvailable, setSliderReturnAvailable] = useState([7]);
@@ -135,22 +160,92 @@ export default function StandaloneFIREPage() {
   const [sliderPensionAge, setSliderPensionAge] = useState([63]);
   const [monthlyExpenses, setMonthlyExpenses] = useState(30000);
   const [sliderMonthlySavings, setSliderMonthlySavings] = useState([10000]);
+  
+  // Ref för att undvika oändlig loop vid synkning
+  const isSyncingFromAgeRef = useRef(false);
+  const isSyncingFromSliderRef = useRef(false);
+  const lastAgeRef = useRef(formValues.age);
+  const lastPensionAgeRef = useRef(formValues.pensionAge);
+
+  // Automatisk justering av pensionsålder när ålder ändras
+  useEffect(() => {
+    if (isSyncingFromSliderRef.current) return; // Ignorera om slidern just ändrats
+    
+    const currentAge = formValues.age;
+    // Bara uppdatera om åldern faktiskt har ändrats
+    if (currentAge === lastAgeRef.current) return;
+    lastAgeRef.current = currentAge;
+    
+    const defaultPensionAge = getDefaultPensionAge(currentAge);
+    
+    // Bara uppdatera om pensionsåldern inte matchar default-värdet
+    if (formValues.pensionAge !== defaultPensionAge) {
+      isSyncingFromAgeRef.current = true;
+      setFormValues(prev => ({ ...prev, pensionAge: defaultPensionAge }));
+      setSliderPensionAge([defaultPensionAge]);
+      lastPensionAgeRef.current = defaultPensionAge;
+      // Reset flag efter en kort delay
+      setTimeout(() => {
+        isSyncingFromAgeRef.current = false;
+      }, 10);
+    }
+  }, [formValues.age]);
+
+  // Synka formValues.pensionAge till slidern (bara om det inte kommer från slidern)
+  useEffect(() => {
+    if (isSyncingFromSliderRef.current) return;
+    if (isSyncingFromAgeRef.current) return;
+    
+    const currentPensionAge = formValues.pensionAge;
+    if (currentPensionAge === lastPensionAgeRef.current) return;
+    lastPensionAgeRef.current = currentPensionAge;
+    
+    if (sliderPensionAge[0] !== currentPensionAge) {
+      isSyncingFromAgeRef.current = true;
+      setSliderPensionAge([currentPensionAge]);
+      setTimeout(() => {
+        isSyncingFromAgeRef.current = false;
+      }, 10);
+    }
+  }, [formValues.pensionAge]);
+
+  // Synka formValues till befintliga state-variabler (utom pensionAge som hanteras separat)
+  useEffect(() => {
+    setMonthlyExpenses(formValues.monthlyExpenses);
+    setSliderMonthlySavings([formValues.monthlySavings]);
+  }, [formValues.monthlyExpenses, formValues.monthlySavings]);
+
+  // Synka slidern tillbaka till formValues när användaren ändrar den
+  useEffect(() => {
+    if (isSyncingFromAgeRef.current) return;
+    
+    const currentSliderValue = sliderPensionAge[0];
+    if (currentSliderValue === lastPensionAgeRef.current) return;
+    lastPensionAgeRef.current = currentSliderValue;
+    
+    if (currentSliderValue !== formValues.pensionAge) {
+      isSyncingFromSliderRef.current = true;
+      setFormValues(prev => ({ ...prev, pensionAge: currentSliderValue }));
+      setTimeout(() => {
+        isSyncingFromSliderRef.current = false;
+      }, 10);
+    }
+  }, [sliderPensionAge]);
   const [manualFireYear, setManualFireYear] = useState<number | null>(null);
   
   // Snabbstart: lön för att beräkna pensioner
   const [quickSalary, setQuickSalary] = useState<string>('');
   const [statePensionPayoutYears, setStatePensionPayoutYears] = useState([20]);
   
-  // Calculate average age first
+  // Calculate average age first - använd formValues om tillgängligt
   const averageAge = useMemo(() => {
-    const val = parseInt(standaloneAge) || 40;
-    return Math.max(18, Math.min(100, val));
-  }, [standaloneAge]);
+    return Math.max(18, Math.min(100, formValues.age));
+  }, [formValues.age]);
   
   // Snabbstart: beräkna pensioner från lön
   const quickPensionCalculations = useMemo(() => {
     if (quickMode && quickSalary) {
-      const salary = parseFloat(quickSalary.replace(/\s/g, '').replace(',', '.')) || 0;
+      const salary = toNumber(quickSalary);
       if (salary > 0) {
         const mockPerson = {
           name: 'Person',
@@ -182,7 +277,7 @@ export default function StandaloneFIREPage() {
   useEffect(() => {
     if (quickPensionCalculations && quickMode) {
       // Bara skriv över om fältet var tomt eller 0, för att inte förstöra manuella inmatningar
-      const currentStatePension = parseFloat(statePensionContrib.replace(/\s/g, '').replace(',', '.')) || 0;
+      const currentStatePension = toNumber(statePensionContrib);
       if (currentStatePension === 0) {
         // Runda till närmaste heltal för bättre UX
         const rounded = Math.round(quickPensionCalculations.statePension);
@@ -190,7 +285,7 @@ export default function StandaloneFIREPage() {
           setStatePensionContrib(rounded.toString());
         }
       }
-      const currentMarketPension = parseFloat(standalonePensionContrib.replace(/\s/g, '').replace(',', '.')) || 0;
+      const currentMarketPension = toNumber(standalonePensionContrib);
       if (currentMarketPension === 0) {
         // Runda till närmaste heltal för bättre UX
         const rounded = Math.round(quickPensionCalculations.marketPension);
@@ -203,25 +298,25 @@ export default function StandaloneFIREPage() {
   
   // Calculate values from standalone inputs
   const baseAvailableAtStart = useMemo(() => {
-    const val = parseFloat(standaloneAssets.replace(/\s/g, '').replace(',', '.')) || 0;
+    const val = toNumber(standaloneAssets);
     return val;
   }, [standaloneAssets]);
   
   const totalPensionCapital = useMemo(() => {
-    const val = parseFloat(standalonePension.replace(/\s/g, '').replace(',', '.')) || 0;
+    const val = toNumber(standalonePension);
     return val;
   }, [standalonePension]);
   
   const totalPensionContribMonthly = useMemo(() => {
-    const val = parseFloat(standalonePensionContrib.replace(/\s/g, '').replace(',', '.')) || 0;
+    const val = toNumber(standalonePensionContrib);
     return Math.max(0, val);
   }, [standalonePensionContrib]);
   
   // Bostad (40% av nettovärde)
   const housingNet = useMemo(() => {
     if (!includeHousing) return 0;
-    const value = parseFloat(housingValue.replace(/\s/g, '').replace(',', '.')) || 0;
-    const loan = parseFloat(housingLoan.replace(/\s/g, '').replace(',', '.')) || 0;
+    const value = toNumber(housingValue);
+    const loan = toNumber(housingLoan);
     return Math.max(0, value - loan);
   }, [includeHousing, housingValue, housingLoan]);
   
@@ -231,58 +326,64 @@ export default function StandaloneFIREPage() {
   }, [housingNet]);
   
   const availableAtStart = useMemo(() => {
-    return baseAvailableAtStart + fireHousing;
-  }, [baseAvailableAtStart, fireHousing]);
+    // Använd formValues om tillgängligt, annars fallback till gammal logik
+    return formValues.availableCapital > 0 ? formValues.availableCapital : (baseAvailableAtStart + fireHousing);
+  }, [formValues.availableCapital, baseAvailableAtStart, fireHousing]);
   
-  // Pensionsfördelning - använd detaljerad om fylld, annars auto-fördela
+  // Pensionsfördelning - använd formValues om tillgängligt
   const occPensionAtStart = useMemo(() => {
+    if (formValues.occPensionCapital > 0) return formValues.occPensionCapital;
     if (showPensionDetails && occPensionCapital) {
-      return parseFloat(occPensionCapital.replace(/\s/g, '').replace(',', '.')) || 0;
+      return toNumber(occPensionCapital);
     }
-    // Auto-fördela enligt procent
     return totalPensionCapital * (occPensionPercent / 100);
-  }, [showPensionDetails, occPensionCapital, totalPensionCapital, occPensionPercent]);
+  }, [formValues.occPensionCapital, showPensionDetails, occPensionCapital, totalPensionCapital, occPensionPercent]);
   
   const premiePensionAtStart = useMemo(() => {
+    if (formValues.premiePensionCapital > 0) return formValues.premiePensionCapital;
     if (showPensionDetails && premiePensionCapital) {
-      return parseFloat(premiePensionCapital.replace(/\s/g, '').replace(',', '.')) || 0;
+      return toNumber(premiePensionCapital);
     }
     return totalPensionCapital * (premiePensionPercent / 100);
-  }, [showPensionDetails, premiePensionCapital, totalPensionCapital, premiePensionPercent]);
+  }, [formValues.premiePensionCapital, showPensionDetails, premiePensionCapital, totalPensionCapital, premiePensionPercent]);
   
   const privatePensionAtStart = useMemo(() => {
+    if (formValues.ipsPensionCapital > 0) return formValues.ipsPensionCapital;
     if (showPensionDetails && ipsPensionCapital) {
-      return parseFloat(ipsPensionCapital.replace(/\s/g, '').replace(',', '.')) || 0;
+      return toNumber(ipsPensionCapital);
     }
     return totalPensionCapital * (ipsPensionPercent / 100);
-  }, [showPensionDetails, ipsPensionCapital, totalPensionCapital, ipsPensionPercent]);
+  }, [formValues.ipsPensionCapital, showPensionDetails, ipsPensionCapital, totalPensionCapital, ipsPensionPercent]);
   
   const occPensionContribMonthly = useMemo(() => {
+    if (formValues.occPensionContrib > 0) return formValues.occPensionContrib;
     if (showPensionDetails && occPensionContrib) {
-      return parseFloat(occPensionContrib.replace(/\s/g, '').replace(',', '.')) || 0;
+      return toNumber(occPensionContrib);
     }
     return totalPensionContribMonthly * (occPensionPercent / 100);
-  }, [showPensionDetails, occPensionContrib, totalPensionContribMonthly, occPensionPercent]);
+  }, [formValues.occPensionContrib, showPensionDetails, occPensionContrib, totalPensionContribMonthly, occPensionPercent]);
   
   const premiePensionContribMonthly = useMemo(() => {
+    if (formValues.premiePensionContrib > 0) return formValues.premiePensionContrib;
     if (showPensionDetails && premiePensionContrib) {
-      return parseFloat(premiePensionContrib.replace(/\s/g, '').replace(',', '.')) || 0;
+      return toNumber(premiePensionContrib);
     }
     return totalPensionContribMonthly * (premiePensionPercent / 100);
-  }, [showPensionDetails, premiePensionContrib, totalPensionContribMonthly, premiePensionPercent]);
+  }, [formValues.premiePensionContrib, showPensionDetails, premiePensionContrib, totalPensionContribMonthly, premiePensionPercent]);
   
   const privatePensionContribMonthly = useMemo(() => {
+    if (formValues.ipsPensionContrib > 0) return formValues.ipsPensionContrib;
     if (showPensionDetails && ipsPensionContrib) {
-      return parseFloat(ipsPensionContrib.replace(/\s/g, '').replace(',', '.')) || 0;
+      return toNumber(ipsPensionContrib);
     }
     return totalPensionContribMonthly * (ipsPensionPercent / 100);
-  }, [showPensionDetails, ipsPensionContrib, totalPensionContribMonthly, ipsPensionPercent]);
+  }, [formValues.ipsPensionContrib, showPensionDetails, ipsPensionContrib, totalPensionContribMonthly, ipsPensionPercent]);
   
   // Statlig pension - beräkning från lön
   const calculatedStatePensionContrib = useMemo(() => {
     if (showStatePensionCalc && statePensionCalcSalary && statePensionCalcAge) {
       // Använd calculateIncomePension för att räkna från lön
-      const salary = parseFloat(statePensionCalcSalary.replace(/\s/g, '').replace(',', '.')) || 0;
+      const salary = toNumber(statePensionCalcSalary);
       const age = parseInt(statePensionCalcAge) || averageAge;
       const mockPerson = {
         name: 'Person',
@@ -313,15 +414,17 @@ export default function StandaloneFIREPage() {
     }
   }, [calculatedStatePensionContrib, quickMode, showStatePensionCalc]);
   
-  // Använd beräknat värde om det finns, annars parsad input
-  const statePensionContribMonthly = useMemo(() => {
-    return calculatedStatePensionContrib ?? (parseFloat(statePensionContrib.replace(/\s/g, '').replace(',', '.')) || 0);
-  }, [calculatedStatePensionContrib, statePensionContrib]);
-  
   const statePensionAtStart = useMemo(() => {
-    const val = parseFloat(statePensionCapital.replace(/\s/g, '').replace(',', '.')) || 0;
+    if (formValues.statePensionCapital > 0) return formValues.statePensionCapital;
+    const val = toNumber(statePensionCapital);
     return Math.max(0, val);
-  }, [statePensionCapital]);
+  }, [formValues.statePensionCapital, statePensionCapital]);
+  
+  // Använd beräknat värde om det finns, annars parsad input - prioritera formValues
+  const statePensionContribMonthly = useMemo(() => {
+    if (formValues.statePensionContrib > 0) return formValues.statePensionContrib;
+    return calculatedStatePensionContrib ?? toNumber(statePensionContrib);
+  }, [formValues.statePensionContrib, calculatedStatePensionContrib, statePensionContrib]);
   
   // Deferred values for performance
   const dSliderReturnAvailable = useDeferredValue(sliderReturnAvailable);
@@ -333,6 +436,7 @@ export default function StandaloneFIREPage() {
   const dSliderPensionAge = useDeferredValue(sliderPensionAge);
   const dMonthlyExpenses = useDeferredValue(monthlyExpenses);
   const dSliderMonthlySavings = useDeferredValue(sliderMonthlySavings);
+  // Notera: occPensionEarlyStartAge och ipsEarlyStartAge är nu primitiva, inga deferred values behövs
   
   // Calculate real returns
   const realReturns = useMemo(() => {
@@ -411,6 +515,16 @@ export default function StandaloneFIREPage() {
       return { yearsToFire: null, portfolioAtFire: 0 };
     }
     
+    // Använd primitiva värden direkt (inte arrays längre)
+    // Debug: Log när dynamicFireResult beräknas med nya värden
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔄 dynamicFireResult calculating with:', {
+        occPensionEarlyStartAge,
+        ipsEarlyStartAge,
+        pensionAge: dSliderPensionAge[0]
+      });
+    }
+    
     const result = calculateFIRE(
       mockAssets,
       mockPersons,
@@ -430,8 +544,8 @@ export default function StandaloneFIREPage() {
       occPensionContribMonthly,
       premiePensionContribMonthly,
       privatePensionContribMonthly,
-      occPensionEarlyStartAge[0],
-      ipsEarlyStartAge[0]
+      occPensionEarlyStartAge, // Primitivt värde
+      ipsEarlyStartAge  // Primitivt värde
     );
     
     return {
@@ -456,8 +570,8 @@ export default function StandaloneFIREPage() {
     premiePensionContribMonthly,
     privatePensionContribMonthly,
     dSliderInflation,
-    occPensionEarlyStartAge,
-    ipsEarlyStartAge,
+    occPensionEarlyStartAge, // Primitivt värde
+    ipsEarlyStartAge, // Primitivt värde
     availableAtStart,
     occPensionAtStart,
     premiePensionAtStart,
@@ -492,31 +606,49 @@ export default function StandaloneFIREPage() {
     if (dynamicFireResult.yearsToFire === null && manualFireYear !== null) {
       setManualFireYear(null);
     }
-  }, [manualFireYear, averageAge, sliderPensionAge, dynamicFireResult.yearsToFire]);
+  }, [manualFireYear, averageAge, sliderPensionAge[0], dynamicFireResult.yearsToFire]);
   
   // Simulate portfolio
   const simulation = useMemo(() => {
-    return simulatePortfolio(
+    // Använd primitiva värden direkt (inte arrays längre)
+    const pensionAge = dSliderPensionAge[0];
+    const payoutYears = statePensionPayoutYears[0];
+    const inflation = dSliderInflation[0] / 100;
+    const monthlySavings = dSliderMonthlySavings[0];
+    
+    // Debug: Log när simuleringen körs med nya värden
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔄 Simulation running with:', {
+        occPensionEarlyStartAge,
+        ipsEarlyStartAge,
+        pensionAge,
+        payoutYears,
+        inflation,
+        monthlySavings
+      });
+    }
+    
+    const result = simulatePortfolio(
       availableAtStart,
       0, // pensionLockedAtStart (används inte längre, separata pensionshinkar används istället)
-      dSliderMonthlySavings[0],
+      monthlySavings,
       realReturns.realReturnAvailable,
       0, // realReturnPension (används inte längre, separata pensionsavkastningar används istället)
       dMonthlyExpenses * 12,
       averageAge,
-      dSliderPensionAge[0],
+      pensionAge,
       requiredAtPensionLive,
       effectiveFireYear,
       0, // monthlyPensionAfterTax
       0, // marketPensionContribMonthly (används inte längre, separata pensionsavsättningar används istället)
-      dSliderInflation[0] / 100,
+      inflation,
       false, // useCoastFire (inte tillgängligt i standalone)
       0, // coastFireYears
       0, // coastFirePensionContribMonthly
       statePensionAtStart,
       realReturns.realReturnStatePension,
       statePensionContribMonthly,
-      statePensionPayoutYears[0],
+      payoutYears,
       dynamicFireResult.statePensionAnnualIncome || 0,
       occPensionAtStart,
       premiePensionAtStart,
@@ -527,9 +659,92 @@ export default function StandaloneFIREPage() {
       occPensionContribMonthly,
       premiePensionContribMonthly,
       privatePensionContribMonthly,
-      occPensionEarlyStartAge[0],
-      ipsEarlyStartAge[0]
+      undefined, // coastFireOccPensionContribMonthly
+      undefined, // coastFirePremiePensionContribMonthly
+      undefined, // coastFirePrivatePensionContribMonthly
+      occPensionEarlyStartAge, // Primitivt värde
+      ipsEarlyStartAge  // Primitivt värde
     );
+    
+    // Temporär logg för att verifiera merge (endast i dev-läge)
+    if (process.env.NODE_ENV !== 'production') {
+      // Verifiera tjänstepension merge
+      if (occPensionAtStart > 0 && occPensionEarlyStartAge > averageAge && occPensionEarlyStartAge <= 100) {
+        const beforeOcc = result.data.find(d => d.age === occPensionEarlyStartAge - 1);
+        const atOcc = result.data.find(d => d.age === occPensionEarlyStartAge);
+        if (beforeOcc && atOcc) {
+          console.log('🔍 Merge check (Tjänstepension):', {
+            age: occPensionEarlyStartAge,
+            before: { 
+              age: beforeOcc.age, 
+              available: beforeOcc.available, 
+              pension: beforeOcc.pension,
+              occPension: beforeOcc.occPension || 0
+            },
+            at: { 
+              age: atOcc.age, 
+              available: atOcc.available, 
+              pension: atOcc.pension,
+              occPension: atOcc.occPension || 0
+            },
+            pensionDecreased: beforeOcc.pension > atOcc.pension,
+            availableIncreased: atOcc.available > beforeOcc.available
+          });
+        }
+      }
+      
+      // Verifiera IPS merge
+      if (privatePensionAtStart > 0 && ipsEarlyStartAge > averageAge && ipsEarlyStartAge <= 100) {
+        const beforeIps = result.data.find(d => d.age === ipsEarlyStartAge - 1);
+        const atIps = result.data.find(d => d.age === ipsEarlyStartAge);
+        if (beforeIps && atIps) {
+          console.log('🔍 Merge check (IPS):', {
+            age: ipsEarlyStartAge,
+            before: { 
+              age: beforeIps.age, 
+              available: beforeIps.available, 
+              pension: beforeIps.pension,
+              privatePension: beforeIps.privatePension || 0
+            },
+            at: { 
+              age: atIps.age, 
+              available: atIps.available, 
+              pension: atIps.pension,
+              privatePension: atIps.privatePension || 0
+            },
+            pensionDecreased: beforeIps.pension > atIps.pension,
+            availableIncreased: atIps.available > beforeIps.available
+          });
+        }
+      }
+      
+      // Verifiera premiepension merge vid pensionsstart
+      if (premiePensionAtStart > 0 && pensionAge > averageAge && pensionAge <= 100) {
+        const beforePension = result.data.find(d => d.age === pensionAge - 1);
+        const atPension = result.data.find(d => d.age === pensionAge);
+        if (beforePension && atPension) {
+          console.log('🔍 Merge check (Premiepension vid pensionsstart):', {
+            age: pensionAge,
+            before: { 
+              age: beforePension.age, 
+              available: beforePension.available, 
+              pension: beforePension.pension,
+              premiePension: beforePension.premiePension || 0
+            },
+            at: { 
+              age: atPension.age, 
+              available: atPension.available, 
+              pension: atPension.pension,
+              premiePension: atPension.premiePension || 0
+            },
+            pensionDecreased: beforePension.pension > atPension.pension,
+            availableIncreased: atPension.available > beforePension.available
+          });
+        }
+      }
+    }
+    
+    return result;
   }, [
     availableAtStart,
     dSliderMonthlySavings,
@@ -554,9 +769,8 @@ export default function StandaloneFIREPage() {
     occPensionContribMonthly,
     premiePensionContribMonthly,
     privatePensionContribMonthly,
-    occPensionEarlyStartAge,
-    ipsEarlyStartAge,
-    dSliderPensionAge
+    occPensionEarlyStartAge, // Primitivt värde
+    ipsEarlyStartAge // Primitivt värde
   ]);
   
   // Hämta portfölj vid frihet från simuleringen (för att matcha grafen)
@@ -600,20 +814,35 @@ export default function StandaloneFIREPage() {
 
   // Prepare chart data - limit to 80 years on mobile
   const chartData = useMemo(() => {
+    const pensionAge = sliderPensionAge[0]; // Använd skalär
     const allData = simulation.data.map(d => {
-      const isAfterPension = d.age >= sliderPensionAge[0];
+      const isAfterPension = d.age >= pensionAge;
       return {
         ...d, // Sprid in alla fält från simuleringen (availableReturn, savingsContrib, netWithdrawal, osv)
         År: d.age,
         Tillgängligt: d.available,
-        'Marknadsbaserad pension': (d.occPension || 0) + (d.premiePension || 0) + (d.privatePension || 0), // Summa av alla marknadsbaserade
+        'Marknadsbaserad pension': d.pension, // Använd bakåtkompatibilitetsfältet (summan av occPension + premiePension + privatePension)
         'Statlig pension': isAfterPension ? (d.statePensionIncome || 0) : (d.statePensionCapital || 0), // Visa kapital före pension, inkomst efter
         Total: d.total,
       };
     });
     
+    // Debug: Log när chartData uppdateras
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('📊 chartData updated:', {
+        dataPoints: allData.length,
+        firstPension: allData.find(d => d['Marknadsbaserad pension'] > 0)?.År,
+        lastPension: allData.filter(d => d['Marknadsbaserad pension'] > 0).pop()?.År,
+        sampleData: allData.slice(0, 3).map(d => ({
+          age: d.År,
+          available: d.Tillgängligt,
+          pension: d['Marknadsbaserad pension']
+        }))
+      });
+    }
+    
     return isMobile ? allData.filter(d => d.År <= 80) : allData;
-  }, [simulation.data, isMobile, sliderPensionAge]);
+  }, [simulation, isMobile, sliderPensionAge]); // Använd hela simulation-objektet för att säkerställa att React upptäcker ändringar
   
   const monthlySavingsMax = Math.max(dSliderMonthlySavings[0], 100000);
   const INPUT_MAX = 1000000;
@@ -676,7 +905,15 @@ export default function StandaloneFIREPage() {
             </CardContent>
           </Card>
           
-          {/* Standalone Input Section */}
+          {/* Standalone Input Section - Ny refaktorerad version */}
+          <FIREFormWrapper
+            quickMode={quickMode}
+            onModeChange={setQuickMode}
+            onValuesChange={setFormValues}
+          />
+          
+          {/* Behåll gammal form-sektion som fallback tills vidare (kommenterad ut) */}
+          {false && (
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="text-lg md:text-xl">Dina grundvärden</CardTitle>
@@ -828,8 +1065,8 @@ export default function StandaloneFIREPage() {
                     <p className="text-xs text-primary/60 mt-1">
                       {quickPensionCalculations ? (
                         <>
-                          Beräknad statlig pension: {formatCurrency(quickPensionCalculations.statePension)}/mån. 
-                          Marknadsbaserad pension: {formatCurrency(quickPensionCalculations.marketPension)}/mån.
+                          Beräknad statlig pension: {formatCurrency(quickPensionCalculations?.statePension || 0)}/mån. 
+                          Marknadsbaserad pension: {formatCurrency(quickPensionCalculations?.marketPension || 0)}/mån.
                         </>
                       ) : (
                         'Vill du skriva in egna belopp? → avancerat'
@@ -886,15 +1123,15 @@ export default function StandaloneFIREPage() {
                               value={(() => {
                                 if (housingNet > 0) return Math.floor(housingNet).toString();
                                 if (housingValue && housingLoan) {
-                                  const val = parseFloat(housingValue.replace(/\s/g, '').replace(',', '.')) || 0;
-                                  const loan = parseFloat(housingLoan.replace(/\s/g, '').replace(',', '.')) || 0;
+                                  const val = toNumber(housingValue);
+                                  const loan = toNumber(housingLoan);
                                   return (val - loan).toString();
                                 }
                                 return '';
                               })()}
                               onChange={(e) => {
                                 const val = e.target.value.replace(/[^\d\s,]/g, '');
-                                const netValue = parseFloat(val.replace(/\s/g, '').replace(',', '.')) || 0;
+                                const netValue = toNumber(val);
                                 // Sätt värde och lån så att netto blir rätt
                                 if (netValue > 0) {
                                   setHousingValue((netValue * 1.5).toString()); // Uppskatta värde
@@ -1319,6 +1556,7 @@ export default function StandaloneFIREPage() {
               )}
             </CardContent>
           </Card>
+          )}
         </div>
 
         {/* Main Content */}
@@ -1343,7 +1581,7 @@ export default function StandaloneFIREPage() {
                         ? 'text-green-800'
                         : 'text-orange-800'
                     }`}>Din väg mot ekonomisk frihet</h3>
-                    <p className={`text-sm ${
+                    <div className={`text-sm ${
                       simulation.capitalDepletedYear !== null
                         ? 'text-red-700'
                         : effectiveFireYear !== null && fourPercentRuleMetYear !== null && fourPercentRuleMetYear <= sliderPensionAge[0]
@@ -1418,7 +1656,7 @@ export default function StandaloneFIREPage() {
                           Ekonomisk frihet ej uppnåelig med nuvarande antaganden
                         </span>
                       )}
-                    </p>
+                    </div>
                   </div>
                   <div className="text-left md:text-right">
                     <div className={`text-sm ${
@@ -1539,7 +1777,10 @@ export default function StandaloneFIREPage() {
             <div className="bg-white rounded-lg border border-slate-200/40 p-4 md:p-6">
               <div className="h-[400px] md:h-[500px] lg:h-[600px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
+                  <LineChart 
+                    key={`chart-${occPensionEarlyStartAge}-${ipsEarlyStartAge}-${sliderPensionAge[0]}`}
+                    data={chartData}
+                  >
                     <CartesianGrid strokeDasharray="3 3" stroke="#E7DFD3" />
                     <XAxis 
                       dataKey="År" 
@@ -1576,8 +1817,8 @@ export default function StandaloneFIREPage() {
                           let details = formattedValue;
                           
                           // Kolla om tjänstepension eller IPS flyttas över detta år
-                          const isOccPensionUnlockYear = age === occPensionEarlyStartAge[0];
-                          const isIpsUnlockYear = age === ipsEarlyStartAge[0];
+                          const isOccPensionUnlockYear = age === occPensionEarlyStartAge;
+                          const isIpsUnlockYear = age === ipsEarlyStartAge;
                           if (isOccPensionUnlockYear || isIpsUnlockYear) {
                             const unlockParts: string[] = [];
                             // Kolla om tjänstepension flyttas över (åldern matchar och det finns inte längre i occPension)
@@ -1659,7 +1900,7 @@ export default function StandaloneFIREPage() {
                             const pensionParts: string[] = [];
                             
                             // Tjänstepension: visa om den inte kan ha överförts än, eller om den faktiskt finns kvar
-                            const canOccBeUnlocked = age >= occPensionEarlyStartAge[0];
+                            const canOccBeUnlocked = age >= occPensionEarlyStartAge;
                             if (!canOccBeUnlocked || (payload.occPension !== undefined && payload.occPension > 0)) {
                               pensionParts.push('Tjänstepension');
                             }
@@ -1668,7 +1909,7 @@ export default function StandaloneFIREPage() {
                             pensionParts.push('Premiepension');
                             
                             // IPS: visa om det inte kan ha överförts än, eller om det faktiskt finns kvar
-                            const canIpsBeUnlocked = age >= ipsEarlyStartAge[0];
+                            const canIpsBeUnlocked = age >= ipsEarlyStartAge;
                             if (!canIpsBeUnlocked || (payload.privatePension !== undefined && payload.privatePension > 0)) {
                               pensionParts.push('IPS');
                             }
@@ -1735,33 +1976,45 @@ export default function StandaloneFIREPage() {
                             }
                           }
                           return details;
-                        } else if (name === 'Statlig pension') {
-                          let details = formattedValue;
-                          if (isAfterPension) {
-                            details += `\nÅrlig utbetalning från statlig inkomstpension`;
-                            if (payload.statePensionCapital !== undefined && payload.statePensionCapital > 0) {
-                              details += `\n(Kapital vid pensionsstart: ${formatCurrency(payload.statePensionCapital)})`;
-                            }
-                            details += `\nEfter pensionsstart visas utbetalning per år, inte kvarvarande kapital.`;
-                          } else {
-                            details += `\nKapital som växer fram till pensionsstart`;
-                            if (payload.statePensionCapital !== undefined && payload.statePensionCapital > 0) {
-                              details += `\n${formatCurrency(payload.statePensionCapital)}`;
-                            }
-                            // Visa avkastning och avsättning om de finns
-                            if (payload.statePensionReturn !== undefined && payload.statePensionReturn !== 0) {
-                              const statePercent = (realReturns.realReturnStatePension * 100).toFixed(1);
-                              details += `\n+ Avkastning (${statePercent}%): ${formatCurrency(payload.statePensionReturn)}`;
-                            }
+                        } else if (name === 'Statlig pension' || name === 'Statlig pension (kapital → inkomst)') {
+                          // Före pension: visa kapital och tillväxt
+                          if (payload.statePensionCapital !== undefined && payload.statePensionCapital > 0) {
+                            let details = formattedValue;
+                            details += `\nInkomstpension (statlig)`;
                             if (payload.statePensionContrib !== undefined && payload.statePensionContrib > 0) {
-                              details += `\n+ Avsättning: ${formatCurrency(payload.statePensionContrib)}/år`;
+                              details += `\n+ Avsättning: ${formatCurrency(payload.statePensionContrib)}`;
                             }
-                            // Om inget kapital finns men avsättning gör det, förklara att det växer från 0
-                            if ((!payload.statePensionCapital || payload.statePensionCapital === 0) && payload.statePensionContrib && payload.statePensionContrib > 0) {
-                              details += `\n(Kapitalet växer från 0 med avsättningar och avkastning)`;
+                            if (payload.statePensionReturn !== undefined && payload.statePensionReturn !== 0) {
+                              // Använd realReturns.realReturnStatePension för avkastningsprocenten (samma som i integrerad version)
+                              const statePensionPercent = (realReturns.realReturnStatePension * 100).toFixed(1);
+                              details += `\n+ Avkastning (${statePensionPercent}%): ${formatCurrency(payload.statePensionReturn)}`;
+                            } else if (payload.statePensionCapital > 0) {
+                              // Visa avkastningsprocenten även om avkastningen är 0 (för att visa att det finns kapital)
+                              const statePensionPercent = (realReturns.realReturnStatePension * 100).toFixed(1);
+                              details += `\n+ Avkastning (${statePensionPercent}%): ${formatCurrency(0)}`;
                             }
+                            return details;
                           }
-                          return details;
+                          // Efter pension: visa inkomst
+                          if (payload.statePensionIncome !== undefined && payload.statePensionIncome > 0) {
+                            // Använd payload.statePensionIncome direkt för att säkerställa rätt värde
+                            const annualIncome = payload.statePensionIncome;
+                            const monthlyIncome = annualIncome / 12;
+                            let details = `${formatCurrency(annualIncome)}/år`;
+                            details += `\n(${formatCurrency(monthlyIncome)}/mån)`;
+                            details += `\nℹ️ Utbetalning per år (minskar uttag)`;
+                            return details;
+                          }
+                          // Om inget kapital eller inkomst finns, visa ändå avkastningsprocenten om det finns avsättning
+                          if (payload.statePensionContrib !== undefined && payload.statePensionContrib > 0) {
+                            let details = formattedValue;
+                            details += `\nInkomstpension (statlig)`;
+                            details += `\n+ Avsättning: ${formatCurrency(payload.statePensionContrib)}`;
+                            const statePensionPercent = (realReturns.realReturnStatePension * 100).toFixed(1);
+                            details += `\n+ Avkastning (${statePensionPercent}%): ${formatCurrency(0)}`;
+                            return details;
+                          }
+                          return formattedValue;
                         } else if (name === 'Total') {
                           let details = formattedValue;
                           const savingsTotal = (payload.savingsContrib || 0);
@@ -2192,11 +2445,11 @@ export default function StandaloneFIREPage() {
                           description="Detta är åldern när du börjar ta ut din tjänstepension.\n\nTjänstepension kan ofta tas ut från 55 år, vilket gör den användbar för bridge-perioden innan statlig pension börjar. När du når denna ålder, flyttas hela tjänstepensionen automatiskt till dina tillgängliga tillgångar.\n\nOm du tar ut tidigt (t.ex. vid 55 år) får du mer kapital tillgängligt tidigt, vilket kan hjälpa dig nå FIRE tidigare eller minska risken under bridge-perioden.\n\nNär tjänstepensionen slås ihop med ditt övriga kapital beräknas en viktad avkastning baserat på storleken av varje del. För att simuleringen ska bli jämn höjs avkastningen på tjänstepensionen till minst samma nivå som efter FIRE (7% nominellt) innan viktningen.\n\nOm du väljer att börja använda denna pensionsdel före din pensionsålder flyttas både kapitalet och de löpande inbetalningarna över till din fria portfölj i simuleringen. Det gör vi för att inte fortsätta sätta in pengar i en pensionshink som redan har tagits i bruk.\n\n⚠️ Kontrollera ditt pensionsavtal för faktiska regler om tidiga uttag."
                         />
                       </div>
-                      <span className="text-sm font-medium">{occPensionEarlyStartAge[0]} år</span>
+                      <span className="text-sm font-medium">{occPensionEarlyStartAge} år</span>
                     </div>
                     <Slider
-                      value={occPensionEarlyStartAge}
-                      onValueChange={setOccPensionEarlyStartAge}
+                      value={[occPensionEarlyStartAge]}
+                      onValueChange={(next) => setOccPensionEarlyStartAge(next[0])}
                       min={55}
                       max={sliderPensionAge[0]}
                       step={1}
@@ -2219,11 +2472,11 @@ export default function StandaloneFIREPage() {
                           description="Detta är åldern när du börjar ta ut ditt IPS (Individuellt Pensionssparande).\n\nIPS kan tas ut från 55 år, vilket gör det användbart för bridge-perioden innan statlig pension börjar. När du når denna ålder, flyttas hela IPS-kapitalet automatiskt till dina tillgängliga tillgångar.\n\nOm du tar ut tidigt (t.ex. vid 55 år) får du mer kapital tillgängligt tidigt, vilket kan hjälpa dig nå FIRE tidigare eller minska risken under bridge-perioden.\n\nNär IPS slås ihop med ditt övriga kapital beräknas en viktad avkastning baserat på storleken av varje del. För att simuleringen ska bli jämn höjs avkastningen på IPS till minst samma nivå som efter FIRE (7% nominellt) innan viktningen.\n\nOm du väljer att börja använda denna pensionsdel före din pensionsålder flyttas både kapitalet och de löpande inbetalningarna över till din fria portfölj i simuleringen. Det gör vi för att inte fortsätta sätta in pengar i en pensionshink som redan har tagits i bruk.\n\n⚠️ Kontrollera ditt pensionsavtal för faktiska regler om tidiga uttag."
                         />
                       </div>
-                      <span className="text-sm font-medium">{ipsEarlyStartAge[0]} år</span>
+                      <span className="text-sm font-medium">{ipsEarlyStartAge} år</span>
                     </div>
                     <Slider
-                      value={ipsEarlyStartAge}
-                      onValueChange={setIpsEarlyStartAge}
+                      value={[ipsEarlyStartAge]}
+                      onValueChange={(next) => setIpsEarlyStartAge(next[0])}
                       min={55}
                       max={sliderPensionAge[0]}
                       step={1}
@@ -2496,11 +2749,11 @@ export default function StandaloneFIREPage() {
                         description="Detta är åldern när du börjar ta ut din tjänstepension.\n\nTjänstepension kan ofta tas ut från 55 år, vilket gör den användbar för bridge-perioden innan statlig pension börjar. När du når denna ålder, flyttas hela tjänstepensionen automatiskt till dina tillgängliga tillgångar.\n\nOm du tar ut tidigt (t.ex. vid 55 år) får du mer kapital tillgängligt tidigt, vilket kan hjälpa dig nå FIRE tidigare eller minska risken under bridge-perioden.\n\nNär tjänstepensionen slås ihop med ditt övriga kapital beräknas en viktad avkastning baserat på storleken av varje del. För att simuleringen ska bli jämn höjs avkastningen på tjänstepensionen till minst samma nivå som efter FIRE (7% nominellt) innan viktningen.\n\nOm du väljer att börja använda denna pensionsdel före din pensionsålder flyttas både kapitalet och de löpande inbetalningarna över till din fria portfölj i simuleringen. Det gör vi för att inte fortsätta sätta in pengar i en pensionshink som redan har tagits i bruk.\n\n⚠️ Kontrollera ditt pensionsavtal för faktiska regler om tidiga uttag."
                       />
                     </div>
-                    <span className="text-sm font-medium">{occPensionEarlyStartAge[0]} år</span>
+                    <span className="text-sm font-medium">{occPensionEarlyStartAge} år</span>
                   </div>
                   <Slider
-                    value={occPensionEarlyStartAge}
-                    onValueChange={setOccPensionEarlyStartAge}
+                    value={[occPensionEarlyStartAge]}
+                    onValueChange={(next) => setOccPensionEarlyStartAge(next[0])}
                     min={55}
                     max={sliderPensionAge[0]}
                     step={1}
@@ -2523,11 +2776,11 @@ export default function StandaloneFIREPage() {
                         description="Detta är åldern när du börjar ta ut ditt IPS (Individuellt Pensionssparande).\n\nIPS kan tas ut från 55 år, vilket gör det användbart för bridge-perioden innan statlig pension börjar. När du når denna ålder, flyttas hela IPS-kapitalet automatiskt till dina tillgängliga tillgångar.\n\nOm du tar ut tidigt (t.ex. vid 55 år) får du mer kapital tillgängligt tidigt, vilket kan hjälpa dig nå FIRE tidigare eller minska risken under bridge-perioden.\n\nNär IPS slås ihop med ditt övriga kapital beräknas en viktad avkastning baserat på storleken av varje del. För att simuleringen ska bli jämn höjs avkastningen på IPS till minst samma nivå som efter FIRE (7% nominellt) innan viktningen.\n\nOm du väljer att börja använda denna pensionsdel före din pensionsålder flyttas både kapitalet och de löpande inbetalningarna över till din fria portfölj i simuleringen. Det gör vi för att inte fortsätta sätta in pengar i en pensionshink som redan har tagits i bruk.\n\n⚠️ Kontrollera ditt pensionsavtal för faktiska regler om tidiga uttag."
                       />
                     </div>
-                    <span className="text-sm font-medium">{ipsEarlyStartAge[0]} år</span>
+                    <span className="text-sm font-medium">{ipsEarlyStartAge} år</span>
                   </div>
                   <Slider
-                    value={ipsEarlyStartAge}
-                    onValueChange={setIpsEarlyStartAge}
+                    value={[ipsEarlyStartAge]}
+                    onValueChange={(next) => setIpsEarlyStartAge(next[0])}
                     min={55}
                     max={sliderPensionAge[0]}
                     step={1}
@@ -2565,11 +2818,11 @@ export default function StandaloneFIREPage() {
               </h3>
               <p className="text-xs md:text-sm text-primary/70 leading-relaxed mb-2">
                 <strong className="text-primary/80">Denna simulator är gjord för att experimentera</strong> med olika antaganden om avkastning, inflation, sparande och utgifter. 
-                Alla beräkningar baseras på antaganden och är inte en garanti för framtida resultat.
+                Alla beräkningar baseras på antaganden, generaliseringar och förenklingar och är inte en garanti för framtida resultat.
               </p>
               <p className="text-xs md:text-sm text-primary/70 leading-relaxed mb-2">
                 <strong className="text-primary/80">Tidigare utveckling är ingen garanti för framtiden.</strong> Historisk avkastning, inflation och ekonomiska trender kan och kommer att variera. 
-                Detta är en förenklad simulering i dagens penningvärde. Skatt och pension kan avvika från verkligheten.
+                Detta är en förenklad simulering i dagens penningvärde med generaliseringar och förenklingar. Skatt och pension kan avvika från verkligheten.
               </p>
               <p className="text-xs md:text-sm text-primary/70 leading-relaxed">
                 <strong className="text-primary/80">Om du funderar på att göra FIRE eller liknande måste du göra egna beräkningar utifrån dina specifika förhållanden.</strong> 

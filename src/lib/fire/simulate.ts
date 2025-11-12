@@ -80,8 +80,8 @@ export function simulatePortfolio(
   coastFireOccPensionContribMonthly?: number, // Månatlig tjänstepensionsavsättning under Coast FIRE
   coastFirePremiePensionContribMonthly?: number, // Månatlig premiepensionsavsättning under Coast FIRE
   coastFirePrivatePensionContribMonthly?: number, // Månatlig IPS-avsättning under Coast FIRE
-  occPensionEarlyStartAge: number = 55, // Tidig uttagsålder för tjänstepension
-  ipsEarlyStartAge: number = 55 // Tidig uttagsålder för IPS
+  occPensionEarlyStartAge: number = 55, // Tidig uttagsålder för tjänstepension (default 55 för bakåtkompatibilitet)
+  ipsEarlyStartAge: number = 55 // Tidig uttagsålder för IPS (default 55 för bakåtkompatibilitet)
 ): FIRESimulation {
   // Clamp avkastningar för stabilitet (förhindra negativa värden som kraschar simuleringen)
   const safeRealAvailable = Math.max(realReturnAvailable, -0.5); // minst -50%
