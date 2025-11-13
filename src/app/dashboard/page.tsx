@@ -467,7 +467,7 @@ export default function DashboardPage() {
             Välkommen till Förmögenhetskollen
           </h1>
           <p className="text-lg sm:text-xl text-neutral-700 max-w-2xl mx-auto font-light mb-6">
-            Din verkliga förmögenhet – inklusive dolda pensionstillgångar
+            Din verkliga förmögenhet – inklusive dina dolda pensionstillgångar
           </p>
           
           {/* Hook-text */}
@@ -476,7 +476,7 @@ export default function DashboardPage() {
               Har du koll på din faktiska förmögenhet?
             </p>
             <p className="text-base sm:text-lg text-neutral-600 leading-relaxed">
-              Många missar dolda värden som kan fördubbla bilden. <span className="font-semibold text-neutral-900">Skrolla ner och kör Förmögenhetskollen</span> – få hela bilden på under 5 minuter.
+              Många missar dolda värden som kan förändra den ekonomiska helhetsbilden. <span className="font-semibold text-neutral-900">Skrolla ner och kör Förmögenhetskollen</span> – få en grov översikt på under 5 minuter.
             </p>
           </div>
           
@@ -513,14 +513,14 @@ export default function DashboardPage() {
           <div className="prose prose-sm sm:prose-base max-w-none text-neutral-700">
             {/* Intro */}
             <p className="leading-relaxed text-lg mb-6">
-              Tänk dig att du tror att du har <strong className="text-neutral-900 font-semibold">500 000 kr</strong> – men att du i själva verket har <strong className="text-neutral-900 font-semibold">2,5 miljoner</strong>. Så kan det vara om du räknar in din pension. I Sverige består ofta <strong className="text-neutral-900 font-semibold">30–50% av hushållets förmögenhet</strong> av pensionsrättigheter, men de flesta ser dem inte som tillgångar.
+              Tänk dig att du tror att du har <strong className="text-neutral-900 font-semibold">500 000 kr</strong> – men att du i själva verket har <strong className="text-neutral-900 font-semibold">2,5 miljoner</strong>. Så kan det se ut när pensionen räknas med. I Sverige är pensionen ofta en stor del av hushållets ekonomiska trygghet, och en betydande del av hushållens finansiella tillgångar ligger i pensionssparande – men den syns sällan i vardagsekonomin.
             </p>
             <p className="leading-relaxed text-lg mb-6">
-              <strong className="text-neutral-900 font-semibold">Förmögenhetskollen</strong> hjälper dig se hela bilden – alla tillgångar, skulder och dolda värden – så att du förstår din faktiska nettoförmögenhet och din plats i <em className="text-neutral-900 font-semibold">The Wealth Ladder</em>.
+              <strong className="text-neutral-900 font-semibold">Förmögenhetskollen</strong> hjälper dig att se hela bilden – alla tillgångar, skulder och dolda värden – så att du förstår din faktiska nettoförmögenhet och vilken nivå du ligger på i <em className="text-neutral-900 font-semibold">Rikedomstrappan</em>.
             </p>
             <div className="bg-blue-50/50 rounded-lg p-4 border-l-4 border-blue-400 mb-6">
               <p className="text-sm leading-relaxed text-neutral-700">
-                <strong className="text-neutral-900">Viktigt att veta:</strong> Appen ger en <strong className="text-neutral-900">förenklad bild</strong> av hushållets förmögenhet, tillgångar, skulder, inkomster och annat. Vi gör <strong className="text-neutral-900">generella antaganden</strong> för att det ska vara lätt att komma igång och få en snabb grov översikt över din ekonomiska situation. Detta gör det möjligt att få värdefulla insikter på <strong className="text-neutral-900">under 5 minuter</strong>, även om alla detaljer inte är perfekta.
+                <strong className="text-neutral-900">Viktigt att veta:</strong> Förmögenhetskollen ger en <strong className="text-neutral-900">förenklad bild</strong> av hushållets förmögenhet, tillgångar, skulder, inkomster och annat. Vi gör <strong className="text-neutral-900">generella antaganden och förenklingar</strong> för att du snabbt ska få en grov översikt över din ekonomiska situation. Förmögenhetskollen tar inte hänsyn till alla delar av din privatekonomi och ska inte ses som personlig ekonomisk rådgivning. Det gör att du kan få värdefulla insikter på <strong className="text-neutral-900">under 5 minuter</strong> – även om alla detaljer inte är perfekta.
               </p>
             </div>
 
@@ -528,7 +528,7 @@ export default function DashboardPage() {
             <div className="bg-neutral-900 rounded-lg p-6 sm:p-8 mb-6 text-white">
               <h2 className="font-serif text-2xl sm:text-3xl mb-4">Sverige vs USA – de dolda rikedomarna</h2>
               <p className="leading-relaxed text-base sm:text-lg mb-6">
-                I USA tjänar många högre löner, men de måste själva spara till sjukvård, utbildning och pension. I Sverige är mycket av vår ekonomiska trygghet redan inbyggd – även om vi sällan ser den.
+                I USA tjänar många högre löner, men måste själva spara till sjukvård, utbildning och pension. I Sverige är en stor del av vår ekonomiska trygghet redan inbyggd – men vi ser den sällan.
               </p>
               <div className="overflow-x-auto mb-6">
                 <table className="w-full border-collapse text-sm sm:text-base">
@@ -542,18 +542,18 @@ export default function DashboardPage() {
                   <tbody className="text-white/90">
                     <tr className="border-b border-white/10">
                       <td className="py-3 px-4 font-medium">Pensionstillgångar</td>
-                      <td className="py-3 px-4">30–50% av hushållets totala förmögenhet</td>
-                      <td className="py-3 px-4">Ofta helt beroende av eget sparande (401k, IRA)</td>
+                      <td className="py-3 px-4">Stor del av hushållets ekonomiska trygghet via allmän pension och tjänstepension (en betydande del av hushållens finansiella tillgångar är pensionssparande)</td>
+                      <td className="py-3 px-4">Kombination av offentlig pension (Social Security) och i hög grad eget sparande i t.ex. 401(k) och IRA. Sparandet är mer individuellt och ojämnt fördelat</td>
                     </tr>
                     <tr className="border-b border-white/10">
                       <td className="py-3 px-4 font-medium">Sparande till pension</td>
-                      <td className="py-3 px-4">18,5% av lön (stat + arbetsgivare)</td>
+                      <td className="py-3 px-4">Stora automatiska pensionsavsättningar via allmän pension (18,5% av pensionsgrundande inkomst) och tjänstepension från arbetsgivare (ofta 4,5–30% av vissa lönedelar)</td>
                       <td className="py-3 px-4">Frivilligt och ojämnt fördelat</td>
                     </tr>
                     <tr className="border-b border-white/10">
                       <td className="py-3 px-4 font-medium">Sjukvård & utbildning</td>
                       <td className="py-3 px-4">Skattefinansierat</td>
-                      <td className="py-3 px-4">Privat finansiering</td>
+                      <td className="py-3 px-4">Till stor del privat finansiering (försäkringar, avgifter, lån)</td>
                     </tr>
                     <tr className="border-b border-white/10">
                       <td className="py-3 px-4 font-medium">Synlig förmögenhet</td>
@@ -562,14 +562,14 @@ export default function DashboardPage() {
                     </tr>
                     <tr>
                       <td className="py-3 px-4 font-medium">Dold rikedom</td>
-                      <td className="py-3 px-4">Ja – i pensionssystemet</td>
-                      <td className="py-3 px-4">Nej – allt måste sparas privat</td>
+                      <td className="py-3 px-4">Ja – stor del av tryggheten ligger i allmän pension och tjänstepension som inte syns på vanliga konton</td>
+                      <td className="py-3 px-4">Delvis – offentlig pension (Social Security) finns, men en stor del av pensionskapitalet bygger på eget sparande i 401(k)/IRA</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <p className="leading-relaxed text-base sm:text-lg">
-                <strong className="font-semibold">Poängen:</strong> En svensk med 500 000 kr på kontot kan ha en verklig förmögenhet motsvarande en amerikan med 2–3 miljoner kr – men utan att veta om det.
+                <strong className="font-semibold">Poängen:</strong> En svensk med 500 000 kr på kontot kan, när pensionen räknas in, i vissa fall ha en total ekonomisk trygghet som grovt kan jämföras med en amerikan med 2–3 miljoner kronor. Det är en förenklad illustration – inte en exakt jämförelse.
               </p>
             </div>
 
@@ -580,12 +580,15 @@ export default function DashboardPage() {
                 Vad är The Wealth Ladder?
               </h2>
               <p className="leading-relaxed text-neutral-700 text-base mb-4">
-                Idén kommer från ekonomen och författaren <strong className="text-neutral-900 font-semibold">Nick Maggiulli</strong>. Han visar att rikedom växer i steg – inte linjärt. Varje nivå kräver ungefär <strong className="text-neutral-900 font-semibold">tio gånger större nettoförmögenhet</strong> än den föregående, och varje steg förändrar både livsstil och strategi.
+                Idén kommer från ekonomen och författaren <strong className="text-neutral-900 font-semibold">Nick Maggiulli</strong>. Han visar att rikedom växer i steg – inte linjärt. Varje nivå kräver ungefär <strong className="text-neutral-900 font-semibold">tio gånger större nettoförmögenhet</strong> än den föregående, och varje steg förändrar både livsstil och strategi för dina pengar.
               </p>
             </div>
 
             {/* Wealth Ladder Table */}
             <div className="overflow-x-auto my-6">
+              <p className="text-sm text-neutral-600 mb-3 italic">
+                Nivåerna är teoretiska intervall och ska ses som ett sätt att förstå olika rikedomsnivåer – inte som mål eller rekommendationer.
+              </p>
               <table className="w-full border-collapse border border-neutral-200 rounded-lg text-sm">
                 <thead>
                   <tr className="bg-neutral-900">
@@ -649,8 +652,8 @@ export default function DashboardPage() {
                 </tbody>
               </table>
               <p className="text-xs text-neutral-500 mt-3 italic">
-                ¹ Andel hushåll som befinner sig inom respektive förmögenhetsintervall just nu i USA (2023), enligt <em>Federal Reserve SCF 2022</em> och Maggiullis tolkning i <em>The Wealth Ladder</em> (2024). Detta är en fördelning av nuvarande hushåll, inte livstidssannolikhet.<br />
-                ² Åldersintervall enligt <em>Fidelity Investments 2024</em> och <em>OfDollarsAndData Net Worth by Age</em>.
+                ¹ Grova uppskattningar av andel amerikanska hushåll i respektive förmögenhetsintervall baserat på <em>Federal Reserve SCF 2022</em> och Maggiullis tolkning i <em>The Wealth Ladder</em> (2025). Detta är en fördelning av nuvarande hushåll, inte livstidssannolikhet.<br />
+                ² Indikativa åldersintervall baserade på median nettoförmögenhet per ålder (SCF 2022 via Fidelity/OfDollarsAndData) och en grov mappning mot nivåerna.
               </p>
             </div>
 
@@ -672,34 +675,34 @@ export default function DashboardPage() {
                   <tbody>
                     <tr className="bg-white hover:bg-neutral-50 transition-colors border-b border-neutral-100">
                       <td className="px-4 py-3 text-neutral-700">Under 35 år</td>
-                      <td className="px-4 py-3 text-neutral-700">$40 k <span className="text-neutral-500">(≈ 400 000 kr)</span></td>
-                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024</td>
+                      <td className="px-4 py-3 text-neutral-700">39 000 USD <span className="text-neutral-500">(≈ 390 000 kr)</span></td>
+                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024 (SCF 2022)</td>
                     </tr>
                     <tr className="bg-neutral-50/50 hover:bg-neutral-100/50 transition-colors border-b border-neutral-100">
                       <td className="px-4 py-3 text-neutral-700">35–44 år</td>
-                      <td className="px-4 py-3 text-neutral-700">$91 k <span className="text-neutral-500">(≈ 910 000 kr)</span></td>
-                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024</td>
+                      <td className="px-4 py-3 text-neutral-700">135 600 USD <span className="text-neutral-500">(≈ 1,36 milj kr)</span></td>
+                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024 (SCF 2022)</td>
                     </tr>
                     <tr className="bg-white hover:bg-neutral-50 transition-colors border-b border-neutral-100">
                       <td className="px-4 py-3 text-neutral-700">45–54 år</td>
-                      <td className="px-4 py-3 text-neutral-700">$168 k <span className="text-neutral-500">(≈ 1,7 milj kr)</span></td>
-                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024</td>
+                      <td className="px-4 py-3 text-neutral-700">247 200 USD <span className="text-neutral-500">(≈ 2,47 milj kr)</span></td>
+                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024 (SCF 2022)</td>
                     </tr>
                     <tr className="bg-neutral-50/50 hover:bg-neutral-100/50 transition-colors border-b border-neutral-100">
                       <td className="px-4 py-3 text-neutral-700">55–64 år</td>
-                      <td className="px-4 py-3 text-neutral-700">$212 k <span className="text-neutral-500">(≈ 2,1 milj kr)</span></td>
-                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024</td>
+                      <td className="px-4 py-3 text-neutral-700">364 500 USD <span className="text-neutral-500">(≈ 3,65 milj kr)</span></td>
+                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024 (SCF 2022)</td>
                     </tr>
                     <tr className="bg-white hover:bg-neutral-50 transition-colors">
                       <td className="px-4 py-3 text-neutral-700">65–74 år</td>
-                      <td className="px-4 py-3 text-neutral-700">$266 k <span className="text-neutral-500">(≈ 2,7 milj kr)</span></td>
-                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024</td>
+                      <td className="px-4 py-3 text-neutral-700">409 900 USD <span className="text-neutral-500">(≈ 4,10 milj kr)</span></td>
+                      <td className="px-4 py-3 text-neutral-600 text-xs">Fidelity 2024 (SCF 2022)</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <p className="text-xs text-neutral-500 italic">
-                <em>(Median ger en mer "typisk" bild än medelvärden som dras upp av de rikaste.)</em>
+                <em>(Median ger en mer typisk bild än medelvärden, som ofta dras upp av de allra rikaste.)</em>
               </p>
             </div>
 
@@ -710,15 +713,15 @@ export default function DashboardPage() {
                 Vad du får när du testar
               </h2>
               <p className="leading-relaxed text-neutral-700 text-base mb-4">
-                När du fyllt i dina tillgångar, skulder och pensionsrätter får du:
+                När du har fyllt i dina tillgångar, skulder och pensionsrätter får du:
               </p>
               <ul className="list-disc list-inside space-y-2 text-neutral-700 text-base ml-2">
-                <li><strong className="text-neutral-900 font-semibold">Din exakta nivå</strong> – var du står på <em>Wealth Ladder</em></li>
+                <li><strong className="text-neutral-900 font-semibold">Din beräknade nivå</strong> – en ungefärlig placering i <em>Rikedomstrappan</em></li>
                 <li><strong className="text-neutral-900 font-semibold">Hastighet mot nästa steg</strong> – hur snabbt din förmögenhet växer</li>
                 <li><strong className="text-neutral-900 font-semibold">Fördelning av tillgångar</strong> – bostad, sparande, pension</li>
-                <li><strong className="text-neutral-900 font-semibold">FIRE-indikator</strong> – när du kan leva på kapitalet</li>
-                <li><strong className="text-neutral-900 font-semibold">0,01%-regeln</strong> – hur mycket du kan konsumera hållbart</li>
-                <li><strong className="text-neutral-900 font-semibold">Strategier som passar din nivå</strong> – från trygghetsfokus till frihetsplanering</li>
+                <li><strong className="text-neutral-900 font-semibold">FIRE-indikator</strong> – simulerar vid vilket ungefärligt läge ditt kapital kan räcka längre, givet dina antaganden</li>
+                <li><strong className="text-neutral-900 font-semibold">0,01%-regeln</strong> – en teoretisk tumregel för hur mycket konsumtion som kan vara hållbar utifrån din förmögenhet</li>
+                <li><strong className="text-neutral-900 font-semibold">Exempel på vanliga fokusområden på olika nivåer</strong> – från ökad trygghet till mer frihetsinriktad planering</li>
               </ul>
               <p className="leading-relaxed text-neutral-700 text-base mt-4">
                 Allt på under <strong className="text-neutral-900 font-semibold">5 minuter</strong>.
@@ -732,7 +735,7 @@ export default function DashboardPage() {
                 Simulera ekonomisk frihet och räkna på sparande
               </h2>
               <p className="leading-relaxed text-neutral-700 text-base mb-4">
-                Förmögenhetskollen innehåller kraftfulla verktyg för att planera din ekonomiska framtid:
+                Förmögenhetskollen innehåller två kraftfulla verktyg för att simulera olika scenarier för din ekonomiska framtid:
               </p>
               <div className="space-y-4 mb-4">
                 <div className="bg-white/70 rounded-lg p-4 border border-blue-200">
@@ -741,22 +744,25 @@ export default function DashboardPage() {
                     FIRE-simulator (Financial Independence, Retire Early)
                   </h3>
                   <p className="text-sm leading-relaxed text-neutral-700 mb-2">
-                    En interaktiv simulator som visar när du kan nå ekonomisk frihet. Verktyget delar upp ditt kapital i separata "hinkar" och simulerar utvecklingen över tid:
+                    En interaktiv simulator som visar en uppskattning av när du kan nå ekonomisk frihet. Verktyget delar upp ditt kapital i separata "hinkar" och simulerar utvecklingen över tid:
                   </p>
                   <ul className="text-sm text-neutral-700 space-y-1 ml-6 list-disc">
-                    <li><strong>Tillgängligt kapital</strong> – kan användas före pension (40% av bostadsnettot räknas med)</li>
-                    <li><strong>Marknadsbaserad pension</strong> – tjänstepension, premiepension och IPS (kan tas ut tidigt från 55 år)</li>
-                    <li><strong>Statlig pension</strong> – växer fram till pension, blir årlig inkomst efter pensionsstart</li>
-                    <li><strong>Viktade avkastningar</strong> – automatiskt beräknade per kategori, eller justera manuellt</li>
-                    <li><strong>Bridge-period</strong> – simulering av tiden mellan FIRE och pension</li>
-                    <li><strong>Coast FIRE</strong> – testa deltidsarbete med reducerade pensionsavsättningar</li>
-                    <li><strong>Validering</strong> – säkerställer att FIRE-året faktiskt håller i simuleringen</li>
+                    <li><strong>Tillgängligt kapital</strong> – kan användas före pension (40 % av bostadsnettot räknas med)</li>
+                    <li><strong>Marknadsbaserad pension</strong> – tjänstepension och IPS/privata pensionsförsäkringar (kan ofta tas ut från 55 år, beroende på avtal)</li>
+                    <li><strong>Statlig pension</strong> – inkomstpension och premiepension (kan tas ut tidigast ca 63–64 år beroende på födelseår)</li>
+                    <li><strong>Viktade avkastningar</strong> – beräknas automatiskt per kategori, men kan justeras manuellt</li>
+                    <li><strong>Bridge-period</strong> – visar tiden mellan FIRE och pensionsstart</li>
+                    <li><strong>Coast FIRE</strong> – låter dig testa deltidsarbete med lägre pensionsavsättningar</li>
+                    <li><strong>Validering</strong> – säkerställer att ditt valda FIRE-år faktiskt håller i simuleringen</li>
                   </ul>
                   <p className="text-sm leading-relaxed text-neutral-700 mt-3">
-                    <strong className="text-neutral-900">Interaktiv graf:</strong> Se hur ditt kapital utvecklas år för år med separata linjer för varje kategori. Justera avkastning, inflation, utgifter och sparande i realtid och se hur det påverkar din väg mot ekonomisk frihet.
+                    <strong className="text-neutral-900">Interaktiv graf:</strong> Följ hur ditt kapital utvecklas år för år med separata linjer för varje kategori. Justera avkastning, inflation, utgifter och sparande i realtid och se direkt hur det påverkar vägen mot ekonomisk frihet.
                   </p>
                   <p className="text-sm leading-relaxed text-neutral-700 mt-2">
-                    <strong className="text-neutral-900">Svensk kontext:</strong> Simulatorn är anpassad för svenska pensionssystemet med separata beräkningar för inkomstpension, premiepension, tjänstepension och IPS. Statlig pension behandlas som livränta-liknande utbetalning efter pensionsstart.
+                    <strong className="text-neutral-900">Svensk kontext:</strong> Simulatorn är anpassad till det svenska pensionssystemet med separata beräkningar för inkomstpension, premiepension, tjänstepension och IPS. Statlig pension hanteras som en livränteliknande utbetalning efter pensionsstart.
+                  </p>
+                  <p className="text-xs text-neutral-600 italic mt-3 pt-3 border-t border-blue-200">
+                    <em>Resultaten är endast simuleringar baserade på dina inmatade antaganden och ska inte ses som någon garanti eller personlig rekommendation.</em>
                   </p>
                 </div>
                 <div className="bg-white/70 rounded-lg p-4 border border-blue-200">
@@ -765,18 +771,21 @@ export default function DashboardPage() {
                     Sparkalkylator (ränta-på-ränta)
                   </h3>
                   <p className="text-sm leading-relaxed text-neutral-700 mb-2">
-                    Räkna på hur ditt sparande växer över tid med avkastning och regelbundna insättningar. Verktyget visar:
+                    Räkna på hur ditt sparande växer över tid med avkastning och regelbundna insättningar. Verktyget visar bland annat:
                   </p>
                   <ul className="text-sm text-neutral-700 space-y-1 ml-6 list-disc">
-                    <li>Hur kapitalet växer år för år med ränta-på-ränta</li>
-                    <li>Jämförelse mellan olika sparstrategier (trygg, aggressiv, passiv)</li>
-                    <li>"Vad händer om"-scenarier (t.ex. öka sparandet efter 5 år)</li>
-                    <li>Milstolpar som "första miljonen" eller "år 10: avkastningen överstiger dina insättningar"</li>
-                    <li>Interaktiva grafer med hover-effekter för detaljerad information</li>
-                    <li>Inkluderar inflation och justerade värden</li>
+                    <li>hur kapitalet växer år för år med ränta-på-ränta</li>
+                    <li>jämförelser mellan olika sparstrategier (trygg, aggressiv, passiv)</li>
+                    <li>"vad händer om"-scenarier (t.ex. öka sparandet efter 5 år)</li>
+                    <li>milstolpar som "första miljonen" eller när avkastningen överstiger dina insättningar</li>
+                    <li>interaktiva grafer med hover-effekter för detaljerad information</li>
+                    <li>resultat både i nominella och inflationsjusterade värden</li>
                   </ul>
                   <p className="text-sm leading-relaxed text-neutral-700 mt-3">
-                    <strong className="text-neutral-900">Perfekt för svenskar</strong> som vill se hur deras månadssparande i fonder och aktier kan växa över tid. Anpassa avkastning, tidshorisonter och sparande för att se olika scenarier.
+                    <strong className="text-neutral-900">Perfekt för svenskar</strong> som vill se hur deras månadssparande i fonder och aktier kan utvecklas över tid. Anpassa avkastning, sparbelopp och tidshorisont för att testa olika scenarier.
+                  </p>
+                  <p className="text-xs text-neutral-600 italic mt-3 pt-3 border-t border-blue-200">
+                    <em>Beräkningarna är exempelbaserade och tar inte hänsyn till risken i olika sparformer eller din fulla ekonomiska situation.</em>
                   </p>
                 </div>
               </div>
@@ -792,10 +801,13 @@ export default function DashboardPage() {
                 0,01%-regeln – konsumera efter förmögenhet, inte lön
               </h2>
               <p className="leading-relaxed text-neutral-700 text-base mb-3">
-                En central insikt från Nick Maggiulli: <strong className="text-neutral-900 font-semibold">din konsumtion bör följa din förmögenhet, inte din lön</strong>. Genom att spendera baserat på din faktiska förmögenhet kan du undvika livsstilsinflation och skapa en hållbar balans mellan att spara för framtiden och leva i nuet.
+                Enligt Nick Maggiulli kan det vara hjälpsamt att låta konsumtionen ta hänsyn till din förmögenhet – inte bara din lön. Det är ett sätt att resonera kring balansen mellan sparande och konsumtion, inte en regel som passar alla. Regeln bygger på antagandet att din förmögenhet i snitt kan växa med cirka 3–4 % per år, vilket motsvarar ungefär 0,01 % per dag.
               </p>
               <p className="text-sm text-neutral-600 italic">
-                I appen kan du se exakt hur mycket du kan spendera baserat på din faktiska nettoförmögenhet och jämföra med olika scenarier.
+                I appen kan du se en teoretisk uppskattning av hur mycket du skulle kunna konsumera per dag enligt 0,01%-regeln, baserat på din beräknade nettoförmögenhet. Beräkningen är förenklad och inte ett personligt råd.
+              </p>
+              <p className="text-xs text-neutral-600 italic mt-3 pt-3 border-t border-neutral-200">
+                <em>Detta är en förenklad simulering och ska inte ses som personlig ekonomisk rådgivning.</em>
               </p>
             </div>
 
@@ -806,10 +818,10 @@ export default function DashboardPage() {
                 Viktigt att veta
               </h3>
               <p className="text-sm leading-relaxed text-neutral-600 mb-2">
-                Förmögenhetskollen är ett <strong className="text-neutral-900">informations- och beräkningsverktyg</strong>, inte en finansiell rådgivningstjänst. Alla siffror bygger på offentliga data och rimliga antaganden. Historisk avkastning är ingen garanti för framtida resultat. Förmögenhetskollen står inte under Finansinspektionens tillsyn. Använd appen för <strong className="text-neutral-900">insikt och reflektion</strong>, inte för investeringsbeslut.
+                Förmögenhetskollen är ett <strong className="text-neutral-900">informations- och beräkningsverktyg</strong> – inte en finansiell rådgivningstjänst. Alla siffror bygger på offentliga data och rimliga antaganden. Historisk avkastning är ingen garanti för framtida resultat, och Förmögenhetskollen står inte under Finansinspektionens tillsyn. Verktyget tar inte hänsyn till alla detaljer i din ekonomiska situation och den information som visas är inte individuellt anpassad rådgivning. Använd Förmögenhetskollen för <strong className="text-neutral-900">insikt och reflektion</strong>, inte som underlag för enskilda investeringsbeslut.
               </p>
               <p className="text-sm leading-relaxed text-neutral-600 mt-3">
-                <strong className="text-neutral-900">Observera:</strong> Verktyget är inte direkt anpassat för personer som aktivt studerar med studielån eller som är pensionerade, då dessa livssituationer kan ha unika ekonomiska förutsättningar som inte fullt ut beaktas i de generella antagandena.
+                <strong className="text-neutral-900">Observera:</strong> Förmögenhetskollen tillhandahåller all information för allmän spridning. Verktyget är inte utformat enligt reglerna för finansiell rådgivning och ska inte betraktas som finansiell rådgivning enligt Lag (2003:862) om finansiell rådgivning till konsumenter. Verktyget är inte direkt anpassat för personer som aktivt studerar med studielån eller som är pensionerade, eftersom dessa livssituationer kan ha unika ekonomiska förutsättningar som inte fullt ut beaktas i de generella antagandena.
               </p>
             </div>
 
@@ -820,7 +832,7 @@ export default function DashboardPage() {
                 Källor och inspiration
               </h3>
               <ul className="text-sm leading-relaxed text-neutral-700 space-y-1">
-                <li>• Nick Maggiulli – <em>The Wealth Ladder</em> (2024), <em>Just Keep Buying</em> (2022)</li>
+                <li>• Nick Maggiulli – <em>The Wealth Ladder</em> (2025), <em>Just Keep Buying</em> (2022)</li>
                 <li>• Federal Reserve SCF 2022</li>
                 <li>• Fidelity Investments – <em>Average Net Worth by Age</em> (2024)</li>
                 <li>• OfDollarsAndData – <em>Net Worth by Age Calculator</em> (2024)</li>
@@ -843,7 +855,7 @@ export default function DashboardPage() {
             {/* Sluttext */}
             <div className="text-center mt-8 mb-6">
               <p className="leading-relaxed text-lg text-neutral-900 font-semibold mb-2">
-                Förmögenhetskollen – se hela bilden.
+                Förmögenhetskollen – se hela bilden av din förmögenhet.
               </p>
               <p className="leading-relaxed text-base text-neutral-700 mb-8">
                 Din förmögenhet kan vara större än du tror.
@@ -961,11 +973,11 @@ export default function DashboardPage() {
             <div className="space-y-1">
               <p className="text-sm font-medium text-primary/60 uppercase tracking-wide">Förmögenhetskollen</p>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-primary leading-tight">
-                Se hur rik du är – inte bara vad du har på kontot.
+                Se hur förmögen du är – inte bara vad du har på kontot.
               </h1>
             </div>
             <p className="text-base sm:text-lg text-primary/80 leading-relaxed">
-              De flesta svenskar underskattar sin verkliga förmögenhet eftersom pensionen inte syns. Vi räknar in allt – statlig pension, tjänstepension, bostad, sparande och skulder – och placerar dig i The Wealth Ladder.
+              Många svenskar underskattar sin verkliga förmögenhet eftersom pensionen inte syns i vardagsekonomin. Förmögenhetskollen gör en förenklad uppskattning av din totala förmögenhet – statlig pension, tjänstepension, bostad, sparande och skulder – och visar en beräknad placering i Rikedomstrappan (The Wealth Ladder).
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button 
@@ -990,7 +1002,7 @@ export default function DashboardPage() {
               </Button>
             </div>
             <p className="text-sm text-primary/70 pt-2">
-              Få din nivå, din månatliga ökning och om du är på väg mot ekonomisk frihet.
+              Se din beräknade nivå, en uppskattad månatlig förändring – och en simulerad bild av om du är på väg mot större ekonomisk frihet.
             </p>
           </div>
 
