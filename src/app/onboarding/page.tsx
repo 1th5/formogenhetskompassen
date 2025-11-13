@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHouseholdStore } from '@/lib/stores/useHouseholdStore';
 import { Asset, Liability, Person } from '@/lib/types';
@@ -22,7 +22,8 @@ import SpecificLiabilityWizardStep from '@/components/onboarding/new/SpecificLia
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Info, Lightbulb } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Info, Lightbulb, AlertTriangle } from 'lucide-react';
 
 type WizardSection = 
   | 'welcome'
@@ -41,7 +42,7 @@ const TOTAL_STEPS = 8; // welcome, persons, pension-per-person, savings-investme
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { setOnboardingData } = useHouseholdStore();
+  const { setOnboardingData, draftHousehold, clearDraft } = useHouseholdStore();
   
   // State för samlad data
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -53,6 +54,34 @@ export default function OnboardingPage() {
   const [currentSection, setCurrentSection] = useState<WizardSection>('welcome');
   const [currentPersonIndex, setCurrentPersonIndex] = useState(0);
   const [completedSections, setCompletedSections] = useState<string[]>([]);
+  
+  // State för dialog om befintligt hushåll
+  const [showExistingHouseholdDialog, setShowExistingHouseholdDialog] = useState(false);
+  
+  // Kontrollera om det finns ett hushåll när komponenten mountas
+  useEffect(() => {
+    const hasExistingHousehold = draftHousehold && 
+      draftHousehold.persons && 
+      draftHousehold.persons.length > 0;
+    
+    if (hasExistingHousehold) {
+      setShowExistingHouseholdDialog(true);
+    }
+  }, [draftHousehold]);
+  
+  // Hantera val i dialogen
+  const handleDialogChoice = (shouldClear: boolean) => {
+    setShowExistingHouseholdDialog(false);
+    
+    if (shouldClear) {
+      // Ta bort hushållet och fortsätt med onboarding
+      clearDraft();
+      // Dialog kommer att stängas och onboarding fortsätter
+    } else {
+      // Skicka till dashboard
+      router.push('/dashboard');
+    }
+  };
   
   // Mappa steg till sektioner för progress-tracking
   const getSectionForStep = (step: WizardSection): 'people' | 'assets' | 'debts' => {
@@ -373,8 +402,75 @@ export default function OnboardingPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--surface-bg)] py-4 md:py-8 px-4 md:px-6">
-      <div className="container mx-auto max-w-3xl">
+    <>
+      {/* Dialog för befintligt hushåll */}
+      <Dialog open={showExistingHouseholdDialog} onOpenChange={(open) => {
+        // Förhindra att dialogen stängs utan att välja
+        if (!open) {
+          // Om användaren försöker stänga, skicka till dashboard som standard
+          handleDialogChoice(false);
+        }
+      }}>
+        <DialogContent 
+          className="sm:max-w-[520px] p-0 gap-0 overflow-hidden" 
+          onEscapeKeyDown={(e) => e.preventDefault()} 
+          onPointerDownOutside={(e) => e.preventDefault()}
+          showCloseButton={false}
+        >
+          {/* Header med gradient bakgrund */}
+          <div className="bg-gradient-to-br from-amber-50 via-amber-50/80 to-orange-50/60 px-6 py-5 border-b border-amber-200/40">
+            <DialogHeader className="space-y-3">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-white/80 rounded-xl shadow-sm border border-amber-200/60 flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="flex-1 pt-1">
+                  <DialogTitle className="text-xl font-serif text-primary mb-2">
+                    Befintligt hushåll hittat
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-primary/70 leading-relaxed">
+                    Du har redan registrerat ett hushåll. För att starta en ny onboarding behöver du ta bort ditt nuvarande hushåll.
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+          </div>
+          
+          {/* Innehåll */}
+          <div className="px-6 py-5 bg-white">
+            <div className="bg-slate-50 border border-slate-200/60 rounded-lg p-4 mb-4">
+              <p className="text-sm text-primary/80 leading-relaxed">
+                <strong className="text-primary font-medium">Vill du ta bort ditt nuvarande hushåll och registrera ett nytt?</strong>
+              </p>
+              <p className="text-xs text-primary/60 mt-2 leading-relaxed">
+                All data i ditt nuvarande hushåll kommer att raderas permanent. Detta går inte att ångra.
+              </p>
+            </div>
+          </div>
+          
+          {/* Footer med knappar */}
+          <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200/60">
+            <DialogFooter className="flex-col sm:flex-row gap-3 sm:justify-end">
+              <Button
+                variant="secondary"
+                onClick={() => handleDialogChoice(false)}
+                className="w-full sm:w-auto order-2 sm:order-1"
+              >
+                Nej, gå till dashboard
+              </Button>
+              <Button
+                onClick={() => handleDialogChoice(true)}
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90 order-1 sm:order-2"
+              >
+                Ja, ta bort och starta ny
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="min-h-screen bg-[var(--surface-bg)] py-4 md:py-8 px-4 md:px-6">
+        <div className="container mx-auto max-w-3xl">
         {/* Header */}
         <div className="text-center mb-6 md:mb-10">
           <div className="inline-flex items-center justify-center mb-4 md:mb-6">
@@ -551,5 +647,6 @@ export default function OnboardingPage() {
         </Card>
       </div>
     </div>
+    </>
   );
 }

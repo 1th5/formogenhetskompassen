@@ -29,6 +29,10 @@ interface HouseholdState {
   setShouldAnimate: (should: boolean) => void;
   cameFromOnboarding: boolean;
   setCameFromOnboarding: (from: boolean) => void;
+  
+  // Pension calculation settings
+  useInflationAdjustment: boolean;
+  setUseInflationAdjustment: (use: boolean) => void;
 }
 
 export const useHouseholdStore = create<HouseholdState>()(
@@ -119,14 +123,21 @@ export const useHouseholdStore = create<HouseholdState>()(
       cameFromOnboarding: false,
       setCameFromOnboarding: (from) => {
         set({ cameFromOnboarding: from });
+      },
+      
+      // Pension calculation settings
+      useInflationAdjustment: false, // Default: nominell avkastning
+      setUseInflationAdjustment: (use) => {
+        set({ useInflationAdjustment: use });
       }
     }),
     {
       name: 'formogenhetskompassen-draft',
-      // Spara både draftHousehold och previousLevel
+      // Spara både draftHousehold, previousLevel och useInflationAdjustment
       partialize: (state) => ({ 
         draftHousehold: state.draftHousehold,
-        previousLevel: state.previousLevel
+        previousLevel: state.previousLevel,
+        useInflationAdjustment: state.useInflationAdjustment
       })
     }
   )

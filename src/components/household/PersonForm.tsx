@@ -35,7 +35,16 @@ const incomeSchema = z.object({
 
 const personSchema = z.object({
   name: z.string().min(1, 'Namn krävs'),
-  birth_year: z.number().min(1920, 'Födelseår måste vara efter 1920').max(2008, 'Minst 16 år'),
+  birth_year: z.number()
+    .min(1920, 'Födelseår måste vara efter 1920')
+    .max(2008, 'Minst 16 år')
+    .refine((year) => {
+      const currentYear = new Date().getFullYear();
+      const age = currentYear - year;
+      return age <= 64;
+    }, {
+      message: 'Appen är anpassad för personer som inte aktivt har pension. Beräkningar och funktioner är designade för personer som vill veta mer om sin framtida pension. Personen får inte vara över 64 år.'
+    }),
   incomes: z.array(incomeSchema).min(1, 'Minst en inkomst krävs'),
   other_savings_monthly: z.number().min(0, 'Sparande kan inte vara negativt'),
   ips_monthly: z.number().min(0, 'IPS kan inte vara negativt').optional()
@@ -323,13 +332,23 @@ export default function PersonForm({ onSave }: PersonFormProps) {
                           type="number"
                           {...control.register(`persons.${index}.birth_year`, { valueAsNumber: true })}
                           min="1920"
-                          max={currentYear > 0 ? currentYear - 16 : 2008}
+                          max={currentYear > 0 ? Math.min(currentYear - 16, currentYear - 65) : 1959}
                           placeholder="1985"
                         />
                         {isClient && (
                           <p className="text-sm text-gray-500 mt-1">
                             Ålder: {watchedPersons[index]?.birth_year ? currentYear - watchedPersons[index].birth_year : '--'} år
                           </p>
+                        )}
+                        {isClient && watchedPersons[index]?.birth_year && (currentYear - watchedPersons[index].birth_year) > 64 && (
+                          <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                            <p className="text-sm text-amber-800 font-medium mb-1">
+                              ⚠️ Åldersbegränsning
+                            </p>
+                            <p className="text-xs text-amber-700 leading-relaxed">
+                              Appen är anpassad för personer som inte aktivt har pension. Beräkningar och funktioner är designade för personer som vill veta mer om sin framtida pension. Personen får inte vara över 64 år.
+                            </p>
+                          </div>
                         )}
                         {errors.persons?.[index]?.birth_year && (
                           <p className="text-sm text-red-600 mt-1">

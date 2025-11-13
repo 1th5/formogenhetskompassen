@@ -503,14 +503,27 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
               id="person-birth-year"
               type="number"
               min="1900"
-              max={new Date().getFullYear()}
+              max={new Date().getFullYear() - 65}
               value={birthYear}
-              onChange={(e) => setBirthYear(Number(e.target.value))}
+              onChange={(e) => {
+                const year = Number(e.target.value);
+                setBirthYear(year);
+              }}
               className="mt-2"
             />
             <p className="text-sm text-primary/60 mt-1">
               Ålder: {age} år
             </p>
+            {age > 64 && (
+              <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-sm text-amber-800 font-medium mb-1">
+                  ⚠️ Åldersbegränsning
+                </p>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  Appen är anpassad för personer som inte aktivt har pension. Beräkningar och funktioner är designade för personer som vill veta mer om sin framtida pension. Personen får inte vara över 64 år.
+                </p>
+              </div>
+            )}
           </div>
         </div>
         
@@ -519,7 +532,14 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
             ← Tillbaka
           </Button>
           <Button 
-            onClick={() => setStep('income-choice')}
+            onClick={() => {
+              if (age > 64) {
+                // Visa felmeddelande - användaren kan inte fortsätta
+                return;
+              }
+              setStep('income-choice');
+            }}
+            disabled={age > 64}
             className="flex-1"
           >
             Nästa →

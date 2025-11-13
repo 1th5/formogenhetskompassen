@@ -27,6 +27,8 @@ import {
   Wallet
 } from 'lucide-react';
 import { getDefaultReturnRate } from '@/lib/types';
+import { Switch } from '@/components/ui/switch';
+import { useHouseholdStore } from '@/lib/stores/useHouseholdStore';
 
 interface PensionOverviewCardProps {
   assets: Asset[];
@@ -42,6 +44,8 @@ interface PensionTypeData {
   futureValueAt67: number;
   color: string;
   bgColor: string;
+  returnInfo: string;
+  usedRiskAdjustment: boolean;
 }
 
 // Konvertera årlig avkastning till månatlig (geometrisk)
@@ -68,10 +72,121 @@ function calculateFutureValue(
   return futureValueOfPrincipal + futureValueOfContributions;
 }
 
+// Beräkna framtida värde med riskjustering för åren 60-67
+// Om snittålder < 65 och avkastning > 5%, använd max 4% för åren 60-67
+// Om useInflationAdjustment är true, använd real avkastning (avkastning - 2% inflation)
+function calculateFutureValueWithRiskAdjustment(
+  currentValue: number,
+  monthlyContribution: number,
+  annualReturn: number,
+  averageAge: number,
+  useInflationAdjustment: boolean = false,
+  targetAge: number = 67
+): { futureValue: number; usedRiskAdjustment: boolean; returnInfo: string } {
+  const INFLATION_RATE = 0.02; // 2% inflation
+  const RISK_ADJUSTMENT_START_AGE = 60;
+  const RISK_ADJUSTMENT_END_AGE = 67;
+  const RISK_ADJUSTED_RETURN = 0.04; // 4% nominell avkastning under riskjustering
+  
+  // Om inflationsjustering är aktiverad, använd real avkastning
+  const effectiveReturn = useInflationAdjustment 
+    ? annualReturn - INFLATION_RATE 
+    : annualReturn;
+    
+  if (averageAge >= targetAge) {
+    const returnText = useInflationAdjustment 
+      ? `${(effectiveReturn * 100).toFixed(1)}% per år (real, efter 2% inflation)`
+      : `${(annualReturn * 100).toFixed(1)}% per år (nominell)`;
+    return {
+      futureValue: currentValue,
+      usedRiskAdjustment: false,
+      returnInfo: returnText
+    };
+  }
+
+  const monthsToTarget = (targetAge - averageAge) * 12;
+  if (monthsToTarget <= 0) {
+    const returnText = useInflationAdjustment 
+      ? `${(effectiveReturn * 100).toFixed(1)}% per år (real, efter 2% inflation)`
+      : `${(annualReturn * 100).toFixed(1)}% per år (nominell)`;
+    return {
+      futureValue: currentValue,
+      usedRiskAdjustment: false,
+      returnInfo: returnText
+    };
+  }
+
+  // Kontrollera om riskjustering ska användas
+  // Riskjustering: snittålder < 65 OCH avkastning > 5% OCH vi kommer att passera åldersintervallet 60-67
+  const willPassRiskAdjustmentPeriod = averageAge < RISK_ADJUSTMENT_END_AGE && targetAge > RISK_ADJUSTMENT_START_AGE;
+  const shouldAdjustRisk = averageAge < 65 && annualReturn > 0.05 && willPassRiskAdjustmentPeriod;
+  
+  // Använd max 4% (eller 2% real om inflationsjustering) för riskjustering
+  const adjustedReturnNominal = Math.min(annualReturn, RISK_ADJUSTED_RETURN); // Max 4%
+  const adjustedReturnEffective = useInflationAdjustment 
+    ? adjustedReturnNominal - INFLATION_RATE 
+    : adjustedReturnNominal;
+
+  if (!shouldAdjustRisk) {
+    // Ingen riskjustering, använd normal beräkning
+    const monthlyReturn = annualToMonthlyRate(effectiveReturn);
+    const returnText = useInflationAdjustment 
+      ? `${(effectiveReturn * 100).toFixed(1)}% per år (real, efter 2% inflation)`
+      : `${(annualReturn * 100).toFixed(1)}% per år (nominell)`;
+    return {
+      futureValue: calculateFutureValue(currentValue, monthlyContribution, monthlyReturn, monthsToTarget),
+      usedRiskAdjustment: false,
+      returnInfo: returnText
+    };
+  }
+
+  // Beräkna i två faser:
+  // 1. Fram till 60 år: normal avkastning
+  // 2. 60-67 år: max 4% avkastning (eller 2% real om inflationsjustering)
+  
+  const monthsTo60 = Math.max(0, (RISK_ADJUSTMENT_START_AGE - averageAge) * 12);
+  const monthsFrom60To67 = Math.max(0, monthsToTarget - monthsTo60);
+
+  const monthlyReturnNormal = annualToMonthlyRate(effectiveReturn);
+  const monthlyReturnAdjusted = annualToMonthlyRate(adjustedReturnEffective);
+
+  // Fas 1: Fram till 60 år med normal avkastning
+  let value = currentValue;
+  if (monthsTo60 > 0) {
+    value = calculateFutureValue(currentValue, monthlyContribution, monthlyReturnNormal, monthsTo60);
+  }
+
+  // Fas 2: 60-67 år med max 4% avkastning
+  if (monthsFrom60To67 > 0) {
+    value = calculateFutureValue(value, monthlyContribution, monthlyReturnAdjusted, monthsFrom60To67);
+  }
+
+  const returnText = useInflationAdjustment
+    ? `${(effectiveReturn * 100).toFixed(1)}% per år (real) fram till 60 år, sedan max ${(adjustedReturnEffective * 100).toFixed(1)}% per år (real, riskjustering 60-67)`
+    : `${(annualReturn * 100).toFixed(1)}% per år fram till 60 år, sedan max ${(adjustedReturnNominal * 100).toFixed(1)}% per år (riskjustering 60-67)`;
+
+  return {
+    futureValue: value,
+    usedRiskAdjustment: true,
+    returnInfo: returnText
+  };
+}
+
 export default function PensionOverviewCard({ assets, persons, isLocked = false }: PensionOverviewCardProps) {
   const router = useRouter();
   const [expandedType, setExpandedType] = useState<string | null>(null);
   const [animatedValues, setAnimatedValues] = useState<Record<string, number>>({});
+  const [showAllCalculations, setShowAllCalculations] = useState(false);
+  const [animatedTotalValue, setAnimatedTotalValue] = useState(0);
+  const [allCalculationsData, setAllCalculationsData] = useState<{
+    totalAt67: number;
+    monthlyPayout: number;
+    usedRiskAdjustment: boolean;
+  } | null>(null);
+  
+  // Hämta inflationsjustering från store
+  const useInflationAdjustment = useHouseholdStore((state) => state.useInflationAdjustment);
+  const setUseInflationAdjustment = useHouseholdStore((state) => state.setUseInflationAdjustment);
 
   // Beräkna genomsnittlig ålder
   const averageAge = useMemo(() => {
@@ -88,6 +203,15 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
     return Math.max(0, (67 - averageAge) * 12);
   }, [averageAge]);
 
+  // Dölj beräkningar när inflationsjustering ändras
+  useEffect(() => {
+    setExpandedType(null);
+    setShowAllCalculations(false);
+    setAllCalculationsData(null);
+    setAnimatedValues({});
+    setAnimatedTotalValue(0);
+  }, [useInflationAdjustment]);
+
   // Beräkna nuvarande värden per pensionstyp
   const pensionData = useMemo(() => {
     // Tjänstepension
@@ -96,12 +220,14 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
       .reduce((sum, a) => sum + a.value, 0);
     const occPensionContrib = calculateOccupationalPensionMonthlyAllocations(persons);
     const occPensionReturn = getDefaultReturnRate('Tjänstepension');
-    const occPensionFuture = calculateFutureValue(
+    const occPensionCalc = calculateFutureValueWithRiskAdjustment(
       occPensionAssets,
       occPensionContrib,
-      annualToMonthlyRate(occPensionReturn),
-      monthsTo67
+      occPensionReturn,
+      averageAge,
+      useInflationAdjustment
     );
+    const occPensionFuture = occPensionCalc.futureValue;
 
     // Premiepension
     const premiePensionAssets = assets
@@ -109,12 +235,14 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
       .reduce((sum, a) => sum + a.value, 0);
     const premiePensionContrib = calculatePremiePensionMonthlyAllocations(persons);
     const premiePensionReturn = getDefaultReturnRate('Premiepension');
-    const premiePensionFuture = calculateFutureValue(
+    const premiePensionCalc = calculateFutureValueWithRiskAdjustment(
       premiePensionAssets,
       premiePensionContrib,
-      annualToMonthlyRate(premiePensionReturn),
-      monthsTo67
+      premiePensionReturn,
+      averageAge,
+      useInflationAdjustment
     );
+    const premiePensionFuture = premiePensionCalc.futureValue;
 
     // IPS
     const ipsAssets = assets
@@ -122,12 +250,14 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
       .reduce((sum, a) => sum + a.value, 0);
     const ipsContrib = calculatePrivatePensionMonthlyAllocations(persons);
     const ipsReturn = getDefaultReturnRate('Privat pensionssparande (IPS)');
-    const ipsFuture = calculateFutureValue(
+    const ipsCalc = calculateFutureValueWithRiskAdjustment(
       ipsAssets,
       ipsContrib,
-      annualToMonthlyRate(ipsReturn),
-      monthsTo67
+      ipsReturn,
+      averageAge,
+      useInflationAdjustment
     );
+    const ipsFuture = ipsCalc.futureValue;
 
     // Statlig pension (inkomstpension)
     const statePensionAssets = assets
@@ -135,12 +265,14 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
       .reduce((sum, a) => sum + a.value, 0);
     const statePensionContrib = calculatePublicPensionMonthlyAllocations(persons);
     const statePensionReturn = getDefaultReturnRate('Trygghetsbaserad pension (Statlig)');
-    const statePensionFuture = calculateFutureValue(
+    const statePensionCalc = calculateFutureValueWithRiskAdjustment(
       statePensionAssets,
       statePensionContrib,
-      annualToMonthlyRate(statePensionReturn),
-      monthsTo67
+      statePensionReturn,
+      averageAge,
+      useInflationAdjustment
     );
+    const statePensionFuture = statePensionCalc.futureValue;
 
     return {
       occupational: {
@@ -150,7 +282,9 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         monthlyContribution: occPensionContrib,
         futureValueAt67: occPensionFuture,
         color: 'text-blue-600',
-        bgColor: 'bg-blue-50'
+        bgColor: 'bg-blue-50',
+        returnInfo: occPensionCalc.returnInfo,
+        usedRiskAdjustment: occPensionCalc.usedRiskAdjustment
       },
       premie: {
         label: 'Premiepension',
@@ -159,7 +293,9 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         monthlyContribution: premiePensionContrib,
         futureValueAt67: premiePensionFuture,
         color: 'text-emerald-600',
-        bgColor: 'bg-emerald-50'
+        bgColor: 'bg-emerald-50',
+        returnInfo: premiePensionCalc.returnInfo,
+        usedRiskAdjustment: premiePensionCalc.usedRiskAdjustment
       },
       ips: {
         label: 'IPS',
@@ -168,7 +304,9 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         monthlyContribution: ipsContrib,
         futureValueAt67: ipsFuture,
         color: 'text-purple-600',
-        bgColor: 'bg-purple-50'
+        bgColor: 'bg-purple-50',
+        returnInfo: ipsCalc.returnInfo,
+        usedRiskAdjustment: ipsCalc.usedRiskAdjustment
       },
       state: {
         label: 'Statlig pension',
@@ -177,10 +315,12 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         monthlyContribution: statePensionContrib,
         futureValueAt67: statePensionFuture,
         color: 'text-amber-600',
-        bgColor: 'bg-amber-50'
+        bgColor: 'bg-amber-50',
+        returnInfo: statePensionCalc.returnInfo,
+        usedRiskAdjustment: statePensionCalc.usedRiskAdjustment
       }
     };
-  }, [assets, persons, monthsTo67]);
+  }, [assets, persons, averageAge, useInflationAdjustment]);
 
   // Animation för framtida värden
   useEffect(() => {
@@ -355,6 +495,116 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
           </p>
         </div>
 
+        {/* Inflationsjustering switch */}
+        <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg border border-slate-200">
+          <div className="flex items-center gap-2">
+            <Info className="w-4 h-4 text-primary/60" />
+            <div>
+              <p className="text-sm font-medium text-gray-900">Inflationsjustering</p>
+              <p className="text-xs text-gray-600">
+                {useInflationAdjustment 
+                  ? 'Räknar med real avkastning (avkastning - 2% inflation)'
+                  : 'Räknar med nominell avkastning'}
+              </p>
+            </div>
+          </div>
+          <Switch
+            checked={useInflationAdjustment}
+            onCheckedChange={(checked) => {
+              setUseInflationAdjustment(checked);
+            }}
+          />
+        </div>
+
+        {/* Knapp för att beräkna alla */}
+        <div className="flex justify-center">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              const totalAt67 = Object.values(pensionData).reduce((sum, p) => sum + p.futureValueAt67, 0);
+              const usedRiskAdjustment = Object.values(pensionData).some(p => p.usedRiskAdjustment);
+              
+              // Beräkna månadsutbetalning över 25 år (300 månader)
+              // Använd enkel formel: totalAt67 / 300 (ingen avkastning under utbetalning för enkelhet)
+              const monthlyPayout = totalAt67 / 300;
+              
+              const willShow = !showAllCalculations;
+              
+              setAllCalculationsData({
+                totalAt67,
+                monthlyPayout,
+                usedRiskAdjustment
+              });
+              setShowAllCalculations(willShow);
+              
+              // Starta animation för totalen när vi visar beräkningen
+              if (willShow) {
+                setAnimatedTotalValue(0);
+                // Använd setTimeout för att säkerställa att state har uppdaterats
+                setTimeout(() => {
+                  const duration = 2000; // 2 sekunder
+                  const steps = 60;
+                  const stepDuration = duration / steps;
+                  let currentStep = 0;
+
+                  const interval = setInterval(() => {
+                    currentStep++;
+                    const progress = currentStep / steps;
+                    // Ease-out animation
+                    const easedProgress = 1 - Math.pow(1 - progress, 3);
+                    const currentValue = totalAt67 * easedProgress;
+                    
+                    setAnimatedTotalValue(currentValue);
+
+                    if (currentStep >= steps) {
+                      clearInterval(interval);
+                      setAnimatedTotalValue(totalAt67);
+                    }
+                  }, stepDuration);
+                }, 10);
+              } else {
+                setAnimatedTotalValue(0);
+              }
+            }}
+            className="text-sm"
+          >
+            <TrendingUp className="w-4 h-4 mr-2" />
+            {showAllCalculations ? 'Dölj' : 'Beräkna alla tillgångar vid 67'}
+          </Button>
+        </div>
+
+        {/* Visa totalberäkning */}
+        {showAllCalculations && allCalculationsData && (
+          <div className="bg-gradient-to-br from-primary/10 to-primary/20 rounded-lg p-4 border border-primary/30">
+            <p className="text-sm font-semibold text-primary mb-3 text-center">Total pensionstillgång vid 67 års ålder</p>
+            <p className="text-2xl sm:text-3xl font-bold text-primary text-center mb-4">
+              {formatCurrency(animatedTotalValue || 0)}
+            </p>
+            {useInflationAdjustment && (
+              <p className="text-xs text-primary/70 text-center mb-2">
+                (Real värde, efter 2% inflation)
+              </p>
+            )}
+            <div className="bg-white/60 rounded-lg p-4 mb-3">
+              <p className="text-sm font-semibold text-gray-900 mb-2">Månadsutbetalning över 25 år</p>
+              <p className="text-xl font-bold text-primary">
+                {formatCurrency(allCalculationsData.monthlyPayout)}/mån
+              </p>
+              <p className="text-xs text-gray-600 mt-1">
+                Om totalbeloppet fördelas jämnt över 25 år (300 månader)
+              </p>
+            </div>
+            {allCalculationsData.usedRiskAdjustment && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-xs text-amber-800">
+                  <strong>ℹ️ Antagande:</strong> För tillgångar med avkastning över 5% har vi begränsat avkastningen till max 4% per år för åren 60-67 för att minska risken närmare pension (gäller när hushållets snittålder är under 65 år).
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Pensionstyper */}
         <div className="space-y-3">
           {(Object.keys(pensionData) as Array<keyof typeof pensionData>).map((key) => {
@@ -400,13 +650,15 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
                         {formatCurrency(animatedValue)}
                       </p>
                       <p className="text-xs text-primary/60 mt-2">
-                        Baserat på {monthsTo67} månader med {((getDefaultReturnRate(
-                          key === 'occupational' ? 'Tjänstepension' :
-                          key === 'premie' ? 'Premiepension' :
-                          key === 'ips' ? 'Privat pensionssparande (IPS)' :
-                          'Trygghetsbaserad pension (Statlig)'
-                        ) * 100).toFixed(1))}% årlig avkastning
+                        Baserat på {monthsTo67} månader med {data.returnInfo}
                       </p>
+                      {data.usedRiskAdjustment && (
+                        <div className="mt-2 pt-2 border-t border-primary/20">
+                          <p className="text-xs text-primary/70 italic">
+                            ℹ️ Riskjustering: Avkastningen begränsas till max 4% per år för åren 60-67 för att minska risken närmare pension
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -511,6 +763,13 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
             <strong className="text-primary/70">Viktigt:</strong> Dessa beräkningar är förenklingar och baseras på antaganden om avkastning och framtida utveckling. 
             Tidigare utveckling på börsen är ingen garanti för framtida resultat. 
             Verkliga värden kan avvika betydligt beroende på marknadsutveckling, skatter, avgifter och förändringar i pensionssystemet.
+            {useInflationAdjustment ? (
+              <> Beräkningarna använder real avkastning (nominell avkastning minus 2% inflation per år), vilket ger värden i dagens penningvärde. 
+              Nominell avkastning skulle ge högre belopp men dessa skulle ha lägre köpkraft på grund av inflation.</>
+            ) : (
+              <> Beräkningarna använder nominell avkastning, vilket innebär att värdena inte är justerade för inflation. 
+              För att se värden i dagens penningvärde, aktivera inflationsjustering.</>
+            )}
           </p>
         </div>
       </CardContent>
