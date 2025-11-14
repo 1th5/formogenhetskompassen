@@ -362,7 +362,7 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
                 <li>Se interaktiv graf över din väg mot ekonomisk frihet</li>
                 <li>Justera avkastning, inflation, utgifter och sparande</li>
                 <li>Simulera Coast FIRE – deltidsarbete under bridge-perioden</li>
-                <li>Se när kapitalet når 4%-regeln och när uttag kan börja</li>
+                <li>Se när kapitalet når 4 %-regeln och när uttag kan börja</li>
                 <li>Testa olika scenarier med "vad händer om"-tänk</li>
               </ul>
             </div>
@@ -482,7 +482,7 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
               </div>
               {fireResult.yearsToFire === 0 ? (
                 <p className="text-base font-semibold text-emerald-700 mb-1 text-center">
-                  Du är ekonomiskt oberoende – grymt jobbat!
+                  Du når ekonomisk frihet enligt dina antaganden – grymt jobbat!
                   <span className="block text-sm font-normal text-emerald-800/80">nu kan du leva på avkastningen utan att behöva arbeta</span>
                 </p>
               ) : (
@@ -492,11 +492,14 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
                 </p>
               )}
               <p className="text-xs text-gray-500">
-                vid {fireResult.estimatedAge} år • snittet av personer i hushållet
+                vid {fireResult.estimatedAge} år • genomsnittlig ålder i hushållet
               </p>
               <div className="mt-3 pt-3 border-t border-amber-200 bg-amber-50/50 rounded-lg p-3">
                 <p className="text-xs text-amber-800 leading-relaxed">
                   <strong className="text-amber-900">Viktigt:</strong> Beräkningen förutsätter uttag från 55 år och använder genomsnittliga avkastningar. Börsen är oförutsägbar och verktyget garanterar inget. Om du planerar FIRE, gör egna beräkningar med dina förutsättningar.
+                </p>
+                <p className="text-xs text-amber-800 leading-relaxed mt-2">
+                  Beräkningen är en simulering baserad på 4 %-regeln och dina antaganden om avkastning och utgifter – inte en garanti eller personlig rekommendation.
                 </p>
               </div>
             </div>
@@ -511,7 +514,7 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
             ) : (
               <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl border border-white/60 shadow-md">
                 <p className="text-sm text-gray-800 leading-relaxed">
-                  <strong className="text-gray-900">Vad betyder det?</strong> När du är ekonomiskt oberoende kan du leva på ditt kapital utan att behöva arbeta. Det ger dig <strong className="text-gray-900">frihet att välja</strong> hur du vill leva – oavsett om det är att sluta jobba, byta karriär, eller ha trygghet i vardagen.
+                  <strong className="text-gray-900">Vad betyder det?</strong> När du enligt denna modell är ekonomiskt oberoende skulle ditt kapital kunna täcka dina beräknade utgifter utan arbete, givet antagandena ovan. Det är en teoretisk simulering – inte en uppmaning att sluta arbeta. Modellen visar en <strong className="text-gray-900">teoretisk frihet att välja</strong> hur du vill leva – oavsett om det är att sluta jobba, byta karriär, eller ha trygghet i vardagen.
                 </p>
               </div>
             )}
@@ -578,11 +581,11 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
                     <p className="font-medium mb-1">Vad är portfölj vid frihet?</p>
                     <p>Det tillgängliga kapitalet (exkl. pension) som du behöver vid ekonomisk frihet för att täcka utgifter fram till pension. Detta är beloppet du behöver ha investerat när du slutar jobba.</p>
                     <p className="mt-2 pt-2 border-t border-gray-200">
-                      <strong>Bostad:</strong> Boendet räknas med till 40% av nettovärdet i FIRE-beräkningen, eftersom allt bostadskapital inte alltid är lätt att frigöra. Avkastningen på tillgängligt kapital beräknas med hänsyn till nettovärden (tillgångar minus relaterade skulder) och proportionell fördelning av övriga skulder.
+                      <strong>Bostad:</strong> I Förmögenhetskollens modell räknas 40 % av bostadens nettovärde som tillgängligt kapital, eftersom allt bostadskapital inte alltid är lätt att frigöra. Avkastningen på tillgängligt kapital beräknas med hänsyn till nettovärden (tillgångar minus relaterade skulder) och proportionell fördelning av övriga skulder.
                     </p>
                     {fireResult?.statePensionAnnualIncome && fireResult.statePensionAnnualIncome > 0 && (
                       <p className="mt-2 pt-2 border-t border-gray-200">
-                        <strong>Statlig pension (inkomstpension):</strong> {formatCurrency(fireResult.statePensionAnnualIncome / 12)}/mån från 63 år utbetalas som inkomst och minskar därför behovet av kapital vid pension. Den statliga pensionen växer fram till pensionsstart och utbetalas sedan över flera år (t.ex. 20 år vid 63 års ålder).
+                        <strong>Statlig pension (inkomstpension):</strong> {formatCurrency(fireResult.statePensionAnnualIncome / 12)}/mån från lägsta uttagsålder för din födelseårskull (ca 63 år idag) utbetalas som inkomst och minskar därför behovet av kapital vid pension. Den statliga pensionen växer fram till pensionsstart och utbetalas sedan över flera år (utbetalningstid kan variera beroende på val och regelverk).
                       </p>
                     )}
                     <button
@@ -599,7 +602,7 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
                 <p className="text-lg font-bold text-gray-900">{formatCurrency(portfolioAtFire)}</p>
                 {fireResult?.statePensionAnnualIncome && fireResult.statePensionAnnualIncome > 0 && (
                   <p className="text-xs text-blue-600 mt-1">
-                    + Statlig pension: {formatCurrency(fireResult.statePensionAnnualIncome / 12)}/mån från 63 år
+                    + Statlig pension: {formatCurrency(fireResult.statePensionAnnualIncome / 12)}/mån från lägsta uttagsålder (ca 63 år idag)
                   </p>
                 )}
               </div>

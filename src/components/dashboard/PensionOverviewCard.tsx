@@ -95,8 +95,8 @@ function calculateFutureValueWithRiskAdjustment(
     
   if (averageAge >= targetAge) {
     const returnText = useInflationAdjustment 
-      ? `${(effectiveReturn * 100).toFixed(1)}% per år (real, efter 2% inflation)`
-      : `${(annualReturn * 100).toFixed(1)}% per år (nominell)`;
+      ? `${(effectiveReturn * 100).toFixed(1)} % per år (real, efter 2 % inflation)`
+      : `${(annualReturn * 100).toFixed(1)} % per år (nominell)`;
     return {
       futureValue: currentValue,
       usedRiskAdjustment: false,
@@ -107,8 +107,8 @@ function calculateFutureValueWithRiskAdjustment(
   const monthsToTarget = (targetAge - averageAge) * 12;
   if (monthsToTarget <= 0) {
     const returnText = useInflationAdjustment 
-      ? `${(effectiveReturn * 100).toFixed(1)}% per år (real, efter 2% inflation)`
-      : `${(annualReturn * 100).toFixed(1)}% per år (nominell)`;
+      ? `${(effectiveReturn * 100).toFixed(1)} % per år (real, efter 2 % inflation)`
+      : `${(annualReturn * 100).toFixed(1)} % per år (nominell)`;
     return {
       futureValue: currentValue,
       usedRiskAdjustment: false,
@@ -131,8 +131,8 @@ function calculateFutureValueWithRiskAdjustment(
     // Ingen riskjustering, använd normal beräkning
     const monthlyReturn = annualToMonthlyRate(effectiveReturn);
     const returnText = useInflationAdjustment 
-      ? `${(effectiveReturn * 100).toFixed(1)}% per år (real, efter 2% inflation)`
-      : `${(annualReturn * 100).toFixed(1)}% per år (nominell)`;
+      ? `${(effectiveReturn * 100).toFixed(1)} % per år (real, efter 2 % inflation)`
+      : `${(annualReturn * 100).toFixed(1)} % per år (nominell)`;
     return {
       futureValue: calculateFutureValue(currentValue, monthlyContribution, monthlyReturn, monthsToTarget),
       usedRiskAdjustment: false,
@@ -162,8 +162,8 @@ function calculateFutureValueWithRiskAdjustment(
   }
 
   const returnText = useInflationAdjustment
-    ? `${(effectiveReturn * 100).toFixed(1)}% per år (real) fram till 60 år, sedan max ${(adjustedReturnEffective * 100).toFixed(1)}% per år (real, riskjustering 60-67)`
-    : `${(annualReturn * 100).toFixed(1)}% per år fram till 60 år, sedan max ${(adjustedReturnNominal * 100).toFixed(1)}% per år (riskjustering 60-67)`;
+    ? `${(effectiveReturn * 100).toFixed(1)} % per år (real) fram till 60 år, sedan max ${(adjustedReturnEffective * 100).toFixed(1)} % per år (real, riskjustering 60-67)`
+    : `${(annualReturn * 100).toFixed(1)} % per år fram till 60 år, sedan max ${(adjustedReturnNominal * 100).toFixed(1)} % per år (riskjustering 60-67)`;
 
   return {
     futureValue: value,
@@ -503,7 +503,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
               <p className="text-sm font-medium text-gray-900">Inflationsjustering</p>
               <p className="text-xs text-gray-600">
                 {useInflationAdjustment 
-                  ? 'Räknar med real avkastning (avkastning - 2% inflation)'
+                  ? 'Räknar med real avkastning (avkastning - 2 % inflation)'
                   : 'Räknar med nominell avkastning'}
               </p>
             </div>
@@ -583,7 +583,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
             </p>
             {useInflationAdjustment && (
               <p className="text-xs text-primary/70 text-center mb-2">
-                (Real värde, efter 2% inflation)
+                (Real värde, efter 2 % inflation)
               </p>
             )}
             <div className="bg-white/60 rounded-lg p-4 mb-3">
@@ -598,7 +598,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
             {allCalculationsData.usedRiskAdjustment && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                 <p className="text-xs text-amber-800">
-                  <strong>ℹ️ Antagande:</strong> För tillgångar med avkastning över 5% har vi begränsat avkastningen till max 4% per år för åren 60-67 för att minska risken närmare pension (gäller när hushållets snittålder är under 65 år).
+                  <strong>ℹ️ Antagande:</strong> För tillgångar med avkastning över 5 % har vi begränsat avkastningen till max 4 % per år för åren 60-67 för att minska risken närmare pension (gäller när hushållets snittålder är under 65 år).
                 </p>
               </div>
             )}
@@ -627,7 +627,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{data.label}</p>
                       <p className="text-xs text-gray-500">
-                        {formatCurrency(data.currentValue)} • +{formatCurrency(data.monthlyContribution)}/mån
+                        {formatCurrency(data.currentValue)} • Beräknad månadsvis pensionsrätt: +{formatCurrency(data.monthlyContribution)}/mån (tilldelas årligen)
                       </p>
                     </div>
                   </div>
@@ -655,7 +655,14 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
                       {data.usedRiskAdjustment && (
                         <div className="mt-2 pt-2 border-t border-primary/20">
                           <p className="text-xs text-primary/70 italic">
-                            ℹ️ Riskjustering: Avkastningen begränsas till max 4% per år för åren 60-67 för att minska risken närmare pension
+                            ℹ️ Modellantagande: För att minska risken begränsar Förmögenhetskollen avkastningen till max 4 % per år för åren 60-67
+                          </p>
+                        </div>
+                      )}
+                      {key === 'state' && (
+                        <div className="mt-2 pt-2 border-t border-primary/20">
+                          <p className="text-xs text-primary/70 italic">
+                            (Inkomstpension är inte en fonderad tillgång utan en intjänad rättighet. Beräkningen här är en förenklad uppskattning.)
                           </p>
                         </div>
                       )}
@@ -764,7 +771,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
             Tidigare utveckling på börsen är ingen garanti för framtida resultat. 
             Verkliga värden kan avvika betydligt beroende på marknadsutveckling, skatter, avgifter och förändringar i pensionssystemet.
             {useInflationAdjustment ? (
-              <> Beräkningarna använder real avkastning (nominell avkastning minus 2% inflation per år), vilket ger värden i dagens penningvärde. 
+              <> Beräkningarna använder real avkastning (nominell avkastning minus 2 % inflation per år), vilket ger värden i dagens penningvärde. 
               Nominell avkastning skulle ge högre belopp men dessa skulle ha lägre köpkraft på grund av inflation.</>
             ) : (
               <> Beräkningarna använder nominell avkastning, vilket innebär att värdena inte är justerade för inflation. 

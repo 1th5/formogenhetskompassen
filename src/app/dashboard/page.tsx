@@ -547,7 +547,7 @@ export default function DashboardPage() {
                     </tr>
                     <tr className="border-b border-white/10">
                       <td className="py-3 px-4 font-medium">Sparande till pension</td>
-                      <td className="py-3 px-4">Stora automatiska pensionsavsättningar via allmän pension (18,5% av pensionsgrundande inkomst) och tjänstepension från arbetsgivare (ofta 4,5–30% av vissa lönedelar)</td>
+                      <td className="py-3 px-4">Stora automatiska pensionsavsättningar via allmän pension (18,5 % av pensionsgrundande inkomst) och tjänstepension från arbetsgivare (ofta 4,5–30 % av vissa lönedelar)</td>
                       <td className="py-3 px-4">Frivilligt och ojämnt fördelat</td>
                     </tr>
                     <tr className="border-b border-white/10">
@@ -720,7 +720,7 @@ export default function DashboardPage() {
                 <li><strong className="text-neutral-900 font-semibold">Hastighet mot nästa steg</strong> – hur snabbt din förmögenhet växer</li>
                 <li><strong className="text-neutral-900 font-semibold">Fördelning av tillgångar</strong> – bostad, sparande, pension</li>
                 <li><strong className="text-neutral-900 font-semibold">FIRE-indikator</strong> – simulerar vid vilket ungefärligt läge ditt kapital kan räcka längre, givet dina antaganden</li>
-                <li><strong className="text-neutral-900 font-semibold">0,01%-regeln</strong> – en teoretisk tumregel för hur mycket konsumtion som kan vara hållbar utifrån din förmögenhet</li>
+                <li><strong className="text-neutral-900 font-semibold">0,01 %-regeln</strong> – en teoretisk tumregel för hur mycket konsumtion som kan vara hållbar utifrån din förmögenhet</li>
                 <li><strong className="text-neutral-900 font-semibold">Exempel på vanliga fokusområden på olika nivåer</strong> – från ökad trygghet till mer frihetsinriktad planering</li>
               </ul>
               <p className="leading-relaxed text-neutral-700 text-base mt-4">
@@ -798,13 +798,13 @@ export default function DashboardPage() {
             <div className="bg-neutral-50 rounded-lg p-5 sm:p-6 border-l-4 border-neutral-900 mb-6">
               <h2 className="font-serif text-xl sm:text-2xl text-neutral-900 mb-3 flex items-center gap-3">
                 <CircleDollarSign className="w-5 h-5 text-neutral-900" />
-                0,01%-regeln – konsumera efter förmögenhet, inte lön
+                0,01 %-regeln – konsumera efter förmögenhet, inte lön
               </h2>
               <p className="leading-relaxed text-neutral-700 text-base mb-3">
                 Enligt Nick Maggiulli kan det vara hjälpsamt att låta konsumtionen ta hänsyn till din förmögenhet – inte bara din lön. Det är ett sätt att resonera kring balansen mellan sparande och konsumtion, inte en regel som passar alla. Regeln bygger på antagandet att din förmögenhet i snitt kan växa med cirka 3–4 % per år, vilket motsvarar ungefär 0,01 % per dag.
               </p>
               <p className="text-sm text-neutral-600 italic">
-                I appen kan du se en teoretisk uppskattning av hur mycket du skulle kunna konsumera per dag enligt 0,01%-regeln, baserat på din beräknade nettoförmögenhet. Beräkningen är förenklad och inte ett personligt råd.
+                I appen kan du se en teoretisk uppskattning av hur mycket du skulle kunna konsumera per dag enligt 0,01 %-regeln, baserat på din beräknade nettoförmögenhet. Beräkningen är förenklad och inte ett personligt råd.
               </p>
               <p className="text-xs text-neutral-600 italic mt-3 pt-3 border-t border-neutral-200">
                 <em>Detta är en förenklad simulering och ska inte ses som personlig ekonomisk rådgivning.</em>
@@ -911,7 +911,7 @@ export default function DashboardPage() {
         'Pengarna tar slut före månaden gör det.',
         'Otur förstärks – minsta motgång kan bli kris.'
       ],
-      focus: 'Fokus: skapa trygghet och buffert.'
+      focus: 'skapa trygghet och buffert.'
     },
     2: {
       heading: 'Nivå 2 – Matvarufrihet (vardagstrygghet)',
@@ -920,7 +920,7 @@ export default function DashboardPage() {
         'Du klarar oväntade utgifter utan stress.',
         'Kan handla fritt i matbutiken utan oro.'
       ],
-      focus: 'Fokus: jobba smartare och börja spara långsiktigt.'
+      focus: 'jobba smartare och börja spara långsiktigt.'
     },
     3: {
       heading: 'Nivå 3 – Restaurangfrihet',
@@ -929,7 +929,7 @@ export default function DashboardPage() {
         'Ekonomin fungerar och du har valfrihet i vardagen.',
         'Du kan unna dig utan oro.'
       ],
-      focus: 'Fokus: låta kapitalet växa och hitta balans i livet.'
+      focus: 'låta kapitalet växa och hitta balans i livet.'
     },
     4: {
       heading: 'Nivå 4 – Resefrihet',
@@ -938,7 +938,7 @@ export default function DashboardPage() {
         'Pengar styr inte längre vardagen.',
         'Du kan resa när och vart du vill.'
       ],
-      focus: 'Fokus: meningsfullhet, inte bara tillväxt.'
+      focus: 'meningsfullhet, inte bara tillväxt.'
     },
     5: {
       heading: 'Nivå 5 – Geografisk frihet',
@@ -947,7 +947,7 @@ export default function DashboardPage() {
         'Full kontroll över plats och tid.',
         'Pengar löser sällan problem – de skapar ibland nya.'
       ],
-      focus: 'Fokus: bevara, diversifiera och hitta balans.'
+      focus: 'bevara, diversifiera och hitta balans.'
     },
     6: {
       heading: 'Nivå 6 – Påverkansfrihet',
@@ -956,7 +956,7 @@ export default function DashboardPage() {
         'Du kan påverka världen och forma framtiden.',
         'Pengar spelar liten roll – inflytande större.'
       ],
-      focus: 'Fokus: ge vidare och skapa bestående värde.'
+      focus: 'ge vidare och skapa bestående värde.'
     }
   };
   
@@ -1194,8 +1194,8 @@ export default function DashboardPage() {
               <div className="mt-3 text-xs font-sans text-primary/70 text-center sm:text-left space-y-1">
                 <p className="font-sans text-xs uppercase tracking-wide text-primary/70 mb-1">Består av</p>
                 <p className="text-xs">✓ Alla tillgångar (sparkonto, fonder, aktier)</p>
-                <p className="text-xs">✓ Pensionstillgångar</p>
-                <p className="text-xs">✓ Fastigheter, bil, m.m.</p>
+                <p className="text-xs">✓ Pensionstillgångar (allmän pension, tjänstepension, IPS m.m.)</p>
+                <p className="text-xs">✓ Bostad, bil och andra större tillgångar</p>
                 <p className="text-xs mt-1">- Alla skulder (lån, krediter)</p>
               </div>
             </CardContent>
@@ -1293,8 +1293,8 @@ export default function DashboardPage() {
               <div className="mt-3 text-xs font-sans text-primary/70 text-center sm:text-left space-y-1">
                 <p className="text-xs uppercase tracking-wide text-primary/70 mb-1">Består av</p>
                 <p className="text-xs">✓ Avkastning på tillgångar</p>
-                <p className="text-xs">✓ Automatiska pensionsavsättningar</p>
-                <p className="text-xs">✓ Löneväxling till pension</p>
+                <p className="text-xs">✓ Pensionsavsättningar (allmän pension + tjänstepension enligt avtal)</p>
+                <p className="text-xs">✓ Löneväxling (om tillämpligt)</p>
                 <p className="text-xs">✓ Övrigt månadssparande</p>
                 <p className="text-xs">✓ Amorteringar på skulder</p>
                 <p className="text-xs mt-2 italic text-primary/60">• Uppskattad månatlig ökning av nettoförmögenheten</p>
@@ -1355,6 +1355,9 @@ export default function DashboardPage() {
               <div className="text-xs font-sans text-primary/70 mt-1">
                     {effectiveIsLevelZero ? 'Låses upp på Nivå 1' : getSpeedExplanation(displayMetrics.speedIndex)}
               </div>
+              {!effectiveIsLevelZero && displayLevel !== 6 && (
+                <p className="text-xs text-primary/50 mt-2 italic text-center">(Uppskattning baserad på nuvarande tillgångar och antaganden om tillväxt — faktiska värden kan variera.)</p>
+              )}
               {metrics.yearsToNextLevel && (
                     <div className="text-xs sm:text-sm font-sans text-primary mt-2 font-medium flex items-center justify-center gap-1">
                   {formatYears(metrics.yearsToNextLevel)} till nästa nivå
@@ -1707,7 +1710,7 @@ export default function DashboardPage() {
                       </p>
                     </div>
                   )}
-                  <p className="text-xs text-primary/70 mt-2">Beräkningen bygger på dina antaganden och är vägledande, inte ett löfte.</p>
+                  <p className="text-xs text-primary/70 mt-2">Beräkningen bygger på dina antaganden och är vägledande, inte ett löfte, och ska inte ses som personlig finansiell rådgivning.</p>
                 </div>
               )}
             </div>
@@ -1756,9 +1759,9 @@ export default function DashboardPage() {
             </div>
             <div className="p-4 sm:p-5 space-y-4 sm:space-y-6 max-h-[75vh] overflow-y-auto">
               <p className="text-sm text-primary/80">
-                Din månatliga ökning består av avkastning på tillgångar, amorteringar, pensionsavsättningar och annat sparande.
-                Pensionsavsättningarna är uppdelade i <strong>statlig trygghetsbaserad pension</strong> (inkomstpension) och 
-                <strong> marknadsbaserad pension</strong> (premiepension, tjänstepension, IPS) med olika avkastningsprocentsatser.
+                Din månatliga ökning beräknas som en kombination av avkastning på tillgångar, amorteringar, pensionsavsättningar och annat sparande.
+                Pensionsavsättningarna (beräknade månadsvis utifrån inlagda inkomster) är uppdelade i <strong>statlig trygghetsbaserad pension</strong> (inkomstpension) och 
+                <strong> marknadsbaserad pension</strong> (premiepension (statlig, fonderad del av allmän pension), tjänstepension, IPS) med olika avkastningsprocentsatser.
               </p>
               <MonthlyBreakdown 
                 breakdown={breakdown} 
@@ -1815,7 +1818,7 @@ export default function DashboardPage() {
                           return `${Math.round(weightedAverage * 1000) / 10}% per år (viktat snitt baserat på dina tillgångar)`;
                         })()})</li>
                   </ul>
-                      <p className="pl-2 mt-1 text-primary/70">Denna del är trygghetsbaserad och har låg men stabil avkastning.</p>
+                      <p className="pl-2 mt-1 text-primary/70">Denna del är trygghetsbaserad och har historiskt haft låg men relativt stabil utveckling. Avkastningen i modellen är ett antagande – inte en garanti.</p>
                     </div>
                     
                     <div>
@@ -1826,21 +1829,21 @@ export default function DashboardPage() {
                           const config = getConfig();
                           const premiePensionRate = config.PREMIEPENSION_RATE * 100;
                           return premiePensionRate.toFixed(1);
-                        })()}% av pensionsgrundande inkomst)</li>
+                        })()} % av pensionsgrundande inkomst)</li>
                         <li>Tjänstepension (beroende på avtal)</li>
                         <li>Löneväxling (valfritt)</li>
                         <li>IPS - Individuellt pensionssparande (valfritt)</li>
-                        <li>Avkastning på marknadsbaserade pensionstillgångar ({(() => {
+                        <li>Avkastning på marknadsbaserad pension ({(() => {
                           // Beräkna faktiskt viktat snitt baserat på användarens tillgångar
                           const marketPensionAssets = (draftHousehold?.assets || []).filter(
                             asset => asset.category === 'Marknadsbaserad pension'
                           );
                           if (marketPensionAssets.length === 0) {
-                            return `${Math.round(getDefaultReturnRate('Marknadsbaserad pension') * 100)}% per år (viktat snitt, default)`;
+                            return `${Math.round(getDefaultReturnRate('Marknadsbaserad pension') * 100)} % per år (viktat snitt, default)`;
                           }
                           const totalValue = marketPensionAssets.reduce((sum, asset) => sum + asset.value, 0);
                           if (totalValue === 0) {
-                            return `${Math.round(getDefaultReturnRate('Marknadsbaserad pension') * 100)}% per år (viktat snitt, default)`;
+                            return `${Math.round(getDefaultReturnRate('Marknadsbaserad pension') * 100)} % per år (viktat snitt, default)`;
                           }
                           const weightedAverage = marketPensionAssets.reduce(
                             (sum, asset) => sum + (asset.value / totalValue) * asset.expected_apy,
@@ -1885,7 +1888,7 @@ export default function DashboardPage() {
                     <li>Hur snabbt din förmögenhet växer varje månad</li>
                     <li>Din hastighet mot nästa nivå</li>
                     <li>Vägen mot ekonomisk frihet (FIRE)</li>
-                    <li>0,01%-regeln för daglig marginal</li>
+                    <li>0,01 %-regeln för daglig marginal</li>
                   </ul>
                 </div>
               </div>

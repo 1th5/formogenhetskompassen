@@ -36,11 +36,11 @@ const LEVEL_INSIGHTS = {
       'Kan upplevas som hopplös'
     ],
     howToProgress: [
-      'Skapa buffert på 10 000–30 000 kr på ett tryggt konto',
-      'Undvik ny skuld',
-      'Höj inkomsten genom fler timmar, extrajobb eller enklare uppdrag',
-      'Motstå frestelsen att direkt höja livsstilen när inkomsten ökar',
-      'Använd överskottet till buffert och skuldfrihet'
+      'Ett vanligt angreppssätt är att först bygga en buffert på cirka 10 000–30 000 kr på ett tryggt konto',
+      'Många fokuserar på att undvika ny skuld',
+      'Höjning av inkomsten genom fler timmar, extrajobb eller enklare uppdrag är ett vanligt sätt att komma vidare',
+      'Vissa motstår frestelsen att direkt höja livsstilen när inkomsten ökar',
+      'Överskottet används ofta till buffert och skuldfrihet'
     ],
     swedishContext: 'Här befinner sig många unga, studenter och ensamstående låginkomsttagare. Det är helt normalt att börja här. Målet är dock att inte fastna. När du når cirka 100 000 kr i positiv nettoförmögenhet eller tre månaders utgifter sparade är du redo för nivå 2.',
     whenComplete: 'När du når cirka 100 000 kr i positiv nettoförmögenhet eller tre månaders utgifter sparade.',
@@ -57,7 +57,7 @@ const LEVEL_INSIGHTS = {
     description: 'När bufferten är på plats och vardagen fungerar har man nått nivå 2. Här kan man hantera oväntade utgifter och har ett andrum att börja planera framåt. Det är inte lyx, men det är frihet på mikronivå – att kunna gå in i mataffären och köpa vad du vill utan stress.',
     coreIdea: 'Learn today, earn forever.',
     coreStrategy: 'Här ger utbildning, fortbildning och kompetensutveckling den högsta möjliga avkastningen. Du kan inte längre spara dig rik – du måste höja inkomsten.',
-    strategy: 'Bygg humankapital. Kurser, certifikat, digitala verktyg, förhandla lön, byta bransch – allt som ökar värdet på din tid. Börja investera: en enkel fondrobot eller global indexfond är fullt tillräckligt.',
+    strategy: 'Många fokuserar på att bygga humankapital. Kurser, certifikat, digitala verktyg, förhandling om lön, byte av bransch – allt som ökar värdet på tiden. Investering kan börja med en enkel fondrobot eller global indexfond, men det är bara exempel.',
     whatIsAmplified: 'Alternativkostnaderna – vad du inte gör börjar kosta mer än vad du gör. Att inte äga bostad, att inte investera, att stanna i ett jobb utan utveckling får större effekt på sikt.',
     advantages: [
       'Stabilitet och trygghet',
@@ -71,13 +71,13 @@ const LEVEL_INSIGHTS = {
       'Stagnation om löneutveckling är låg eller boende för tungt'
     ],
     howToProgress: [
-      'Spara minst 10% av inkomsten',
-      'Öka inkomsterna årligen',
-      'Automatisera överföringar till sparande',
-      'Undvik att låta utgifter växa i samma takt som lönen',
-      'Fortsätt investera smått men konsekvent'
+      'Som tumregel brukar många som vill öka sin förmögenhet sikta på att spara omkring 10 % av inkomsten',
+      'Ökning av inkomsterna årligen är ett vanligt fokus',
+      'Automatisering av överföringar till sparande är ett sätt många använder',
+      'Vissa undviker att låta utgifter växa i samma takt som lönen',
+      'Fortsatt investering smått men konsekvent är ett vanligt mönster'
     ],
-    swedishContext: 'I Sverige kan du på denna nivå börja känna dig ekonomiskt "lugnad". Du är inte rik, men trygg. Ett hushåll med ca 0,5–1 miljon kr i nettoförmögenhet ligger redan över medianen.',
+    swedishContext: 'I Sverige kan du på denna nivå börja känna dig ekonomiskt "lugnad". Du är inte rik, men trygg. Ett hushåll med cirka 0,5–1 miljon kronor i nettoförmögenhet ligger ofta runt eller över mitten i förmögenhetsfördelningen i Sverige, beroende på ålder, boendeform och skuldsättning.',
     whenComplete: 'När du har byggt humankapital, automatiserat sparande och börjar se investeringarna växa.',
     summary: 'Nivå 2 är stabilitetens zon. Du har andrum – men om du vill växa måste du börja jobba smartare, inte hårdare.'
   },
@@ -89,10 +89,10 @@ const LEVEL_INSIGHTS = {
       percentage: '≈ 40%',
       medianAge: '54 år'
     },
-    description: 'Det här är den nivå där man har "vunnit pengaspelet" i samhällets ögon. De flesta i Sverige som når hit tillhör den övre medelklassen. Du kan gå på restaurang och beställa vad du vill utan att tänka på priset. Pengarna börjar jobba bättre än du själv.',
+    description: 'Det här är den nivå där man har "vunnit pengaspelet" i samhällets ögon. Många som når denna nivå har en stabil privatekonomi och god marginal i vardagen. Du kan unna dig restaurangbesök utan större ekonomisk oro. Pengarna börjar jobba bättre än du själv.',
     coreIdea: 'Just keep buying.',
     coreStrategy: 'Fortsätt investera regelbundet i breda, inkomstproducerande tillgångar. Disciplin är nu viktigare än ambition.',
-    strategy: 'Fortsätt månadsspara med automatisk överföring. Håll portföljen bred: indexfonder, global diversifiering. Rebalansera men försök inte tajma marknaden. Undvik livsstilsinflation – hus, bil och semester kan äta upp allt.',
+    strategy: 'Många fortsätter månadsspara med automatisk överföring. Bred portfölj med indexfonder och global diversifiering är vanligt. Rebalansering utan att tajma marknaden är ett vanligt mönster. Livsstilsinflation – hus, bil och semester – kan äta upp allt om man inte är försiktig.',
     whatIsAmplified: 'Misstagens pris. Ett dåligt beslut kostar mycket mer i kronor än tidigare. Investeringsdisciplin är nu viktigare än ambition.',
     advantages: [
       'Verklig ekonomisk frihet',
@@ -106,13 +106,13 @@ const LEVEL_INSIGHTS = {
       'Du är "klar" men vet inte vad nästa steg är'
     ],
     howToProgress: [
-      'Låt kapitalet jobba i 10–20 år',
-      'Behåll hög inkomstnivå',
-      'Håll fast vid enkla regler',
-      'Frigör kapital ur boendet (inte 60–70% i huset)',
-      'Undvik livsstilsinflation'
+      'Många låter kapitalet jobba i 10–20 år',
+      'Behållande av hög inkomstnivå är vanligt',
+      'Många håller fast vid enkla regler',
+      'För vissa kan det vara aktuellt att frigöra kapital ur boendet om en mycket stor del av förmögenheten är bunden där, men det beror på individuella förutsättningar',
+      'Undvikande av livsstilsinflation är ett vanligt fokus'
     ],
-    swedishContext: 'I Sverige innebär 1–10 miljoner kr att du tillhör den rikaste tredjedelen av hushållen. Här är man ofta "ekonomiskt trygg för livet" om man håller utgifterna rimliga.',
+    swedishContext: 'Nivå 3 innebär att hushållet tydligt ligger över genomsnittet i förmögenhetsfördelningen, särskilt i medelåldern. Du tillhör den rikare delen av befolkningen, även om exakta procenttal varierar med ålder och bostadsmarknad. Här är man ofta "ekonomiskt trygg för livet" om man håller utgifterna rimliga.',
     whenComplete: 'När du känner att du har vunnit pengaspelet och kan leva bekvämt utan oro. De flesta kan leva hela livet lyckligt här.',
     summary: 'Nivå 3 är komfort, kontroll och balans. Du behöver inte klättra mer – men om du gör det, gör det för att du vill, inte för att du måste.'
   },
@@ -328,7 +328,7 @@ export default function CurrentLevelInsight({ level, isLevelZero = false }: Curr
               <Target className={`w-5 h-5 ${colors.text} flex-shrink-0 mt-0.5`} />
               <div className="flex-1">
                 <h4 className={`font-semibold text-sm ${colors.text} mb-1.5`}>
-                  Strategi
+                  Exempel på vanliga strategier
                 </h4>
                 <p className="text-xs text-primary/90 leading-relaxed">
                   {insight.strategy}
@@ -392,7 +392,7 @@ export default function CurrentLevelInsight({ level, isLevelZero = false }: Curr
             <TrendingUp className={`w-5 h-5 ${colors.text} flex-shrink-0 mt-0.5`} />
             <div className="flex-1">
               <h4 className={`font-semibold text-sm ${colors.text} mb-2`}>
-                Hur man tar sig vidare
+                Exempel på nästa steg
               </h4>
               <ul className="space-y-1.5">
                 {insight.howToProgress.map((step, idx) => (
@@ -436,7 +436,14 @@ export default function CurrentLevelInsight({ level, isLevelZero = false }: Curr
         {/* USA-kontext (diskret) */}
         <div className="text-center">
           <p className="text-xs text-primary/50">
-            USA-kontext: {insight.usContext.percentage} • {insight.usContext.medianAge} • Baserat på Nick Maggiulli's Wealth Ladder
+            USA-kontext: {insight.usContext.percentage} • {insight.usContext.medianAge} • Grova uppskattningar baserade på Nick Maggiullis Wealth Ladder och SCF-data
+          </p>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="mt-4 pt-3 border-t border-primary/20">
+          <p className="text-xs text-primary/60 italic text-center">
+            All information ovan är förenklad och illustrativ. Beskrivningarna av nivåer, strategier och steg vidare är inte personlig ekonomisk rådgivning utan generella exempel. Din situation kan kräva helt andra val. Nivåbeskrivningarna är förenklade och illustrativa. Individers faktiska möjligheter beror på inkomster, kostnader och livssituation.
           </p>
         </div>
       </CardContent>

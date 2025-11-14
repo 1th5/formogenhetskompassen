@@ -332,7 +332,7 @@ export default function PersonForm({ onSave }: PersonFormProps) {
                           type="number"
                           {...control.register(`persons.${index}.birth_year`, { valueAsNumber: true })}
                           min="1920"
-                          max={currentYear > 0 ? Math.min(currentYear - 16, currentYear - 65) : 1959}
+                          max={currentYear > 0 ? currentYear - 16 : 2008}
                           placeholder="1985"
                         />
                         {isClient && (

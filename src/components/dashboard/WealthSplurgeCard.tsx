@@ -375,7 +375,7 @@ export default function WealthSplurgeCard({ householdNetWorth, assets = [], pers
             <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
               {focus === 'total' ? (
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  0,01 %-regeln baserat på hela din nettoförmögenhet visar den dagliga marginalen du kan unna dig utan att påverka din långsiktiga bana.
+                  0,01 %-regeln baserat på hela din nettoförmögenhet visar en uppskattad daglig marginal du kan unna dig givet antagandena om avkastning och förmögenhetsutveckling – om antagandena om avkastning håller.
                 </p>
               ) : (
                 <p className="text-sm text-gray-600 leading-relaxed">
@@ -399,7 +399,7 @@ export default function WealthSplurgeCard({ householdNetWorth, assets = [], pers
               </div>
               <div className="flex-1">
                 <h4 className="font-serif text-primary text-xl mb-2">Vad är 0,01 %-regeln?</h4>
-                <p className="text-sm text-primary/70 mb-4">Ett diskret beslutsstöd som visar din dagliga "marginal" baserat på förmögenhet – inte ett köptvång.</p>
+                <p className="text-sm text-primary/70 mb-4">Ett diskret beslutsstöd som visar en ungefärlig daglig 'marginal' baserat på förmögenhet – inte ett köptvång eller en regel du måste följa.</p>
                 <div className="space-y-4">
                   <div>
                     <h5 className="font-medium text-primary mb-1">Grundprincip</h5>
@@ -412,6 +412,7 @@ export default function WealthSplurgeCard({ householdNetWorth, assets = [], pers
                     <h5 className="font-medium text-primary mb-1">Matematisk grund</h5>
                     <p className="text-sm text-primary/80">
                       Förmögenheten kan i snitt skapa ~0,01 % per dag (~3,7 %/år). Potten påverkar därför inte den långsiktiga banan.
+                      <span className="block mt-1 italic">(Baseras på ett teoretiskt antagande om ca 3,7 % årlig avkastning = 0,01 % per dag.)</span>
                     </p>
                   </div>
                   <div>

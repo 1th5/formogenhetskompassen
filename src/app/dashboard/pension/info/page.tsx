@@ -47,7 +47,7 @@ export default function PensionInfoPage() {
             <p className="text-primary/80 leading-relaxed">
               Sveriges pensionssystem består av flera delar som tillsammans bildar din totala pension. 
               Förståelsen för hur dessa delar fungerar är avgörande för att kunna planera din ekonomiska framtid. 
-              Denna guide förklarar de olika pensionstyperna, hur de fungerar och vad du bör tänka på.
+              Denna guide förklarar de olika pensionstyperna, hur de fungerar och vad som kan vara bra att känna till.
             </p>
           </CardContent>
         </Card>
@@ -69,7 +69,7 @@ export default function PensionInfoPage() {
             <div>
               <h3 className="font-semibold text-lg mb-2">Vad är det?</h3>
               <p className="text-primary/80 leading-relaxed">
-                Statlig pension är grunden i det svenska pensionssystemet. Den finansieras genom allmänna pensionsavgifter 
+                Statlig pension är grunden i det svenska pensionssystemet. Den finansieras genom arbetsgivaravgifter och den allmänna pensionsavgiften som tas ut på arbetsinkomster 
                 som betalas av alla som arbetar i Sverige. Din inkomstpension byggs upp baserat på dina pensiongrundande inkomster 
                 under hela ditt arbetsliv.
               </p>
@@ -78,11 +78,11 @@ export default function PensionInfoPage() {
             <div>
               <h3 className="font-semibold text-lg mb-2">Hur fungerar det?</h3>
               <ul className="list-disc list-inside space-y-2 text-primary/80">
-                <li>18,5% av din pensiongrundande inkomst (PGI) går till pension</li>
-                <li>16% går till inkomstpension (statlig pension)</li>
-                <li>2,5% går till premiepension (se nedan)</li>
-                <li>Pensionen växer med inkomstindexering, vilket ger en låg men stabil avkastning (cirka 2-3% per år)</li>
-                <li>Du kan börja ta ut pensionen från 63 års ålder</li>
+                <li>18,5 % av din pensiongrundande inkomst (PGI) går till pension</li>
+                <li>16 % går till inkomstpension (statlig pension)</li>
+                <li>2,5 % går till premiepension (se nedan)</li>
+                <li>Inkomstpensionen följer ett inkomstindex som speglar den genomsnittliga löneutvecklingen i Sverige minus en s.k. norm. Historiskt har detta gett en viss real tillväxt över tid, men framtida utveckling är osäker. I Förmögenhetskollen används en förenklad antagen avkastning för att kunna göra beräkningar.</li>
+                <li>Du kan börja ta ut pensionen från lägsta uttagsålder (ca 63 år idag, beroende på födelseår)</li>
               </ul>
             </div>
 
@@ -130,8 +130,8 @@ export default function PensionInfoPage() {
                 <div className="border rounded-lg p-3">
                   <Badge variant="outline" className="mb-2">ITP1</Badge>
                   <p className="text-sm text-primary/80">
-                    För privatanställda tjänstemän. Vanligtvis 4,5% av lönen upp till 7,5 IBB, 
-                    plus 30% av lönen över taket.
+                    För privatanställda tjänstemän. Vanligtvis 4,5 % av lönen upp till 7,5 IBB, 
+                    plus 30 % av lönen över taket.
                   </p>
                 </div>
                 <div className="border rounded-lg p-3">
@@ -144,13 +144,13 @@ export default function PensionInfoPage() {
                 <div className="border rounded-lg p-3">
                   <Badge variant="outline" className="mb-2">SAF-LO</Badge>
                   <p className="text-sm text-primary/80">
-                    För arbetare i privat sektor. Vanligtvis 4,5% av lönen.
+                    För arbetare i privat sektor. Vanligtvis 4,5 % av lönen.
                   </p>
                 </div>
                 <div className="border rounded-lg p-3">
                   <Badge variant="outline" className="mb-2">PA16</Badge>
                   <p className="text-sm text-primary/80">
-                    För statligt anställda. Vanligtvis 4,5% av lönen.
+                    För statligt anställda. Vanligtvis 4,5 % av lönen.
                   </p>
                 </div>
               </div>
@@ -171,10 +171,12 @@ export default function PensionInfoPage() {
               <div className="flex items-start gap-2">
                 <TrendingUp className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold text-blue-900 mb-1">Tips för bättre avkastning</p>
-                  <p className="text-sm text-blue-800">
-                    Tjänstepensionen kan ge en betydligt högre avkastning än statlig pension om du väljer rätt fonder. 
-                    Över tid kan skillnaden bli mycket stor. Tänk på att sprida risken och välj fonder med låga avgifter.
+                  <p className="font-semibold text-blue-900 mb-1">Faktorer som kan påverka avkastningen</p>
+                  <p className="text-sm text-blue-800 mb-2">
+                    Avkastningen i tjänstepensionen påverkas bland annat av vilka fonder som väljs, risknivå och avgifter. I många informationskällor lyfts spridning av risk och låga avgifter fram som faktorer som på sikt kan påverka utfallet. Vad som är lämpligt beror på din riskvilja, ålder och totala ekonomi.
+                  </p>
+                  <p className="text-xs text-blue-700 italic">
+                    Detta är allmänt hållen information och inte en rekommendation att välja en viss fond eller strategi.
                   </p>
                 </div>
               </div>
@@ -191,7 +193,7 @@ export default function PensionInfoPage() {
               </div>
               <div>
                 <CardTitle className="text-2xl">Premiepension</CardTitle>
-                <p className="text-sm text-primary/60 mt-1">Marknadsbaserad del av statlig pension</p>
+                <p className="text-sm text-primary/60 mt-1">Marknadsbaserad pension</p>
               </div>
             </div>
           </CardHeader>
@@ -199,7 +201,7 @@ export default function PensionInfoPage() {
             <div>
               <h3 className="font-semibold text-lg mb-2">Vad är det?</h3>
               <p className="text-primary/80 leading-relaxed">
-                Premiepension är den del av din statliga pension (2,5% av PGI) som investeras i fonder. 
+                Premiepension är den del av din statliga pension (2,5 % av PGI) som investeras i fonder. 
                 Till skillnad från inkomstpensionen kan du själv välja hur premiepensionen ska investeras.
               </p>
             </div>
@@ -207,9 +209,9 @@ export default function PensionInfoPage() {
             <div>
               <h3 className="font-semibold text-lg mb-2">Hur fungerar det?</h3>
               <ul className="list-disc list-inside space-y-2 text-primary/80">
-                <li>2,5% av din pensiongrundande inkomst går till premiepension</li>
+                <li>2,5 % av din pensiongrundande inkomst går till premiepension</li>
                 <li>Du kan välja fonder själv eller låta den förvaltas automatiskt (AP7 Såfa)</li>
-                <li>Premiepensionen kan inte tas ut tidigt - den växer till pensionsstart (vanligtvis 63 år)</li>
+                <li>Premiepensionen kan inte tas ut före den lägsta uttagsålder som gäller för din årskull (idag ofta omkring 63–65 år)</li>
                 <li>Avkastningen beror på dina fondval och marknadsutveckling</li>
               </ul>
             </div>
@@ -218,15 +220,9 @@ export default function PensionInfoPage() {
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold text-emerald-900 mb-1">AP7 Såfa - Ett bra val</p>
+                  <p className="font-semibold text-emerald-900 mb-1">AP7 Såfa - Ett standardalternativ</p>
                   <p className="text-sm text-emerald-800 mb-2">
-                    Om du inte vill välja fonder själv är AP7 Såfa (Sveriges Automatiska Alternativ) ett utmärkt val. 
-                    Det är en automatisk fond som anpassar risken baserat på din ålder - högre risk när du är ung, 
-                    lägre risk när du närmar dig pension.
-                  </p>
-                  <p className="text-sm text-emerald-800">
-                    AP7 Såfa har historiskt sett gett bra avkastning med låga avgifter, vilket gör den till ett 
-                    populärt val för många svenskar.
+                    AP7 Såfa är det statliga standardalternativet för premiepensionen. I officiell information beskrivs det ofta som ett automatiskt alternativ där risken anpassas efter ålder och där avgiften är relativt låg. Historisk avkastning har tidvis varit hög, men framtida utveckling är osäker. Detta är ingen rekommendation att välja AP7 Såfa; du behöver själv ta ställning till vilket alternativ som passar dig.
                   </p>
                 </div>
               </div>
@@ -257,7 +253,7 @@ export default function PensionInfoPage() {
               </div>
               <div>
                 <CardTitle className="text-2xl">IPS (Individuellt Pensionssparande)</CardTitle>
-                <p className="text-sm text-primary/60 mt-1">Privat pensionssparande med skatteförmåner</p>
+                <p className="text-sm text-primary/60 mt-1">Äldre sparform med begränsade skattefördelar idag</p>
               </div>
             </div>
           </CardHeader>
@@ -265,60 +261,30 @@ export default function PensionInfoPage() {
             <div>
               <h3 className="font-semibold text-lg mb-2">Vad är det?</h3>
               <p className="text-primary/80 leading-relaxed">
-                IPS är ett privat pensionssparande som du själv betalar in till. Det ger skatteförmåner genom 
-                att du får skattereduktion på insättningarna. IPS kan vara ett bra komplement till dina övriga pensioner.
+                IPS är en form av privat pensionssparande där pengarna är låsta till pensionsålder. Nyteckning och insättningar är i dag begränsade, och de tidigare generella skatteavdragen för privat pensionssparande har till stor del tagits bort. I vissa särskilda situationer kan avdragsrätt fortfarande finnas (t.ex. om du saknar tjänstepension), men reglerna är mer begränsade än tidigare.
               </p>
             </div>
 
             <div>
               <h3 className="font-semibold text-lg mb-2">Hur fungerar det?</h3>
               <ul className="list-disc list-inside space-y-2 text-primary/80">
-                <li>Du betalar in pengar själv (max 35% av din pensiongrundande inkomst, med ett tak)</li>
-                <li>Du får skattereduktion på insättningarna (upp till 75% av insättningen)</li>
-                <li>Du väljer själv hur pengarna ska investeras (fonder, aktier, etc.)</li>
-                <li>Du kan ta ut IPS från 55 års ålder</li>
-                <li>Vid uttag beskattas pengarna som inkomst</li>
+                <li>Du betalar in pengar själv till ett IPS-konto.</li>
+                <li>Pengarna är låsta till tidigast 55 års ålder (exakt ålder beror på avtalet och gällande regler).</li>
+                <li>Du väljer själv hur pengarna ska investeras (t.ex. fonder eller andra värdepapper).</li>
+                <li>Vid uttag beskattas utbetalningarna som inkomst.</li>
               </ul>
-            </div>
-
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <Info className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-purple-900 mb-1">När är IPS värt det?</p>
-                  <p className="text-sm text-purple-800 mb-2">
-                    IPS kan vara särskilt värdefullt om du har hög inkomst och vill spara mer till pension. 
-                    Skatteförmånen gör att du får mer för pengarna, men tänk på att pengarna är låsta tills 
-                    du är 55 år. Om du behöver pengarna tidigare kan det vara bättre att spara på ett vanligt 
-                    ISK-konto istället.
-                  </p>
-                </div>
-              </div>
             </div>
 
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold text-amber-900 mb-1">Varför är IPS inte lika förmånligt längre?</p>
+                  <p className="font-semibold text-amber-900 mb-1">Viktigt</p>
                   <p className="text-sm text-amber-800 mb-2">
-                    IPS har blivit mindre förmånligt av tre huvudskäl:
+                    Reglerna för IPS och avdragsrätt har ändrats flera gånger. Kontrollera alltid aktuella regler hos Skatteverket eller Pensionsmyndigheten om du funderar på att använda IPS.
                   </p>
-                  <ul className="text-sm text-amber-800 space-y-1.5 list-disc list-inside ml-2">
-                    <li>
-                      <strong>ISK är bättre:</strong> ISK (Investeringssparkonto) ger ofta lägre skatt och du kan spara hur mycket du vill. 
-                      IPS har en maxgräns per år.
-                    </li>
-                    <li>
-                      <strong>Låsta pengar:</strong> Pengarna i IPS är låsta tills du är 55 år. Med ISK kan du ta ut pengarna när du vill.
-                    </li>
-                    <li>
-                      <strong>Mindre skatteförmån:</strong> Skattereduktionen på IPS har minskat över tid.
-                    </li>
-                  </ul>
-                  <p className="text-sm text-amber-800 mt-2">
-                    <strong>Rekommendation:</strong> För de flesta är ISK ett bättre val. IPS kan vara värt att överväga om du har mycket hög inkomst 
-                    och redan sparar mycket på ISK, eller om du specifikt vill ha pengarna låsta tills 55 års ålder.
+                  <p className="text-sm text-amber-800">
+                    För många löntagare används i dag i första hand tjänstepension och långsiktigt sparande på t.ex. ISK. IPS kan vara aktuellt i mer specifika situationer – kontrollera med Skatteverket eller rådgivare.
                   </p>
                 </div>
               </div>
@@ -344,26 +310,27 @@ export default function PensionInfoPage() {
                   Ränta-på-ränta-effekten är kraftfull över lång tid.
                 </li>
                 <li>
-                  <strong>Risk:</strong> När du är ung kan du ta mer risk (högre andel aktier/fonder). 
-                  När du närmar dig pension bör du minska risken.
+                  <strong>Risk:</strong> I många allmänna pensionsguider nämns ofta att yngre sparare ibland väljer en högre andel aktier/fonder, medan risken gradvis minskas när pensionen närmar sig. Det är dock ingen regel som passar alla.
                 </li>
                 <li>
                   <strong>Avgifter:</strong> Låga avgifter gör stor skillnad över tid. 
-                  Jämför avgifter när du väljer fonder.
+                  Jämförelse av avgifter när man väljer fonder är ett vanligt fokus i allmänna sparguider.
                 </li>
                 <li>
-                  <strong>Kontroll:</strong> Ta kontroll över dina pensioner. Välj fonder aktivt, 
-                  eller låt dem förvaltas automatiskt med ett bra val som AP7 Såfa.
+                  <strong>Kontroll:</strong> Du har möjlighet att själv välja fonder eller låta dem förvaltas automatiskt, beroende på hur aktiv du vill vara. Olika alternativ passar olika personer.
                 </li>
               </ul>
             </div>
 
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
-              <p className="text-sm text-primary/80 leading-relaxed">
+              <p className="text-sm text-primary/80 leading-relaxed mb-2">
                 <strong className="text-primary">Viktigt:</strong> Denna guide är en förenkling av det svenska pensionssystemet. 
                 Verkligheten kan vara mer komplex, och regler kan ändras över tid. 
                 För specifik rådgivning om din pensionssituation, kontakta en auktoriserad pensionsrådgivare eller 
                 Pensionsmyndigheten.
+              </p>
+              <p className="text-xs text-primary/70 italic">
+                Denna sammanfattning är allmänt hållen och inte anpassad till din situation. För frågor om din specifika pension bör du kontakta Pensionsmyndigheten, ditt tjänstepensionsbolag eller en auktoriserad rådgivare.
               </p>
             </div>
           </CardContent>

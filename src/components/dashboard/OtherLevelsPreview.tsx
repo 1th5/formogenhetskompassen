@@ -189,7 +189,7 @@ const LEVEL_DATA = {
     borderColor: 'border-amber-300/50',
     textColor: 'text-amber-700',
     headingColor: 'text-amber-900',
-    advantages: ['Verklig ekonomisk frihet', 'Du bestämmer över tiden'],
+    advantages: ['Stor ekonomisk frihet i vardagen', 'Du bestämmer över tiden'],
     challenges: ['Risk att tappa mål', 'Du är "klar" men vet inte nästa steg']
   },
   4: {
@@ -201,7 +201,7 @@ const LEVEL_DATA = {
     borderColor: 'border-blue-300/50',
     textColor: 'text-blue-700',
     headingColor: 'text-blue-900',
-    advantages: ['Total ekonomisk frihet', 'Välj tid och plats'],
+    advantages: ['Mycket hög ekonomisk frihet', 'Välj tid och plats'],
     challenges: ['Svårt att känna mening', 'Kapitalet blir "för stort för att kännas"']
   },
   5: {
@@ -213,7 +213,7 @@ const LEVEL_DATA = {
     borderColor: 'border-purple-300/50',
     textColor: 'text-purple-700',
     headingColor: 'text-purple-900',
-    advantages: ['Total frihet och inflytande', 'Resurser för att skapa förändring'],
+    advantages: ['Väldigt stor frihet och möjlighet till inflytande', 'Resurser för att skapa förändring'],
     challenges: ['Isolering och oro', 'Rikedom utan glädje']
   },
   6: {
@@ -462,6 +462,13 @@ export default function OtherLevelsPreview({ currentNetWorth, isLocked = false }
         <div className="flex items-center justify-center gap-2 text-xs text-primary/60 pt-2">
           <ArrowRight className="w-3 h-3" />
           <span>Byter automatiskt var 10:e sekund</span>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="mt-3 pt-3 border-t border-primary/20">
+          <p className="text-xs text-primary/60 italic text-center">
+            Nivåbeskrivningar är illustrativa. Faktiska möjligheter att bo eller flytta beror på lagar, uppehållstillstånd och individuella inkomster.
+          </p>
         </div>
       </CardContent>
     </Card>

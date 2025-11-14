@@ -92,7 +92,7 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
     } else {
       return {
         title: 'Mot ekonomisk frihet',
-        message: 'Ränta-på-ränta-effekten accelererar – ditt sparande förvärdes exponentiellt.',
+        message: 'Ränta-på-ränta-effekten accelererar – ditt sparande får växa allt snabbare över tid.',
         color: 'emerald',
         icon: Sparkles,
         badge: 'Fantastiskt!',
@@ -241,14 +241,14 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
             </div>
             <p className="text-sm text-gray-600 mb-2">per månad</p>
             <p className="text-xs text-primary/60 mb-3">
-              Månadssparandet består av amorteringar på skulder samt annat sparande som registrerats i hushållet (exklusive pensionsavsättningar).
+              Månadsökningen består av amorteringar (som ökar din nettoförmögenhet) och annat sparande som registrerats i hushållet (exklusive pensionsavsättningar).
             </p>
             
             {/* Sparkvot */}
             <div className={`inline-block px-4 py-2 rounded-lg border-2 mb-3 ${savingsRateInfo.bgClass} ${savingsRateInfo.borderClass}`}>
               <p className="text-xs text-gray-600 mb-1">Sparkvot</p>
               <div className={`text-3xl font-bold ${savingsRateInfo.colorClass}`}>
-                {savingsRate.toFixed(1)}%
+                {savingsRate.toFixed(1)} %
               </div>
             <div className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${savingsRateInfo.badgeClass}`}>
                 {savingsRateInfo.badge}
@@ -258,13 +258,20 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
           {/* Progressbar borttagen enligt önskemål */}
         </div>
 
+        {/* Disclaimer */}
+        <div className="mt-3 pt-3 border-t border-slate-200">
+          <p className="text-xs text-primary/60 italic text-center">
+            Sparkvotsbedömningarna är förenklade och baserade på allmän praxis — individuell situation kan variera.
+          </p>
+        </div>
+
           {/* Uppmuntring */}
           <div className={`${savingsRateInfo.bgClass} backdrop-blur-sm p-4 rounded-xl border-2 ${savingsRateInfo.borderClass} shadow-sm`}>
             <p className={`text-sm ${savingsRateInfo.colorClass} leading-relaxed text-center font-medium`}>
               {savingsRate === 0 
                 ? messageInfo.encouragement
                 : savingsRate < 5
-                ? messageInfo.encouragement + ' Din sparkvot är ' + savingsRate.toFixed(1) + '% – en målsättning på 10-20% ger snabbare framsteg.'
+                ? messageInfo.encouragement + ' Din sparkvot är ' + savingsRate.toFixed(1) + ' % – en målsättning på 10–20 % ger snabbare framsteg.'
                 : messageInfo.encouragement
               }
             </p>
@@ -304,8 +311,8 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
             <div className="space-y-6">
                 <div className="bg-white/90 border border-slate-200/60 p-6 rounded-xl">
                   <h4 className="text-lg font-semibold text-primary mb-2">Vad är ISK?</h4>
-                  <p className="text-primary/80 mb-2">ISK är ett smidigt konto för långsiktigt sparande. Du betalar en låg schablonskatt istället för kapitalvinstskatt – perfekt för fonder och aktier.</p>
-                  <p className="text-primary/70">Det är enkelt att öppna själv med BankID hos din bank (t.ex. Avanza/Nordnet). Hela processen tar oftast bara några minuter och du styr månadssparandet själv.</p>
+                  <p className="text-primary/80 mb-2">ISK är ett konto som i många informationskällor förklaras som anpassat för långsiktigt sparande. Skatten tas ut som en årlig schablon i stället för kapitalvinstskatt. Om ISK är lämpligt för dig beror på din totala ekonomi och dina mål.</p>
+                  <p className="text-primary/70">Du kan öppna ISK hos din bank eller en nätbank. Hela processen tar oftast bara några minuter med BankID och du styr månadssparandet själv.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-green-50 p-4 rounded-lg border border-green-200">
@@ -318,35 +325,41 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
                     </ul>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                    <h5 className="font-bold text-purple-900 mb-2">Vad ska man köpa?</h5>
+                    <h5 className="font-bold text-purple-900 mb-2">Exempel på investeringar</h5>
                     <ul className="text-sm text-purple-800 space-y-1">
                       <li>• Breda indexfonder (global/USA)</li>
                       <li>• Ev. komplettera med Sverige</li>
-                      <li>• Välj <strong>låga avgifter</strong> – avgiften är en säker kostnad</li>
+                      <li>• Låga avgifter kan vara viktigt – avgiften är en säker kostnad</li>
                     </ul>
                   </div>
                 </div>
                   <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
                   <h4 className="text-lg font-semibold text-blue-900 mb-2">Tidshorisont – fond eller sparkonto?</h4>
-                  <p className="text-sm text-blue-900">Om pengarna <strong>inte</strong> behövs i närtid: välj ISK + lågkostnadsindexfond. Om du saknar buffert eller kan behöva ta ut pengarna snart – välj i stället ett sparkonto med ränta tills bufferten är på plats.</p>
+                  <p className="text-sm text-blue-900">Ett vanligt sätt att resonera i allmänna sparguider är att pengar som inte behövs i närtid ibland placeras i fonder via t.ex. ISK, medan pengar som kan behövas snart ofta ligger kvar på sparkonto. Vad som passar dig beror på din risknivå, buffert och tidshorisont.</p>
                 </div>
                 <div className="bg-amber-50 p-6 rounded-xl border border-amber-200">
                   <h4 className="text-lg font-semibold text-amber-900 mb-2">Kom igång – 4 steg</h4>
                   <ol className="list-decimal ml-5 text-sm text-amber-900 space-y-1">
-                    <li>Välj bank (t.ex. Avanza/Nordnet)</li>
+                    <li>Välj bank eller nätbank</li>
                     <li>Öppna ISK-konto – det går snabbt med BankID</li>
                     <li>Ställ in månadssparande</li>
-                    <li>Köp en global indexfond med <strong>låg avgift (&lt; 0,4%)</strong></li>
+                    <li>Som exempel nämns ofta i sparguider en global indexfond med låg avgift (t.ex. under 0,4 %) som ett alternativ för långsiktigt sparande. Detta är endast ett exempel och inte en rekommendation – välj själv det som passar din situation och risknivå.</li>
                   </ol>
                 </div>
                 <div className="bg-white/90 border border-slate-200/60 p-6 rounded-xl">
-                  <h4 className="text-lg font-semibold text-primary mb-2">Fondrobot – ett enkelt alternativ</h4>
-                  <p className="text-primary/80 text-sm">En fondrobot kan vara ett smidigt sätt att komma igång om du vill ha automatisk fördelning och återbalansering. Titta på avgiften och välj gärna ett paket som bygger på breda indexfonder med totalkostnad under 0,4%.</p>
+                  <h4 className="text-lg font-semibold text-primary mb-2">Fondrobot – ett alternativ</h4>
+                  <p className="text-primary/80 text-sm">En fondrobot kan vara ett sätt att komma igång om du vill ha automatisk fördelning och återbalansering. Titta på avgiften och välj ett paket som passar din situation och risknivå.</p>
                 </div>
             </div>
           </div>
+          {/* Disclaimer */}
+          <div className="px-6 pt-4 pb-2 border-t border-slate-200/60 bg-white/95 backdrop-blur-sm">
+            <p className="text-xs text-primary/60 italic text-center">
+              Den här guiden beskriver vanliga sparformer på en generell nivå. Informationen är inte anpassad till din situation och ska inte ses som personlig finansiell rådgivning eller rekommendation att välja en viss bank, fond eller sparprodukt.
+            </p>
+          </div>
           {/* Footer docked inside dialog content */}
-          <div className="px-6 pb-4 pt-3 border-t border-slate-200/60 bg-white/95 backdrop-blur-sm">
+          <div className="px-6 pb-4 pt-3 bg-white/95 backdrop-blur-sm">
             <div className="flex gap-3">
               <button onClick={() => setShowISKGuide(false)} className="flex-1 rounded-full border border-slate-300 px-4 py-2 text-sm">Stäng</button>
               <button onClick={() => { setShowISKGuide(false); router.push('/household'); }} className="flex-1 rounded-full bg-primary text-white px-4 py-2 text-sm">Lägg till sparande</button>
