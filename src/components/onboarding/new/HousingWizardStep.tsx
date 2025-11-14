@@ -60,7 +60,7 @@ export default function HousingWizardStep({ onComplete, onSkip }: HousingWizardS
             Äger du ditt boende eller annan bostad?
           </h3>
           <p className="text-sm md:text-base text-primary/70 mb-6">
-            Lägg till din bostadsrätt, hus, fritidshus eller annat boende
+            Lägg till bostadsrätt, hus, fritidshus eller annan bostad du äger
           </p>
         </div>
         
@@ -100,6 +100,9 @@ export default function HousingWizardStep({ onComplete, onSkip }: HousingWizardS
           <h3 className="text-lg md:text-xl font-serif text-primary mb-2">
             Vilken typ av boende?
           </h3>
+          <p className="text-xs text-primary/60 italic mb-4">
+            När du lägger in boendet får du en mer komplett bild av din förmögenhet.
+          </p>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -171,7 +174,7 @@ export default function HousingWizardStep({ onComplete, onSkip }: HousingWizardS
               className="mt-2"
             />
             <p className="text-sm text-primary/60 mt-1">
-              Använd aktuellt marknadsvärde eller senaste taxeringsvärde
+              Använd aktuellt marknadsvärde eller senaste taxeringsvärde. Detta är endast för att göra en grov uppskattning av tillgångens värde.
             </p>
           </div>
           

@@ -33,6 +33,8 @@ interface HouseholdState {
   // Pension calculation settings
   useInflationAdjustment: boolean;
   setUseInflationAdjustment: (use: boolean) => void;
+  pensionAge: number; // Default: 67
+  setPensionAge: (age: number) => void;
 }
 
 export const useHouseholdStore = create<HouseholdState>()(
@@ -129,15 +131,20 @@ export const useHouseholdStore = create<HouseholdState>()(
       useInflationAdjustment: false, // Default: nominell avkastning
       setUseInflationAdjustment: (use) => {
         set({ useInflationAdjustment: use });
+      },
+      pensionAge: 67, // Default: 67 år
+      setPensionAge: (age) => {
+        set({ pensionAge: age });
       }
     }),
     {
       name: 'formogenhetskompassen-draft',
-      // Spara både draftHousehold, previousLevel och useInflationAdjustment
+      // Spara både draftHousehold, previousLevel, useInflationAdjustment och pensionAge
       partialize: (state) => ({ 
         draftHousehold: state.draftHousehold,
         previousLevel: state.previousLevel,
-        useInflationAdjustment: state.useInflationAdjustment
+        useInflationAdjustment: state.useInflationAdjustment,
+        pensionAge: state.pensionAge
       })
     }
   )

@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { getDefaultReturnRate } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
+import { SegmentedControl } from '@/components/ui/segmented-control';
 import { useHouseholdStore } from '@/lib/stores/useHouseholdStore';
 
 interface PensionOverviewCardProps {
@@ -184,9 +185,11 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
     usedRiskAdjustment: boolean;
   } | null>(null);
   
-  // Hämta inflationsjustering från store
+  // Hämta inflationsjustering och pensionsår från store
   const useInflationAdjustment = useHouseholdStore((state) => state.useInflationAdjustment);
   const setUseInflationAdjustment = useHouseholdStore((state) => state.setUseInflationAdjustment);
+  const pensionAge = useHouseholdStore((state) => state.pensionAge);
+  const setPensionAge = useHouseholdStore((state) => state.setPensionAge);
 
   // Beräkna genomsnittlig ålder
   const averageAge = useMemo(() => {
@@ -198,19 +201,19 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
     return Math.round(totalAge / persons.length);
   }, [persons]);
 
-  // Beräkna månader till 67 års ålder
-  const monthsTo67 = useMemo(() => {
-    return Math.max(0, (67 - averageAge) * 12);
-  }, [averageAge]);
+  // Beräkna månader till valt pensionsår
+  const monthsToPensionAge = useMemo(() => {
+    return Math.max(0, (pensionAge - averageAge) * 12);
+  }, [averageAge, pensionAge]);
 
-  // Dölj beräkningar när inflationsjustering ändras
+  // Dölj beräkningar när inflationsjustering eller pensionsår ändras
   useEffect(() => {
     setExpandedType(null);
     setShowAllCalculations(false);
     setAllCalculationsData(null);
     setAnimatedValues({});
     setAnimatedTotalValue(0);
-  }, [useInflationAdjustment]);
+  }, [useInflationAdjustment, pensionAge]);
 
   // Beräkna nuvarande värden per pensionstyp
   const pensionData = useMemo(() => {
@@ -225,7 +228,8 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
       occPensionContrib,
       occPensionReturn,
       averageAge,
-      useInflationAdjustment
+      useInflationAdjustment,
+      pensionAge
     );
     const occPensionFuture = occPensionCalc.futureValue;
 
@@ -240,7 +244,8 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
       premiePensionContrib,
       premiePensionReturn,
       averageAge,
-      useInflationAdjustment
+      useInflationAdjustment,
+      pensionAge
     );
     const premiePensionFuture = premiePensionCalc.futureValue;
 
@@ -255,7 +260,8 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
       ipsContrib,
       ipsReturn,
       averageAge,
-      useInflationAdjustment
+      useInflationAdjustment,
+      pensionAge
     );
     const ipsFuture = ipsCalc.futureValue;
 
@@ -270,7 +276,8 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
       statePensionContrib,
       statePensionReturn,
       averageAge,
-      useInflationAdjustment
+      useInflationAdjustment,
+      pensionAge
     );
     const statePensionFuture = statePensionCalc.futureValue;
 
@@ -280,7 +287,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         icon: <Building2 className="w-5 h-5" />,
         currentValue: occPensionAssets,
         monthlyContribution: occPensionContrib,
-        futureValueAt67: occPensionFuture,
+        futureValueAt67: occPensionFuture, // Note: actually uses pensionAge
         color: 'text-blue-600',
         bgColor: 'bg-blue-50',
         returnInfo: occPensionCalc.returnInfo,
@@ -291,7 +298,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         icon: <Landmark className="w-5 h-5" />,
         currentValue: premiePensionAssets,
         monthlyContribution: premiePensionContrib,
-        futureValueAt67: premiePensionFuture,
+        futureValueAt67: premiePensionFuture, // Note: actually uses pensionAge
         color: 'text-emerald-600',
         bgColor: 'bg-emerald-50',
         returnInfo: premiePensionCalc.returnInfo,
@@ -302,7 +309,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         icon: <PiggyBank className="w-5 h-5" />,
         currentValue: ipsAssets,
         monthlyContribution: ipsContrib,
-        futureValueAt67: ipsFuture,
+        futureValueAt67: ipsFuture, // Note: actually uses pensionAge
         color: 'text-purple-600',
         bgColor: 'bg-purple-50',
         returnInfo: ipsCalc.returnInfo,
@@ -313,14 +320,14 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         icon: <Wallet className="w-5 h-5" />,
         currentValue: statePensionAssets,
         monthlyContribution: statePensionContrib,
-        futureValueAt67: statePensionFuture,
+        futureValueAt67: statePensionFuture, // Note: actually uses pensionAge
         color: 'text-amber-600',
         bgColor: 'bg-amber-50',
         returnInfo: statePensionCalc.returnInfo,
         usedRiskAdjustment: statePensionCalc.usedRiskAdjustment
       }
     };
-  }, [assets, persons, averageAge, useInflationAdjustment]);
+  }, [assets, persons, averageAge, useInflationAdjustment, pensionAge]);
 
   // Animation för framtida värden
   useEffect(() => {
@@ -495,6 +502,41 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
           </p>
         </div>
 
+        {/* Pensionsår reglage */}
+        <div className="p-3 bg-white/60 rounded-lg border border-slate-200">
+          <div className="flex items-center gap-2 mb-2">
+            <Info className="w-4 h-4 text-primary/60" />
+            <p className="text-sm font-medium text-gray-900">Pensionsår för beräkningar</p>
+          </div>
+          <SegmentedControl
+            options={[
+              { 
+                value: 63, 
+                label: '63 år',
+                disabled: averageAge >= 63
+              },
+              { 
+                value: 65, 
+                label: '65 år',
+                disabled: averageAge >= 65
+              },
+              { 
+                value: 67, 
+                label: '67 år',
+                disabled: averageAge >= 67
+              }
+            ]}
+            value={pensionAge}
+            onChange={(age) => {
+              setPensionAge(age);
+            }}
+            className="w-full"
+          />
+          <p className="text-xs text-gray-600 mt-2">
+            Alla beräkningar använder detta pensionsår
+          </p>
+        </div>
+
         {/* Inflationsjustering switch */}
         <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg border border-slate-200">
           <div className="flex items-center gap-2">
@@ -570,14 +612,14 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
             className="text-sm"
           >
             <TrendingUp className="w-4 h-4 mr-2" />
-            {showAllCalculations ? 'Dölj' : 'Beräkna alla tillgångar vid 67'}
+            {showAllCalculations ? 'Dölj' : `Beräkna alla tillgångar vid ${pensionAge}`}
           </Button>
         </div>
 
         {/* Visa totalberäkning */}
         {showAllCalculations && allCalculationsData && (
           <div className="bg-gradient-to-br from-primary/10 to-primary/20 rounded-lg p-4 border border-primary/30">
-            <p className="text-sm font-semibold text-primary mb-3 text-center">Total pensionstillgång vid 67 års ålder</p>
+            <p className="text-sm font-semibold text-primary mb-3 text-center">Total pensionstillgång vid {pensionAge} års ålder</p>
             <p className="text-2xl sm:text-3xl font-bold text-primary text-center mb-4">
               {formatCurrency(animatedTotalValue || 0)}
             </p>
@@ -637,7 +679,7 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
                     onClick={() => setExpandedType(isExpanded ? null : key)}
                     className="text-xs"
                   >
-                    {isExpanded ? 'Dölj' : 'Visa vid 67'}
+                    {isExpanded ? 'Dölj' : `Visa vid ${pensionAge}`}
                     <ChevronRight className={`w-4 h-4 ml-1 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                   </Button>
                 </div>
@@ -645,12 +687,12 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
                 {isExpanded && (
                   <div className="mt-3 pt-3 border-t border-slate-200">
                     <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-4 text-center">
-                      <p className="text-xs text-primary/70 mb-1">Uppskattat värde vid 67 års ålder</p>
+                      <p className="text-xs text-primary/70 mb-1">Uppskattat värde vid {pensionAge} års ålder</p>
                       <p className="text-xl sm:text-2xl font-bold text-primary">
                         {formatCurrency(animatedValue)}
                       </p>
                       <p className="text-xs text-primary/60 mt-2">
-                        Baserat på {monthsTo67} månader med {data.returnInfo}
+                        Baserat på {monthsToPensionAge} månader med {data.returnInfo}
                       </p>
                       {data.usedRiskAdjustment && (
                         <div className="mt-2 pt-2 border-t border-primary/20">

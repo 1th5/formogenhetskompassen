@@ -13,7 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Asset, Person } from '@/lib/types';
 import { formatCurrency } from '@/lib/utils/format';
 import { getDefaultReturnRate } from '@/lib/types';
-import { ExternalLink, CheckCircle, ArrowRight, ArrowLeft, Info, PiggyBank, Shield } from 'lucide-react';
+import { ExternalLink, CheckCircle, ArrowRight, ArrowLeft, Info, PiggyBank, Shield, Lightbulb } from 'lucide-react';
 
 interface PensionPerPersonStepProps {
   persons: Person[];
@@ -177,9 +177,19 @@ export default function PensionPerPersonStep({
         <h3 className="text-lg md:text-xl font-serif text-primary mb-2">
           Hitta din pension på minpension.se
         </h3>
-        <p className="text-sm md:text-base text-primary/70 mb-6">
-          Nu tar vi det du redan har tjänat in. Vi guidar dig genom att hitta alla delar av din pension.
+          <p className="text-sm md:text-base text-primary/70 mb-2">
+          Nu tar vi det du redan har tjänat in. Vi guidar dig genom att hitta alla delar av din pension. Du kan fylla i pensionen i vilken ordning du vill — allt sparas automatiskt.
         </p>
+        <p className="text-xs text-primary/60 italic mb-6">
+          När du fyllt i detta steg kan vi göra en modellbaserad pensionsuppskattning.
+        </p>
+        <Card className="bg-amber-50 border-amber-200 mb-4">
+          <CardContent className="p-3">
+            <p className="text-xs text-primary/80 leading-relaxed">
+              Beräkningarna i appen bygger på dina inmatade värden och förenklade antaganden och ska inte ses som personlig pensionsrådgivning.
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="bg-blue-50 border-blue-200">
@@ -218,7 +228,7 @@ export default function PensionPerPersonStep({
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium text-primary mb-2">💡 Varför pensionen är viktig</p>
+              <p className="font-medium text-primary mb-2">Varför pensionen är viktig</p>
               <p className="text-sm text-primary/80 mb-2">
                 I genomsnitt ligger en stor del av svenskarnas förmögenhet i pensionssystemet.
               </p>
@@ -352,9 +362,12 @@ export default function PensionPerPersonStep({
 
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="p-4">
-            <p className="text-sm text-primary/80">
-              💡 Nu kan vi räkna in din dolda förmögenhet.
-            </p>
+            <div className="flex items-start gap-3">
+              <Lightbulb className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-primary/80">
+                Nu kan vi räkna in din dolda förmögenhet.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -406,9 +419,9 @@ export default function PensionPerPersonStep({
         premiepensionValue,
         setPremiepensionValue,
         'Premiepension',
-        'Detta är den marknadsbaserade delen som kan växa mest.',
+        'Detta är den marknadsbaserade delen, där värdet kan variera mer över tid beroende på marknadsutvecklingen. Premiepensionen är en del av den allmänna pensionen och kan tas ut först från den lägsta uttagsålder som gäller för din årskull (idag ofta omkring 63–65 år).',
         'På minpension.se under "Allmän pension" → "Premiepension"',
-        'Detta är den marknadsbaserade delen som kan växa mest.'
+        'Detta är den marknadsbaserade delen, där värdet kan variera mer över tid beroende på marknadsutvecklingen. Premiepensionen är en del av den allmänna pensionen och kan tas ut först från den lägsta uttagsålder som gäller för din årskull (idag ofta omkring 63–65 år).'
       )}
       {currentSubStep === 'tjanstepension' && renderPensionInput(
         'tjanstepension',
@@ -424,7 +437,7 @@ export default function PensionPerPersonStep({
         ipsValue,
         setIpsValue,
         'IPS (Privat pensionssparande)',
-        'Din privata IPS-pension som du själv betalar in till.',
+        'Individuellt pensionssparande (IPS) är en äldre sparform som inte längre har avdragsrätt för de flesta. Om du redan har ett IPS-värde kan du ange det här.',
         'På minpension.se under "IPS" eller på din banks webbplats',
         'Din privata IPS-pension som du själv betalar in till.'
       )}

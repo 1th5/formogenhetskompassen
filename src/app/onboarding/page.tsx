@@ -59,15 +59,21 @@ export default function OnboardingPage() {
   const [showExistingHouseholdDialog, setShowExistingHouseholdDialog] = useState(false);
   
   // Kontrollera om det finns ett hushåll när komponenten mountas
+  // Men inte om vi är i summary-steget (då har vi precis sparat data)
   useEffect(() => {
+    // Visa inte dialogen om vi är i summary-steget eller redan har visat den
+    if (currentSection === 'summary') {
+      return;
+    }
+    
     const hasExistingHousehold = draftHousehold && 
       draftHousehold.persons && 
       draftHousehold.persons.length > 0;
     
-    if (hasExistingHousehold) {
+    if (hasExistingHousehold && !showExistingHouseholdDialog) {
       setShowExistingHouseholdDialog(true);
     }
-  }, [draftHousehold]);
+  }, [draftHousehold, currentSection, showExistingHouseholdDialog]);
   
   // Hantera val i dialogen
   const handleDialogChoice = (shouldClear: boolean) => {
@@ -293,6 +299,9 @@ export default function OnboardingPage() {
   };
 
   const handleSummaryComplete = () => {
+    // Stäng dialogen om den är öppen (för att undvika att den visas när vi navigerar)
+    setShowExistingHouseholdDialog(false);
+    
     // Spara all data och gå till dashboard
     // Kombinera alla assets (inklusive pensionsassets)
     const allAssets = [...assets, ...pensionAssets];
@@ -487,9 +496,18 @@ export default function OnboardingPage() {
             Förmögenhetskollen
           </h1>
           <p className="font-sans text-sm md:text-base text-primary/70">
-            Låt oss bygga din ekonomiska karta tillsammans
+            Vi hjälper dig att skapa en tydlig karta över din ekonomi
           </p>
         </div>
+        
+        {/* Global disclaimer */}
+        <Card className="bg-amber-50 border-amber-200 mb-6">
+          <CardContent className="p-4">
+            <p className="text-xs text-primary/80 leading-relaxed">
+              <strong className="text-primary/90">Observera:</strong> Alla beräkningar och uppskattningar i onboardingprocessen är förenklade, bygger på generella antaganden och är inte individanpassad rådgivning. Förmögenhetskollen står inte under Finansinspektionens tillsyn och informationen är avsedd för översikt och reflektion – inte som beslutsunderlag för investeringar, lån eller pensionsval.
+            </p>
+          </CardContent>
+        </Card>
         
         {/* Section Progress */}
         {currentSection !== 'welcome' && (
@@ -545,10 +563,10 @@ export default function OnboardingPage() {
                   <>
                     <p className="font-medium text-primary mb-2">Tänk om din verkliga förmögenhet är större än du tror?</p>
                     <p className="text-sm text-primary/80 mb-2">
-                      I Sverige ligger ofta en stor del av hushållets rikedom i pensioner – men många ser dem inte som tillgångar.
+                      I Sverige ligger en betydande del av hushållens finansiella sparande i pensionstillgångar. För många blir bilden därför missvisande om pension inte räknas in.
                     </p>
                     <p className="text-sm text-primary/80">
-                      Här börjar vi med personerna i hushållet, så vi kan räkna rätt på pension, ålder och ekonomisk frihet för just er.
+                      Vi börjar med personerna i hushållet för att kunna räkna rätt på pension, ålder och ekonomisk utveckling.
                     </p>
                   </>
                 )}
@@ -562,8 +580,8 @@ export default function OnboardingPage() {
             
             {currentSection === 'pension-per-person' && persons.length > 0 && (
               <>
-                {renderMicroInsight('Enligt Nick Maggiulli, skaparen av The Wealth Ladder, underskattar de flesta sin verkliga förmögenhet – ofta med 1–2 nivåer – eftersom pensionen inte räknas med.')}
-                {renderMicroInsight('Tänk dig att du tror att du har 500 000 kr – men i verkligheten 2,5 miljoner. Så ser det ofta ut när pensionen räknas in.')}
+                {renderMicroInsight('Enligt Nick Maggiulli, skaparen av The Wealth Ladder, tenderar många att underskatta pensionens betydelse i den totala förmögenheten.')}
+                {renderMicroInsight('Tänk dig att du tror att du har 500 000 kr – men i verkligheten 2,5 miljoner. I många fall kan det se ut så när pensionen räknas in.')}
                 <PensionPerPersonStep
                   persons={persons}
                   currentPersonIndex={currentPersonIndex}
@@ -578,7 +596,7 @@ export default function OnboardingPage() {
             {currentSection === 'savings-investments' && (
               <>
                 {renderMicroInsight('För många svenskar är bostaden deras största tillgång – ofta mer värd än allt sparande tillsammans.')}
-                {renderMicroInsight('En svensk med 500 000 kr på kontot kan i verkligheten ha samma totala rikedom som en amerikan med 2–3 miljoner.')}
+                {renderMicroInsight('En svensk med 500 000 kr i sparande kan i vissa fall ha en liknande ekonomisk trygghet som en amerikan med ett betydligt större privat sparkapital, eftersom mycket av tryggheten i Sverige ligger i pensionssystem och offentliga tjänster.')}
                 <SavingsInvestmentWizardStep
                   onComplete={handleSavingsInvestmentComplete}
                   onSkip={handleSkipSection}
@@ -588,7 +606,7 @@ export default function OnboardingPage() {
             
             {currentSection === 'housing' && (
               <>
-                {renderMicroInsight('💬 Nu tittar vi på allt du äger – ditt hem, bilen, sparandet och andra tillgångar. Många blir förvånade över hur mycket av deras förmögenhet som faktiskt finns i boendet.')}
+                {renderMicroInsight('Nu tittar vi på allt du äger – ditt hem, bilen, sparandet och andra tillgångar. Många blir förvånade över hur mycket av deras förmögenhet som faktiskt finns i boendet.')}
                 <HousingWizardStep
                   onComplete={handleHousingComplete}
                   onSkip={handleSkipSection}
@@ -626,7 +644,13 @@ export default function OnboardingPage() {
             {currentSection === 'liabilities' && (
               <>
                 {renderMicroInsight('Att ha lån betyder inte att du ligger efter – det handlar om balansen mellan tillgångar och skulder.')}
-                {renderMicroInsight('Lån kan vara en hävstång: om tillgången växer mer än räntan du betalar, ökar din förmögenhet snabbare.')}
+                {renderMicroInsight(
+                  <>
+                    <p>I ekonomisk teori kan lån skapa så kallad hävstång.</p>
+                    <p className="text-sm text-primary/80 mt-1">Det innebär att förändringar i värdet på en tillgång kan slå hårdare – både uppåt och nedåt – när en del av köpet är lånefinansierat.</p>
+                    <p className="text-xs text-primary/70 mt-2">Detta är endast en teoretisk princip och ska inte tolkas som en uppmaning att investera med lån eller belåna tillgångar.</p>
+                  </>
+                )}
                 <LiabilitiesWizardStep
                   onComplete={handleLiabilitiesComplete}
                   onSkip={handleSkipSection}

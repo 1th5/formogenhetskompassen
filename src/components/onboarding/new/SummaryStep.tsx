@@ -74,7 +74,7 @@ export default function SummaryStep({ persons, assets, liabilities, onComplete, 
                 Nu kan vi visa var ditt hushåll befinner sig i The Wealth Ladder – din ekonomiska nivå i verkligheten.
               </p>
               <p className="text-sm text-primary/80 mb-2">
-                I USA ligger ungefär 20% av hushållen på nivå 1, 20% på nivå 2 och 40% på nivå 3 – där den typiska medelklassen befinner sig. Bara cirka 2% når nivå 5 ("geografisk frihet"). Var hamnar du?
+                I USA uppskattar ekonomer att ungefär 20% av hushållen befinner sig på nivå 1, 20% på nivå 2 och runt 40% på nivå 3 enligt tolkningar av SCF-data. Bara cirka 2% når nivå 5 ("geografisk frihet"). Var hamnar du?
               </p>
               <p className="text-sm text-primary/80">
                 Du är nu redo att se hur din rikedom utvecklas månad för månad – och när din pension börjar bidra på riktigt.
@@ -97,9 +97,9 @@ export default function SummaryStep({ persons, assets, liabilities, onComplete, 
 
       {/* Microcopy */}
       <p className="text-xs text-primary/70 text-center italic">
-        Nu får du se var du befinner dig på The Wealth Ladder – din personliga rikedomskarta.
+        Nu får du se var du ligger på The Wealth Ladder och hur din ekonomi utvecklas över tid.
         <br />
-        Här ser du hur din förmögenhet växer varje månad och när din pension börjar göra skillnad på riktigt.
+        Här ser du hur din förmögenhet förändras varje månad och när pensionen blir en viktig del av helheten.
       </p>
 
       {/* Referenstext */}

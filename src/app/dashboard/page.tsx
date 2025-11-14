@@ -6,7 +6,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ import PensionOverviewCard from '@/components/dashboard/PensionOverviewCard';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { draftHousehold, shouldAnimate, setShouldAnimate, previousLevel, cameFromOnboarding, setPreviousLevel, setCameFromOnboarding } = useHouseholdStore();
   const [metrics, setMetrics] = useState<any>(null);
   const [breakdown, setBreakdown] = useState<any>(null);
@@ -268,6 +269,22 @@ export default function DashboardPage() {
       }
     };
   }, [showWelcomeSection, showHeroSection]);
+  
+  // Scroll till pensionskortet om scrollTo=pension finns i URL
+  useEffect(() => {
+    const scrollTo = searchParams.get('scrollTo');
+    if (scrollTo === 'pension') {
+      // Vänta lite för att säkerställa att DOM är redo
+      setTimeout(() => {
+        const pensionCard = document.getElementById('pension-card');
+        if (pensionCard) {
+          pensionCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Ta bort query-parametern från URL utan att trigga en reload
+          router.replace('/dashboard', { scroll: false });
+        }
+      }, 100);
+    }
+  }, [searchParams, router]);
   
   // Beräkna riktiga metrics
   useEffect(() => {
@@ -1388,17 +1405,18 @@ export default function DashboardPage() {
           />
         </div>
         
-        {/* FIRE Card */}
+        {/* Andra nivåer preview */}
         <div className="mb-4 sm:mb-6 md:mb-8">
-          <div id="fire-card">
-          <FIRECard
-              assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
-              liabilities={effectiveIsLevelZero ? [] : (draftHousehold?.liabilities || [])}
-              persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
-              totalNetWorth={displayNetWorth}
-              currentLevel={displayLevel}
-            />
-          </div>
+          <OtherLevelsPreview currentNetWorth={displayNetWorth} isLocked={effectiveIsLevelZero} />
+        </div>
+        
+        {/* Pensionstillgångar kort */}
+        <div id="pension-card" className="mb-4 sm:mb-6 md:mb-8">
+          <PensionOverviewCard
+            assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
+            persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
+            isLocked={effectiveIsLevelZero}
+          />
         </div>
         
         {/* Sparande kort */}
@@ -1412,25 +1430,26 @@ export default function DashboardPage() {
           />
         </div>
         
-        {/* Pensionstillgångar kort */}
+        {/* FIRE Card */}
         <div className="mb-4 sm:mb-6 md:mb-8">
-          <PensionOverviewCard
-            assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
-            persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
-            isLocked={effectiveIsLevelZero}
-          />
+          <div id="fire-card">
+          <FIRECard
+              assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
+              liabilities={effectiveIsLevelZero ? [] : (draftHousehold?.liabilities || [])}
+              persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
+              totalNetWorth={displayNetWorth}
+              currentLevel={displayLevel}
+            />
+          </div>
         </div>
         
         {/* Förmögenhetsfördelning flyttad till modal */}
         
         {/* Månatlig uppdelning flyttad till modal */}
         
-        {/* Andra nivåer preview */}
+        {/* Externa verktyg */}
         <div className="mb-4 sm:mb-6 md:mb-8">
-          <OtherLevelsPreview currentNetWorth={displayNetWorth} isLocked={effectiveIsLevelZero} />
-
-          {/* Externa verktyg */}
-          <Card className="mt-6 sm:mt-8 border border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-slate-100/50 backdrop-blur-sm">
+          <Card className="border border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-slate-100/50 backdrop-blur-sm">
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-start gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-slate-200/60">
@@ -1498,8 +1517,9 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-          
-          {/* Om-knapp för mobil - utanför boxen */}
+        </div>
+        
+        {/* Om-knapp för mobil - utanför boxen */}
           <Button
             variant="secondary"
             onClick={() => router.push('/about')}
@@ -1515,7 +1535,6 @@ export default function DashboardPage() {
               </div>
             </div>
           </Button>
-              </div>
 
         {/* Nivåer - modal */}
         <Dialog open={showLevelsModal} onOpenChange={setShowLevelsModal}>

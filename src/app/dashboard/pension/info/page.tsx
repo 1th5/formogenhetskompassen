@@ -27,7 +27,7 @@ export default function PensionInfoPage() {
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={() => router.back()}
+            onClick={() => router.push('/dashboard?scrollTo=pension')}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -367,7 +367,7 @@ export default function PensionInfoPage() {
         {/* Tillbaka-knapp */}
         <div className="text-center">
           <Button
-            onClick={() => router.back()}
+            onClick={() => router.push('/dashboard?scrollTo=pension')}
             variant="secondary"
             size="lg"
           >

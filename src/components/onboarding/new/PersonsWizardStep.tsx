@@ -65,7 +65,7 @@ const PENSION_STEPS: WizardStep[] = [
     id: 'custom_agreement',
     question: 'Vill du använda standardavtalet eller ange ditt eget?',
     options: [
-      { id: 'standard', label: 'Använd standardavtalet', description: 'Vi rekommenderar det bästa avtalet för din situation' },
+      { id: 'standard', label: 'Använd standardavtalet', description: 'Vi föreslår ett standardavtal som brukar passa de flesta i din situation' },
       { id: 'custom', label: 'Ange mitt eget avtal', description: 'Jag vet vilket avtal jag har eller vill ange det manuellt' }
     ]
   }
@@ -102,6 +102,7 @@ function determinePensionType(answers: Record<string, string>, age: number): Pen
 export default function PersonsWizardStep({ onComplete, onSkip, liabilities = [] }: PersonsWizardStepProps) {
   const [step, setStep] = useState<'intro' | 'person-details' | 'income-choice' | 'income-choice-type' | 'income-job' | 'income-other' | 'pension-wizard' | 'pension-custom' | 'salary-exchange' | 'savings'>('intro');
   const [persons, setPersons] = useState<Person[]>([]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   
   // Current person being created
   const [name, setName] = useState('');
@@ -232,6 +233,10 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
       
       setPersons(prev => [...prev, person]);
       
+      // Visa kvitto
+      setShowConfirmation(true);
+      setTimeout(() => setShowConfirmation(false), 3000);
+      
       // Reset
       setName('');
       setBirthYear(new Date().getFullYear() - 30);
@@ -268,13 +273,16 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
           <h3 className="text-lg md:text-xl font-serif text-primary mb-2">
             Vem ingår i hushållet?
           </h3>
-          <p className="text-sm md:text-base text-primary/70 mb-4">
+          <p className="text-sm md:text-base text-primary/70 mb-2">
             Lägg till vuxna i hushållet med inkomst och tillgångar
+          </p>
+          <p className="text-xs text-primary/60 italic mb-4">
+            När du fyllt i detta steg kan vi göra en modellbaserad pensionsuppskattning.
           </p>
           <Card className="bg-blue-50 border-blue-200 mb-6">
             <CardContent className="p-4">
               <p className="text-sm text-primary/80">
-                Vi behöver veta vilka vuxna ni är för att kunna räkna pension, ålder vid ekonomisk frihet och rätt nivå i rikedomstrappan. Barn behöver inte läggas till.
+                Vi behöver veta vilka vuxna ni är för att kunna göra en förenklad uppskattning av pension, uppskattad ålder vid ekonomisk frihet (simulerad) och beräknad nivå i Rikedomstrappan. Du behöver inte lägga till barn — de påverkar inte beräkningarna.
               </p>
             </CardContent>
           </Card>
@@ -287,6 +295,9 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
                 Lägg till person
               </Button>
             </div>
+            <p className="text-xs text-primary/60 mt-2 text-center">
+              (Du behöver lägga in någon form av inkomst eller sparande för att kunna beräkna pension och nettoförmögenhet korrekt.)
+            </p>
             <Card className="bg-amber-50 border-amber-200 mt-4">
               <CardContent className="p-4">
                 <p className="text-sm text-amber-900">
@@ -295,6 +306,19 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
               </CardContent>
             </Card>
           </>
+        )}
+        
+        {showConfirmation && (
+          <Card className="bg-green-50 border-green-200 mb-4 animate-in fade-in slide-in-from-top-2">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <p className="text-sm text-green-800">
+                  Bra! Detta ingår i den förenklade uppskattning som visas senare.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         )}
         
         {persons.length > 0 && (() => {
@@ -346,9 +370,9 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
                           <span className="font-medium text-green-600">{formatCurrency(personNetIncome)}/månad</span>
                         </div>
                         <div className="pl-2 space-y-1">
-                          <div className="text-xs font-medium text-blue-600 uppercase tracking-wide">Trygghetsbaserad</div>
+                          <div className="text-xs font-medium text-blue-600 uppercase tracking-wide">Statlig pension</div>
                         <div className="flex justify-between pl-2">
-                            <span className="text-xs">- Inkomstpension:</span>
+                            <span className="text-xs">- Inkomstpension (fördelningssystem):</span>
                             <span className="font-medium text-xs">{formatCurrency(incomePension)}/månad</span>
                           </div>
                           <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mt-2">Marknadsbaserad</div>
@@ -407,9 +431,12 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className="text-green-800 flex-shrink-0">Pensionsavsättningar:</span>
-                      <span className="font-medium text-green-700">
-                        {formatCurrency(totalPensionContributions)}/månad
-                      </span>
+                      <div className="flex flex-col sm:items-end">
+                        <span className="font-medium text-green-700">
+                          {formatCurrency(totalPensionContributions)}/månad
+                        </span>
+                        <p className="text-xs text-green-600 mt-0.5">Omräknat som månadsbelopp, men tjänas in årsvis</p>
+                      </div>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className="text-green-800 flex-shrink-0">Övrigt sparande:</span>
@@ -734,10 +761,13 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="p-4">
             <p className="text-sm text-primary/80 mb-2">
-              <strong>Viktigt:</strong> Ange din bruttolön (före skatt) <strong>efter eventuell löneväxling</strong>. Om du har löneväxling, dra av den från bruttolönen innan du anger beloppet här. Vi räknar automatiskt ut nettoinkomsten och skatten åt dig.
+              <strong>Viktigt:</strong> Ange bruttolön (före skatt) efter eventuell löneväxling. Om du löneväxlar drar du av det från bruttolönen innan du fyller i den här.
+            </p>
+            <p className="text-sm text-primary/80 mb-2">
+              Vi ber om detta eftersom tjänstepensionsavsättningen annars riskerar att beräknas dubbelt.
             </p>
             <p className="text-sm text-primary/80">
-              Din inkomst styr hur mycket som sätts av till pension. Vi använder svenska nivåer (inkomstpension + premiepension + tjänstepension) för att räkna fram hushållets dolda förmögenhet.
+              Vi gör en förenklad skatteberäkning baserad på schabloniserade svenska skatteregler. Nettoinkomsten och pensionsavsättningarna beräknas därefter.
             </p>
           </CardContent>
         </Card>
@@ -765,7 +795,7 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
               className="mt-2"
             />
             <p className="text-xs text-primary/60 mt-1">
-              Ange din bruttolön efter eventuell löneväxling (före skatt). Om du har löneväxling, dra av den från bruttolönen. Vi räknar automatiskt ut nettoinkomsten åt dig.
+              Ange din bruttolön efter eventuell löneväxling (före skatt). Om du har löneväxling, dra av den från bruttolönen. Vi gör en förenklad nettoberäkning baserad på schabloner.
             </p>
           </div>
           
@@ -1095,7 +1125,7 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
               className="mt-2"
             />
             <p className="text-xs text-primary/60 mt-1">
-              Allt som du lägger på ekonomiska investeringar: ISK, AF, KF, fonder, aktier, ETF:er, obligationer, räntefonder, sparkonto, kapitalförsäkring, fastigheter, crypto m.m.
+              Allt som du lägger på ekonomiska investeringar: ISK, AF, KF, fonder, aktier, ETF:er, obligationer, räntefonder, sparkonto, kapitalförsäkring, fastigheter, crypto m.m. Här anger du värden på investeringar du redan har – detta är inte en rekommendation att köpa vissa typer av tillgångar.
             </p>
           </div>
           

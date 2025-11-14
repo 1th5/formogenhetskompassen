@@ -35,7 +35,7 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
           Välkommen
         </h2>
         <p className="text-sm md:text-base text-primary/70">
-          Låt oss tillsammans upptäcka din verkliga förmögenhet
+          Vi hjälper dig att skapa en tydlig bild av din förmögenhet
         </p>
       </div>
 
@@ -48,7 +48,10 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
           <div>
             <p className="font-medium text-primary">Tänk om du redan är miljonär – utan att veta om det.</p>
             <p className="text-sm text-primary/70 mt-1">
-              När din pension räknas in visar det sig ofta att förmögenheten är flera gånger större än du trodde.
+              När pensionen räknas med blir den totala ekonomiska bilden för många betydligt större än vad man först tror.
+            </p>
+            <p className="text-xs text-primary/60 mt-1 italic">
+              Vi visar dig en helhetsbild – inte bara saldot på kontot.
             </p>
           </div>
         </div>
@@ -58,9 +61,9 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
             <TrendingUp className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="font-medium text-primary">Vi räknar ut din rikedomsnivå.</p>
+            <p className="font-medium text-primary">Vi gör en förenklad uppskattning av din rikedomsnivå.</p>
             <p className="text-sm text-primary/70 mt-1">
-              Baserat på The Wealth Ladder delar vi in förmögenhet i nivåer och visar var du befinner dig.
+              Baserat på The Wealth Ladder delar vi in förmögenhet i nivåer och visar en beräknad placering.
             </p>
           </div>
         </div>
@@ -82,9 +85,9 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
             <Target className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="font-medium text-primary">Experimentera med ekonomisk frihet enligt FIRE-principer.</p>
+            <p className="font-medium text-primary">Testa olika teoretiska sparscenarier enligt FIRE-principer.</p>
             <p className="text-sm text-primary/70 mt-1">
-              Simulera olika sparstrategier och se när du kan leva på dina tillgångar – helt på dina egna villkor.
+              Simulera olika scenarier och se en uppskattning av när dina tillgångar kan räcka – helt baserat på dina egna antaganden.
             </p>
           </div>
         </div>
@@ -98,7 +101,7 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
             <div>
               <p className="font-medium text-primary mb-1">Varför frågar vi om pension?</p>
               <p className="text-sm text-primary/80">
-                I Sverige ligger ofta en stor del av hushållets förmögenhet i pension – därför frågar vi om den också.
+                I Sverige ligger en betydande del av hushållens finansiella sparande i pensionstillgångar. Bilden kan bli ofullständig om pension inte räknas in.
               </p>
             </div>
           </div>

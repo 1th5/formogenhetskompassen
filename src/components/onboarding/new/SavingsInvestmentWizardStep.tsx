@@ -77,8 +77,11 @@ export default function SavingsInvestmentWizardStep({ onComplete, onSkip }: Savi
           <h3 className="text-lg md:text-xl font-serif text-primary mb-2">
             Spar och investeringar på börsen
           </h3>
-          <p className="text-sm md:text-base text-primary/70 mb-6">
+          <p className="text-sm md:text-base text-primary/70 mb-2">
             Lägg till dina bankinvesteringar - sparkonton, fonder och aktier.
+          </p>
+          <p className="text-xs text-primary/60 italic mb-6">
+            När du lägger in detta får du en mer komplett bild av din förmögenhet.
           </p>
         </div>
         
@@ -89,11 +92,19 @@ export default function SavingsInvestmentWizardStep({ onComplete, onSkip }: Savi
               Logga in på din bank och hitta:
             </p>
             <ul className="text-sm md:text-base text-blue-800 space-y-2">
-              <li>• Sparkonton och belopp</li>
+              <li>• Sparkonton och belopp (det går bra att lägga till både sparkonton och lönekonton med överskott)</li>
               <li>• Fonder och deras värde</li>
               <li>• Aktier och deras värde</li>
               <li>• Övriga tillgångar via banken</li>
             </ul>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-amber-50 border-amber-200">
+          <CardContent className="p-3">
+            <p className="text-xs text-primary/80 leading-relaxed">
+              Här fyller du i värden på sparande eller investeringar du redan har. Detta är inte en rekommendation att investera i en viss produkt eller tillgångstyp.
+            </p>
           </CardContent>
         </Card>
         
