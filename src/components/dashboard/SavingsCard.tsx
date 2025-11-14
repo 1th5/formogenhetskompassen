@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils/format';
 import { getCurrentLevel } from '@/lib/wealth/calc';
@@ -22,7 +21,6 @@ interface SavingsCardProps {
 
 export default function SavingsCard({ assets, liabilities, persons, totalNetWorth, isLocked = false }: SavingsCardProps) {
   const router = useRouter();
-  const [showISKGuide, setShowISKGuide] = useState(false);
 
   // Beräkna nuvarande månadssparande
   const monthlySavings = useMemo(() => {
@@ -66,6 +64,15 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
   const shouldShowSavingsNudge = useMemo(() => {
     return currentLevel.level <= 3 && savingsRate < 5 && ((liquidRatio < 0.3) || (totalAssetValue < 100000));
   }, [currentLevel.level, savingsRate, liquidRatio, totalAssetValue]);
+
+  // Bestäm text för "Kom igång"-knappen baserat på sparande
+  const getISKButtonText = () => {
+    // Om man har högt sparande (över 500k i likvida tillgångar eller nivå 3+)
+    if (liquidValue > 500000 || currentLevel.level >= 3) {
+      return 'Läs mer om ISK';
+    }
+    return 'Kom igång';
+  };
 
   // Bestäm meddelande och stil baserat på nivå
   const messageInfo = useMemo(() => {
@@ -194,25 +201,28 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
         savingsRate > 0 ? 'bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50' :
         'bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100'
       }`}>
-        {shouldShowSavingsNudge && (
-          <div className="absolute top-4 right-4 z-30">
-            <div className="flex items-center gap-3 bg-white/95 backdrop-blur-sm border border-slate-200/60 rounded-xl shadow-card px-3 py-2">
-              <div className="relative group w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center cursor-help">
-                <span className="text-primary">💡</span>
-                <div className="pointer-events-none absolute right-0 top-9 hidden group-hover:block whitespace-normal break-words bg-white border border-slate-200/70 rounded-lg shadow-md text-[10px] text-primary/80 px-3 py-2 w-[320px] z-40">
-                  Börja spara regelbundet och bygg upp likvida tillgångar – då blir 0,01%-potten mer användbar i vardagen. Små steg räcker för att komma igång.
+        {/* ISK-guide knapp - alltid synlig */}
+        <div className="absolute top-4 right-4 z-30">
+          <div className="flex items-center gap-3 bg-white/95 backdrop-blur-sm border border-slate-200/60 rounded-xl shadow-card px-3 py-2">
+            {shouldShowSavingsNudge && (
+              <>
+                <div className="relative group w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center cursor-help">
+                  <span className="text-primary">💡</span>
+                  <div className="pointer-events-none absolute right-0 top-9 hidden group-hover:block whitespace-normal break-words bg-white border border-slate-200/70 rounded-lg shadow-md text-[10px] text-primary/80 px-3 py-2 w-[320px] z-40">
+                    Börja spara regelbundet och bygg upp likvida tillgångar – då blir 0,01%-potten mer användbar i vardagen. Små steg räcker för att komma igång.
+                  </div>
                 </div>
-              </div>
-              <span className="hidden sm:block text-xs font-medium text-primary">Tips</span>
-              <button
-                onClick={() => setShowISKGuide(true)}
-                className="inline-flex items-center rounded-full bg-primary text-white px-3 py-1.5 text-xs shadow-sm hover:bg-primary/90 hover:shadow-md cursor-pointer"
-              >
-                Kom igång
-              </button>
-            </div>
+                <span className="hidden sm:block text-xs font-medium text-primary">Tips</span>
+              </>
+            )}
+            <button
+              onClick={() => router.push('/dashboard/savings/info')}
+              className="inline-flex items-center rounded-full bg-primary text-white px-3 py-1.5 text-xs shadow-sm hover:bg-primary/90 hover:shadow-md cursor-pointer"
+            >
+              {getISKButtonText()}
+            </button>
           </div>
-        )}
+        </div>
         <CardHeader className="relative z-10 pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -289,84 +299,6 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
         </CardContent>
       </Card>
 
-      {/* ISK-guide dialog */}
-      <Dialog open={showISKGuide} onOpenChange={setShowISKGuide}>
-        <DialogContent showCloseButton={true} className="sm:max-w-[720px] w-[95vw] h-[90vh] overflow-hidden p-0 rounded-2xl">
-          {/* Header */}
-          <div className="bg-white/90 backdrop-blur-sm p-6 rounded-t-2xl border-b border-slate-200/40">
-            <div className="flex items-start justify-between">
-              <DialogHeader className="gap-1">
-                <DialogTitle className="text-2xl font-serif text-primary flex items-center gap-3">
-                  <PiggyBank className="w-7 h-7 text-emerald-600" />
-                  Kom igång med sparande (ISK och buffert)
-                </DialogTitle>
-                <p className="text-primary/70 mt-1 text-sm">
-                  En enkel guide för att välja mellan fond (ISK) och sparkonto utifrån din tidshorisont – och hur du startar på några minuter.
-                </p>
-              </DialogHeader>
-            </div>
-          </div>
-          {/* Scrollable body */}
-          <div className="p-6 overflow-y-auto h-[calc(90vh-72px)] pb-24">
-            <div className="space-y-6">
-                <div className="bg-white/90 border border-slate-200/60 p-6 rounded-xl">
-                  <h4 className="text-lg font-semibold text-primary mb-2">Vad är ISK?</h4>
-                  <p className="text-primary/80 mb-2">ISK är ett konto som i många informationskällor förklaras som anpassat för långsiktigt sparande. Skatten tas ut som en årlig schablon i stället för kapitalvinstskatt. Om ISK är lämpligt för dig beror på din totala ekonomi och dina mål.</p>
-                  <p className="text-primary/70">Du kan öppna ISK hos din bank eller en nätbank. Hela processen tar oftast bara några minuter med BankID och du styr månadssparandet själv.</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h5 className="font-bold text-green-900 mb-2">Fördelar</h5>
-                    <ul className="text-sm text-green-800 space-y-1">
-                      <li>• Låg, förutsägbar skatt</li>
-                      <li>• Ingen vinstskatt vid försäljning</li>
-                      <li>• Enkelt att månadsspara</li>
-                      <li>• Passar för sparande som inte behövs i närtid</li>
-                    </ul>
-                  </div>
-                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                    <h5 className="font-bold text-purple-900 mb-2">Exempel på investeringar</h5>
-                    <ul className="text-sm text-purple-800 space-y-1">
-                      <li>• Breda indexfonder (global/USA)</li>
-                      <li>• Ev. komplettera med Sverige</li>
-                      <li>• Låga avgifter kan vara viktigt – avgiften är en säker kostnad</li>
-                    </ul>
-                  </div>
-                </div>
-                  <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
-                  <h4 className="text-lg font-semibold text-blue-900 mb-2">Tidshorisont – fond eller sparkonto?</h4>
-                  <p className="text-sm text-blue-900">Ett vanligt sätt att resonera i allmänna sparguider är att pengar som inte behövs i närtid ibland placeras i fonder via t.ex. ISK, medan pengar som kan behövas snart ofta ligger kvar på sparkonto. Vad som passar dig beror på din risknivå, buffert och tidshorisont.</p>
-                </div>
-                <div className="bg-amber-50 p-6 rounded-xl border border-amber-200">
-                  <h4 className="text-lg font-semibold text-amber-900 mb-2">Kom igång – 4 steg</h4>
-                  <ol className="list-decimal ml-5 text-sm text-amber-900 space-y-1">
-                    <li>Välj bank eller nätbank</li>
-                    <li>Öppna ISK-konto – det går snabbt med BankID</li>
-                    <li>Ställ in månadssparande</li>
-                    <li>Som exempel nämns ofta i sparguider en global indexfond med låg avgift (t.ex. under 0,4 %) som ett alternativ för långsiktigt sparande. Detta är endast ett exempel och inte en rekommendation – välj själv det som passar din situation och risknivå.</li>
-                  </ol>
-                </div>
-                <div className="bg-white/90 border border-slate-200/60 p-6 rounded-xl">
-                  <h4 className="text-lg font-semibold text-primary mb-2">Fondrobot – ett alternativ</h4>
-                  <p className="text-primary/80 text-sm">En fondrobot kan vara ett sätt att komma igång om du vill ha automatisk fördelning och återbalansering. Titta på avgiften och välj ett paket som passar din situation och risknivå.</p>
-                </div>
-            </div>
-          </div>
-          {/* Disclaimer */}
-          <div className="px-6 pt-4 pb-2 border-t border-slate-200/60 bg-white/95 backdrop-blur-sm">
-            <p className="text-xs text-primary/60 italic text-center">
-              Den här guiden beskriver vanliga sparformer på en generell nivå. Informationen är inte anpassad till din situation och ska inte ses som personlig finansiell rådgivning eller rekommendation att välja en viss bank, fond eller sparprodukt.
-            </p>
-          </div>
-          {/* Footer docked inside dialog content */}
-          <div className="px-6 pb-4 pt-3 bg-white/95 backdrop-blur-sm">
-            <div className="flex gap-3">
-              <button onClick={() => setShowISKGuide(false)} className="flex-1 rounded-full border border-slate-300 px-4 py-2 text-sm">Stäng</button>
-              <button onClick={() => { setShowISKGuide(false); router.push('/household'); }} className="flex-1 rounded-full bg-primary text-white px-4 py-2 text-sm">Lägg till sparande</button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

@@ -270,7 +270,7 @@ export default function DashboardPage() {
     };
   }, [showWelcomeSection, showHeroSection]);
   
-  // Scroll till pensionskortet om scrollTo=pension finns i URL
+  // Scroll till pensionskortet eller savings-kortet om scrollTo finns i URL
   useEffect(() => {
     const scrollTo = searchParams.get('scrollTo');
     if (scrollTo === 'pension') {
@@ -279,6 +279,16 @@ export default function DashboardPage() {
         const pensionCard = document.getElementById('pension-card');
         if (pensionCard) {
           pensionCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Ta bort query-parametern från URL utan att trigga en reload
+          router.replace('/dashboard', { scroll: false });
+        }
+      }, 100);
+    } else if (scrollTo === 'savings') {
+      // Vänta lite för att säkerställa att DOM är redo
+      setTimeout(() => {
+        const savingsCard = document.getElementById('savings-card');
+        if (savingsCard) {
+          savingsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
           // Ta bort query-parametern från URL utan att trigga en reload
           router.replace('/dashboard', { scroll: false });
         }
@@ -1420,7 +1430,7 @@ export default function DashboardPage() {
         </div>
         
         {/* Sparande kort */}
-        <div className="mb-4 sm:mb-6 md:mb-8">
+        <div id="savings-card" className="mb-4 sm:mb-6 md:mb-8">
           <SavingsCard
             assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
             liabilities={effectiveIsLevelZero ? [] : (draftHousehold?.liabilities || [])}

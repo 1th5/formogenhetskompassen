@@ -719,8 +719,8 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
         {/* Per person */}
         {perPersonData.length > 0 && (
           <div className="pt-4 border-t border-slate-200/60">
-            <p className="text-sm font-semibold text-gray-900 mb-4">Per person</p>
-            <div className="space-y-4">
+            <p className="text-sm font-semibold text-gray-900 mb-3">Per person</p>
+            <div className="space-y-3">
               {perPersonData.map((person, idx) => {
                 const hasAnyPension = 
                   person.assets.occupational > 0 || 
@@ -734,71 +734,97 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
                 
                 if (!hasAnyPension) return null;
                 
+                // Samla alla pensionstyper med data
+                const pensionTypes = [
+                  { 
+                    key: 'occupational', 
+                    label: 'Tjänstepension', 
+                    icon: <Building2 className="w-4 h-4" />,
+                    asset: person.assets.occupational,
+                    contribution: person.contributions.occupational,
+                    color: 'text-blue-600',
+                    bgColor: 'bg-blue-50'
+                  },
+                  { 
+                    key: 'premie', 
+                    label: 'Premiepension', 
+                    icon: <Landmark className="w-4 h-4" />,
+                    asset: person.assets.premie,
+                    contribution: person.contributions.premie,
+                    color: 'text-emerald-600',
+                    bgColor: 'bg-emerald-50'
+                  },
+                  { 
+                    key: 'ips', 
+                    label: 'IPS', 
+                    icon: <PiggyBank className="w-4 h-4" />,
+                    asset: person.assets.ips,
+                    contribution: person.contributions.ips,
+                    color: 'text-purple-600',
+                    bgColor: 'bg-purple-50'
+                  },
+                  { 
+                    key: 'state', 
+                    label: 'Statlig pension', 
+                    icon: <Wallet className="w-4 h-4" />,
+                    asset: person.assets.state,
+                    contribution: person.contributions.state,
+                    color: 'text-amber-600',
+                    bgColor: 'bg-amber-50'
+                  }
+                ].filter(pt => pt.asset > 0 || pt.contribution > 0);
+                
                 return (
-                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-slate-200/60">
-                    <p className="font-semibold text-base text-gray-900 mb-3">
-                      {person.name} ({person.age} år)
-                    </p>
+                  <div key={idx} className="bg-gradient-to-br from-white to-slate-50/50 rounded-xl p-3 sm:p-4 border border-slate-200/60 shadow-sm">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="font-semibold text-sm sm:text-base text-gray-900">
+                        {person.name}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        {person.agreements.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {person.agreements.map((agreement, aidx) => (
+                              <Badge 
+                                key={aidx} 
+                                variant="outline" 
+                                className="text-xs bg-white/80 border-slate-300/60 text-gray-700 font-medium px-2 py-0.5"
+                              >
+                                {agreement}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        <span className="text-xs text-gray-500">{person.age} år</span>
+                      </div>
+                    </div>
                     
-                    {/* Tillgångar */}
-                    {(person.assets.occupational > 0 || person.assets.premie > 0 || person.assets.ips > 0 || person.assets.state > 0) && (
-                      <div className="mb-3">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Tillgångar</p>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700">
-                          {person.assets.occupational > 0 && (
-                            <span className="font-medium">Tjänstepension: <span className="font-normal">{formatCurrency(person.assets.occupational)}</span></span>
+                    {/* Pensionstyper - kompakt grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {pensionTypes.map((pt) => (
+                        <div 
+                          key={pt.key} 
+                          className={`${pt.bgColor} rounded-lg p-2.5 border border-slate-200/40`}
+                        >
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <div className={pt.color}>
+                              {pt.icon}
+                            </div>
+                            <span className="text-xs font-medium text-gray-700">{pt.label}</span>
+                          </div>
+                          {pt.asset > 0 && (
+                            <p className="text-xs text-gray-600 mb-0.5">
+                              <span className="font-semibold text-gray-900">{formatCurrency(pt.asset)}</span>
+                            </p>
                           )}
-                          {person.assets.premie > 0 && (
-                            <span className="font-medium">Premiepension: <span className="font-normal">{formatCurrency(person.assets.premie)}</span></span>
-                          )}
-                          {person.assets.ips > 0 && (
-                            <span className="font-medium">IPS: <span className="font-normal">{formatCurrency(person.assets.ips)}</span></span>
-                          )}
-                          {person.assets.state > 0 && (
-                            <span className="font-medium">Statlig pension: <span className="font-normal">{formatCurrency(person.assets.state)}</span></span>
+                          {pt.contribution > 0 && (
+                            <p className="text-xs text-gray-600">
+                              <span className="text-gray-500">+</span> <span className="font-medium text-gray-700">{formatCurrency(pt.contribution)}</span><span className="text-gray-500">/mån</span>
+                            </p>
                           )}
                         </div>
-                      </div>
-                    )}
-                    
-                    {/* Avsättningar */}
-                    {(person.contributions.occupational > 0 || person.contributions.premie > 0 || person.contributions.ips > 0 || person.contributions.state > 0) && (
-                      <div className="mb-3">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Avsättning/mån</p>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700">
-                          {person.contributions.occupational > 0 && (
-                            <span className="font-medium">Tjänstepension: <span className="font-normal">{formatCurrency(person.contributions.occupational)}/mån</span></span>
-                          )}
-                          {person.contributions.premie > 0 && (
-                            <span className="font-medium">Premiepension: <span className="font-normal">{formatCurrency(person.contributions.premie)}/mån</span></span>
-                          )}
-                          {person.contributions.ips > 0 && (
-                            <span className="font-medium">IPS: <span className="font-normal">{formatCurrency(person.contributions.ips)}/mån</span></span>
-                          )}
-                          {person.contributions.state > 0 && (
-                            <span className="font-medium">Statlig pension: <span className="font-normal">{formatCurrency(person.contributions.state)}/mån</span></span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Pensionsavtal */}
-                    {person.agreements.length > 0 && (
-                      <div className="pt-3 border-t border-slate-200/60">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Pensionsavtal</p>
-                        <div className="flex flex-wrap gap-2">
-                          {person.agreements.map((agreement, aidx) => (
-                            <Badge 
-                              key={aidx} 
-                              variant="outline" 
-                              className="text-sm bg-slate-50/80 border-slate-300/60 text-gray-700 font-normal px-3 py-1"
-                            >
-                              {agreement}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      ))}
+                    </div>
                   </div>
                 );
               })}
