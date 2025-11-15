@@ -1,15 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { MultiSelectToggle, MultiSelectOption } from '@/components/ui/multi-select-toggle';
 import { formatCurrency } from '@/lib/utils/format';
-import { getCurrentLevel } from '@/lib/wealth/calc';
-import { calculateAmortizationMonthly } from '@/lib/wealth/calc';
+import { getCurrentLevel, calculateAmortizationMonthly, calculatePrivatePensionMonthlyAllocations } from '@/lib/wealth/calc';
 import { Person, Asset, Liability } from '@/lib/types';
-import { PiggyBank, TrendingUp, Target, Sparkles, Lock } from 'lucide-react';
+import { PiggyBank, TrendingUp, Target, Sparkles, Lock, Wallet, Home, PiggyBank as PiggyBankIcon } from 'lucide-react';
 
 interface SavingsCardProps {
   assets: Asset[];
@@ -19,8 +19,33 @@ interface SavingsCardProps {
   isLocked?: boolean;
 }
 
+const SAVINGS_SELECTION_STORAGE_KEY = 'savings-card-selection';
+
 export default function SavingsCard({ assets, liabilities, persons, totalNetWorth, isLocked = false }: SavingsCardProps) {
   const router = useRouter();
+
+  // Ladda val från localStorage eller använd default
+  const [selectedSavingsTypes, setSelectedSavingsTypes] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return ['other_savings'];
+    const stored = localStorage.getItem(SAVINGS_SELECTION_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        // Säkerställ att minst ett val är markerat
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : ['other_savings'];
+      } catch {
+        return ['other_savings'];
+      }
+    }
+    return ['other_savings']; // Default: endast övrigt sparande
+  });
+
+  // Spara val till localStorage när de ändras
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SAVINGS_SELECTION_STORAGE_KEY, JSON.stringify(selectedSavingsTypes));
+    }
+  }, [selectedSavingsTypes]);
 
   // Beräkna nuvarande månadssparande
   const monthlySavings = useMemo(() => {
@@ -31,7 +56,46 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
     return calculateAmortizationMonthly(liabilities);
   }, [liabilities]);
 
-  const totalMonthlySavings = monthlySavings + amortizationMonthly;
+  const ipsMonthly = useMemo(() => {
+    return calculatePrivatePensionMonthlyAllocations(persons);
+  }, [persons]);
+
+  // Beräkna totalMonthlySavings baserat på val
+  const totalMonthlySavings = useMemo(() => {
+    let total = 0;
+    if (selectedSavingsTypes.includes('other_savings')) {
+      total += monthlySavings;
+    }
+    if (selectedSavingsTypes.includes('amortization')) {
+      total += amortizationMonthly;
+    }
+    if (selectedSavingsTypes.includes('ips')) {
+      total += ipsMonthly;
+    }
+    return total;
+  }, [selectedSavingsTypes, monthlySavings, amortizationMonthly, ipsMonthly]);
+
+  // Flervalsinput-alternativ
+  const savingsOptions: MultiSelectOption[] = [
+    {
+      id: 'other_savings',
+      label: 'Övrigt sparande',
+      description: 'Investeringar och sparande',
+      icon: <Wallet className="w-4 h-4" />
+    },
+    {
+      id: 'amortization',
+      label: 'Amorteringar',
+      description: 'Lånebetalningar som ökar nettoförmögenhet',
+      icon: <Home className="w-4 h-4" />
+    },
+    {
+      id: 'ips',
+      label: 'Månadsspar till IPS',
+      description: 'Individuellt pensionssparande',
+      icon: <PiggyBankIcon className="w-4 h-4" />
+    }
+  ];
 
   // Beräkna nettoinkomst för att räkna ut sparkvot
   const netIncome = useMemo(() => {
@@ -244,6 +308,19 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
         </CardHeader>
 
         <CardContent className="relative z-10 space-y-4">
+          {/* Flervalsinput för vad som ska räknas som sparande */}
+          <div className="mb-4">
+            <p className="text-xs font-medium text-primary/70 mb-2 text-center">
+              Välj vad som ska räknas som månadssparande:
+            </p>
+            <MultiSelectToggle
+              options={savingsOptions}
+              selected={selectedSavingsTypes}
+              onChange={setSelectedSavingsTypes}
+              minSelections={1}
+            />
+          </div>
+
           {/* Nuvarande sparande */}
           <div className="text-center py-2">
             <div className={`text-4xl md:text-5xl font-extrabold mb-1 ${savingsRateInfo.colorClass} drop-shadow-sm`}>
@@ -251,7 +328,7 @@ export default function SavingsCard({ assets, liabilities, persons, totalNetWort
             </div>
             <p className="text-sm text-gray-600 mb-2">per månad</p>
             <p className="text-xs text-primary/60 mb-3">
-              Månadsökningen består av amorteringar (som ökar din nettoförmögenhet) och annat sparande som registrerats i hushållet (exklusive pensionsavsättningar).
+              Baserat på dina val ovan. Detta värde används som standard i sparkalkylatorn när du väljer investerat kapital.
             </p>
             
             {/* Sparkvot */}

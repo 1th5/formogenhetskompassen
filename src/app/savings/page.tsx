@@ -44,6 +44,9 @@ interface SavingsPlan {
     increaseAfterYears: number;
     increaseAmount: number;
   };
+  // Scenario-val: vilka globala scenarier som ska gälla för denna plan
+  useWhatIf?: boolean;
+  useAnnualChange?: boolean;
 }
 
 // Konvertera årlig avkastning till månatlig (geometrisk)
@@ -51,13 +54,14 @@ function annualToMonthlyRate(annualRate: number): number {
   return Math.pow(1 + annualRate, 1/12) - 1;
 }
 
-// Beräkna ränta-på-ränta effekt med stöd för "vad händer om"-scenarier
+// Beräkna ränta-på-ränta effekt med stöd för "vad händer om"-scenarier och årlig förändring
 function calculateCompoundInterest(
   monthlyContribution: number,
   annualReturn: number,
   years: number,
   initialAmount: number = 0,
-  whatIf?: { increaseAfterYears: number; increaseAmount: number }
+  whatIf?: { increaseAfterYears: number; increaseAmount: number },
+  annualChange?: { amount: number } // Månatlig förändring per år (kan vara negativ)
 ): CompoundInterestResult {
   const monthlyReturn = annualToMonthlyRate(annualReturn);
   const months = years * 12;
@@ -81,9 +85,26 @@ function calculateCompoundInterest(
 
   for (let month = 1; month <= months; month++) {
     let currentMonthlySavings = monthlyContribution;
-    if (whatIf && month > whatIf.increaseAfterYears * 12) {
-      currentMonthlySavings = monthlyContribution + whatIf.increaseAmount;
+    const currentYear = Math.floor((month - 1) / 12);
+    
+    // Hantera årlig förändring (öka/sänk varje år) - appliceras alltid om aktiv
+    if (annualChange) {
+      currentMonthlySavings = monthlyContribution + (annualChange.amount * currentYear);
     }
+    
+    // Hantera "vad händer om"-scenario (öka/sänk efter X år) - läggs till på toppen av årlig förändring
+    if (whatIf && month > whatIf.increaseAfterYears * 12) {
+      // Om annualChange är aktiv, lägg till whatIf på toppen av det redan modifierade beloppet
+      // Annars lägg till på grundbeloppet
+      if (annualChange) {
+        currentMonthlySavings = currentMonthlySavings + whatIf.increaseAmount;
+      } else {
+        currentMonthlySavings = monthlyContribution + whatIf.increaseAmount;
+      }
+    }
+    
+    // Säkerställ att sparbeloppet inte blir negativt (gäller både whatIf och annualChange)
+    currentMonthlySavings = Math.max(0, currentMonthlySavings);
 
     currentAmount += currentMonthlySavings;
     totalContributed += currentMonthlySavings;
@@ -175,6 +196,8 @@ export default function StandaloneSavingsPage() {
   const [showWhatIf, setShowWhatIf] = useState(false);
   const [whatIfIncreaseAfter, setWhatIfIncreaseAfter] = useState([5]);
   const [whatIfIncreaseAmount, setWhatIfIncreaseAmount] = useState([500]);
+  const [showAnnualChange, setShowAnnualChange] = useState(false);
+  const [annualChangeAmount, setAnnualChangeAmount] = useState([0]);
   const animationRefs = useRef<Record<string, number>>({});
   const isAnimatingRef = useRef(false);
   const previousTargetValueRef = useRef<number | null>(null);
@@ -200,6 +223,7 @@ export default function StandaloneSavingsPage() {
   const dSliderYears = useDeferredValue(sliderYears);
   const dWhatIfIncreaseAfter = useDeferredValue(whatIfIncreaseAfter);
   const dWhatIfIncreaseAmount = useDeferredValue(whatIfIncreaseAmount);
+  const dAnnualChangeAmount = useDeferredValue(annualChangeAmount);
 
   const effectiveMonthlySavings = dSliderMonthlySavings[0];
   const effectiveReturnNominal = dSliderReturn[0] / 100;
@@ -216,14 +240,19 @@ export default function StandaloneSavingsPage() {
       increaseAmount: dWhatIfIncreaseAmount[0]
     } : undefined;
     
+    const annualChange = showAnnualChange ? {
+      amount: dAnnualChangeAmount[0]
+    } : undefined;
+    
     return calculateCompoundInterest(
       effectiveMonthlySavings,
       effectiveReturn,
       dSliderYears[0],
       effectiveStartCapital,
-      whatIf
+      whatIf,
+      annualChange
     );
-  }, [effectiveMonthlySavings, effectiveReturn, dSliderYears, effectiveStartCapital, showWhatIf, dWhatIfIncreaseAfter, dWhatIfIncreaseAmount]);
+  }, [effectiveMonthlySavings, effectiveReturn, dSliderYears, effectiveStartCapital, showWhatIf, dWhatIfIncreaseAfter, dWhatIfIncreaseAmount, showAnnualChange, dAnnualChangeAmount]);
 
   // Beräkna alla sparplaner
   const allPlanResults = useMemo(() => {
@@ -235,6 +264,10 @@ export default function StandaloneSavingsPage() {
       increaseAmount: dWhatIfIncreaseAmount[0]
     } : undefined;
     
+    const globalAnnualChange = showAnnualChange ? {
+      amount: dAnnualChangeAmount[0]
+    } : undefined;
+    
     savingsPlans.forEach(plan => {
       const planReturnNominal = plan.returnNominal / 100;
       let planReturn: number;
@@ -244,19 +277,35 @@ export default function StandaloneSavingsPage() {
       } else {
         planReturn = planReturnNominal;
       }
-      const planWhatIf = globalWhatIf || plan.whatIf;
+      
+      // Använd globala scenarier endast om planen har valt att använda dem
+      // Om useWhatIf är false, använd inte globalWhatIf. Om undefined, använd globalWhatIf om det finns.
+      // Om useWhatIf är false och plan.whatIf finns, använd plan.whatIf istället.
+      let planWhatIf: { increaseAfterYears: number; increaseAmount: number } | undefined;
+      if (plan.useWhatIf === false) {
+        // Planen har explicit valt att inte använda globalt whatIf, använd bara plan.whatIf om det finns
+        planWhatIf = plan.whatIf;
+      } else if (plan.useWhatIf === true || plan.useWhatIf === undefined) {
+        // Planen har valt att använda globalt whatIf (eller default är att använda det)
+        planWhatIf = globalWhatIf || plan.whatIf;
+      }
+      
+      // Om useAnnualChange är false, använd inte globalAnnualChange
+      // Om undefined, använd globalAnnualChange om det finns
+      const planAnnualChange = (plan.useAnnualChange !== false && globalAnnualChange) || undefined;
       
       results[plan.id] = calculateCompoundInterest(
         plan.monthlySavings,
         planReturn,
         plan.years,
         plan.startCapital,
-        planWhatIf
+        planWhatIf,
+        planAnnualChange
       );
     });
     
     return results;
-  }, [result, savingsPlans, useInflation, showWhatIf, dWhatIfIncreaseAfter, dWhatIfIncreaseAmount]);
+  }, [result, savingsPlans, useInflation, showWhatIf, dWhatIfIncreaseAfter, dWhatIfIncreaseAmount, showAnnualChange, dAnnualChangeAmount]);
 
   // Memoize chart data - optimera genom att använda index istället för find()
   const chartData = useMemo(() => {
@@ -390,15 +439,8 @@ export default function StandaloneSavingsPage() {
     }
     
     if (isSlidingRef.current) {
+      // När användaren drar, uppdatera bara ref, inte state (förhindrar oändliga loopar)
       animatedAmountRef.current = targetValue;
-      try {
-        setAnimatedAmounts(prev => {
-          if (prev.main === targetValue) return prev;
-          return { ...prev, main: targetValue };
-        });
-      } catch (error) {
-        console.warn('Animation state update error caught:', error);
-      }
       previousTargetValueRef.current = targetValue;
       return;
     }
@@ -1092,25 +1134,42 @@ export default function StandaloneSavingsPage() {
                                     ? allPlanResults[savingsPlans.find(p => p.name === entry.dataKey)!.id]?.yearByYear.find((y: any) => y.year === year)
                                     : null;
                                 
-                                let annualSavings = 0;
-                                if (entry.dataKey === 'Nuvarande plan') {
-                                  if (showWhatIf && year > whatIfIncreaseAfter[0]) {
-                                    annualSavings = (effectiveMonthlySavings + whatIfIncreaseAmount[0]) * 12;
-                                  } else {
-                                    annualSavings = effectiveMonthlySavings * 12;
-                                  }
-                                } else {
-                                  const plan = savingsPlans.find(p => p.name === entry.dataKey);
-                                  if (plan) {
-                                    if (showWhatIf && year > whatIfIncreaseAfter[0]) {
-                                      annualSavings = (plan.monthlySavings + whatIfIncreaseAmount[0]) * 12;
-                                    } else if (plan.whatIf && year > plan.whatIf.increaseAfterYears) {
-                                      annualSavings = (plan.monthlySavings + plan.whatIf.increaseAmount) * 12;
-                                    } else {
-                                      annualSavings = plan.monthlySavings * 12;
-                                    }
-                                  }
+                              let annualSavings = 0;
+                              if (entry.dataKey === 'Nuvarande plan') {
+                                let monthlySavingsForYear = effectiveMonthlySavings;
+                                
+                                // Först applicera årlig förändring (om aktiv)
+                                if (showAnnualChange && year > 0) {
+                                  monthlySavingsForYear += dAnnualChangeAmount[0] * (year - 1);
                                 }
+                                
+                                // Sedan lägg till "vad händer om"-scenario på toppen (om aktiv och efter X år)
+                                if (showWhatIf && year > dWhatIfIncreaseAfter[0]) {
+                                  monthlySavingsForYear += dWhatIfIncreaseAmount[0];
+                                }
+                                
+                                annualSavings = Math.max(0, monthlySavingsForYear) * 12;
+                              } else {
+                                const plan = savingsPlans.find(p => p.name === entry.dataKey);
+                                if (plan) {
+                                  let monthlySavingsForYear = plan.monthlySavings;
+                                  
+                                  // Först applicera årlig förändring (om aktiv och planen har valt att använda den)
+                                  if (showAnnualChange && plan.useAnnualChange !== false && year > 0) {
+                                    monthlySavingsForYear += dAnnualChangeAmount[0] * (year - 1);
+                                  }
+                                  
+                                  // Sedan lägg till "vad händer om"-scenario på toppen (om aktiv och planen har valt att använda den)
+                                  if (showWhatIf && plan.useWhatIf !== false && year > dWhatIfIncreaseAfter[0]) {
+                                    monthlySavingsForYear += dWhatIfIncreaseAmount[0];
+                                  } else if (plan.whatIf && year > plan.whatIf.increaseAfterYears) {
+                                    // Använd planens eget whatIf om den inte använder det globala
+                                    monthlySavingsForYear += plan.whatIf.increaseAmount;
+                                  }
+                                  
+                                  annualSavings = Math.max(0, monthlySavingsForYear) * 12;
+                                }
+                              }
                                 
                                 const previousYearData = entry.dataKey === 'Nuvarande plan'
                                   ? result.yearByYear.find((y: any) => y.year === year - 1)
@@ -1232,7 +1291,7 @@ export default function StandaloneSavingsPage() {
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-primary mb-1">Vad händer om-scenario</h4>
                   <p className="text-xs text-primary/70">
-                    Se vad som händer om du ökar månadssparandet efter X år (påverkar alla sparplaner)
+                    Se vad som händer om du ökar eller sänker månadssparandet efter X år (påverkar alla sparplaner)
                   </p>
                 </div>
                 <Switch
@@ -1275,19 +1334,37 @@ export default function StandaloneSavingsPage() {
                     <Slider
                       value={whatIfIncreaseAfter}
                       onValueChange={(vals) => {
-                        isSlidingRef.current = true;
-                        setWhatIfIncreaseAfter(vals);
-                        setTimeout(() => {
-                          isSlidingRef.current = false;
-                        }, 100);
+                        if (!isSlidingRef.current) {
+                          if (sliderUpdateTimeouts.current.whatIfIncreaseAfter) {
+                            clearTimeout(sliderUpdateTimeouts.current.whatIfIncreaseAfter);
+                          }
+                          isSlidingRef.current = true;
+                          try {
+                            setWhatIfIncreaseAfter(vals);
+                          } catch (error) {
+                            console.warn('WhatIf after slider update error caught:', error);
+                          } finally {
+                            sliderUpdateTimeouts.current.whatIfIncreaseAfter = setTimeout(() => {
+                              isSlidingRef.current = false;
+                            }, 100);
+                          }
+                        }
                       }}
                       onValueCommit={(vals) => {
-                        setWhatIfIncreaseAfter(vals);
-                        isSlidingRef.current = false;
-                        if (chartDataTimeoutRef.current) {
-                          clearTimeout(chartDataTimeoutRef.current);
+                        try {
+                          setWhatIfIncreaseAfter(vals);
+                          isSlidingRef.current = false;
+                          if (sliderUpdateTimeouts.current.whatIfIncreaseAfter) {
+                            clearTimeout(sliderUpdateTimeouts.current.whatIfIncreaseAfter);
+                            sliderUpdateTimeouts.current.whatIfIncreaseAfter = null;
+                          }
+                          if (chartDataTimeoutRef.current) {
+                            clearTimeout(chartDataTimeoutRef.current);
+                          }
+                          setDebouncedChartData(chartData);
+                        } catch (error) {
+                          console.warn('WhatIf after slider commit error caught:', error);
                         }
-                        setDebouncedChartData(chartData);
                       }}
                       min={1}
                       max={sliderYears[0] - 1}
@@ -1299,7 +1376,7 @@ export default function StandaloneSavingsPage() {
                     </div>
                   </div>
                   <div>
-                    <Label className="text-xs text-primary/70 mb-2 block">Öka med (kr/mån)</Label>
+                    <Label className="text-xs text-primary/70 mb-2 block">Förändra med (kr/mån)</Label>
                     <div className="flex items-center gap-3 mb-2">
                       <Input
                         type="number"
@@ -1310,15 +1387,15 @@ export default function StandaloneSavingsPage() {
                           if (val === '') {
                             setWhatIfIncreaseAmount([0]);
                           } else {
-                            const num = parseInt(val.replace(/[^\d]/g, ''), 10);
+                            const num = parseInt(val.replace(/[^\d-]/g, ''), 10);
                             if (!isNaN(num)) {
-                              const clampedValue = Math.max(0, Math.min(10000, num));
+                              const clampedValue = Math.max(-10000, Math.min(10000, num));
                               setWhatIfIncreaseAmount([clampedValue]);
                             }
                           }
                         }}
                         placeholder="0"
-                        min={0}
+                        min={-10000}
                         max={10000}
                         step={100}
                         className="w-24 sm:w-32 text-sm"
@@ -1328,28 +1405,143 @@ export default function StandaloneSavingsPage() {
                     <Slider
                       value={whatIfIncreaseAmount}
                       onValueChange={(vals) => {
-                        isSlidingRef.current = true;
-                        setWhatIfIncreaseAmount(vals);
-                        setTimeout(() => {
-                          isSlidingRef.current = false;
-                        }, 100);
+                        if (!isSlidingRef.current) {
+                          if (sliderUpdateTimeouts.current.whatIfIncreaseAmount) {
+                            clearTimeout(sliderUpdateTimeouts.current.whatIfIncreaseAmount);
+                          }
+                          isSlidingRef.current = true;
+                          try {
+                            setWhatIfIncreaseAmount(vals);
+                          } catch (error) {
+                            console.warn('WhatIf slider update error caught:', error);
+                          } finally {
+                            sliderUpdateTimeouts.current.whatIfIncreaseAmount = setTimeout(() => {
+                              isSlidingRef.current = false;
+                            }, 100);
+                          }
+                        }
                       }}
                       onValueCommit={(vals) => {
-                        setWhatIfIncreaseAmount(vals);
-                        isSlidingRef.current = false;
-                        if (chartDataTimeoutRef.current) {
-                          clearTimeout(chartDataTimeoutRef.current);
+                        try {
+                          setWhatIfIncreaseAmount(vals);
+                          isSlidingRef.current = false;
+                          if (sliderUpdateTimeouts.current.whatIfIncreaseAmount) {
+                            clearTimeout(sliderUpdateTimeouts.current.whatIfIncreaseAmount);
+                            sliderUpdateTimeouts.current.whatIfIncreaseAmount = null;
+                          }
+                          if (chartDataTimeoutRef.current) {
+                            clearTimeout(chartDataTimeoutRef.current);
+                          }
+                          setDebouncedChartData(chartData);
+                        } catch (error) {
+                          console.warn('WhatIf slider commit error caught:', error);
                         }
-                        setDebouncedChartData(chartData);
                       }}
-                      min={0}
+                      min={-10000}
                       max={10000}
                       step={100}
                       className="w-full"
                     />
                     <div className="text-xs text-gray-500 mt-1">
-                      +{formatCurrency(whatIfIncreaseAmount[0])}/månad
+                      {whatIfIncreaseAmount[0] >= 0 ? '+' : ''}{formatCurrency(whatIfIncreaseAmount[0])}/månad
                     </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Årlig förändring-scenario */}
+            <div className="bg-white/70 backdrop-blur-sm p-4 md:p-5 rounded-xl border border-slate-200/40 shadow-subtle mt-4 md:mt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-semibold text-primary mb-1">Årlig förändring</h4>
+                  <p className="text-xs text-primary/70">
+                    Öka eller sänk sparbeloppet varje år med ett fast belopp (påverkar alla sparplaner)
+                  </p>
+                </div>
+                <Switch
+                  checked={showAnnualChange}
+                  onCheckedChange={setShowAnnualChange}
+                  className="flex-shrink-0"
+                />
+              </div>
+              
+              {showAnnualChange && (
+                <div className="mt-4">
+                  <Label className="text-xs text-primary/70 mb-2 block">Förändring per år (kr/mån)</Label>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      value={annualChangeAmount[0] === 0 ? '' : annualChangeAmount[0].toString()}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                          setAnnualChangeAmount([0]);
+                        } else {
+                          const num = parseInt(val.replace(/[^\d-]/g, ''), 10);
+                          if (!isNaN(num)) {
+                            const clampedValue = Math.max(-5000, Math.min(5000, num));
+                            setAnnualChangeAmount([clampedValue]);
+                          }
+                        }
+                      }}
+                      placeholder="0"
+                      min={-5000}
+                      max={5000}
+                      step={100}
+                      className="w-24 sm:w-32 text-sm"
+                    />
+                    <span className="text-xs text-gray-500">kr/mån per år</span>
+                  </div>
+                  <Slider
+                    value={annualChangeAmount}
+                    onValueChange={(vals) => {
+                      if (!isSlidingRef.current) {
+                        if (sliderUpdateTimeouts.current.annualChangeAmount) {
+                          clearTimeout(sliderUpdateTimeouts.current.annualChangeAmount);
+                        }
+                        isSlidingRef.current = true;
+                        try {
+                          setAnnualChangeAmount(vals);
+                        } catch (error) {
+                          console.warn('Annual change slider update error caught:', error);
+                        } finally {
+                          sliderUpdateTimeouts.current.annualChangeAmount = setTimeout(() => {
+                            isSlidingRef.current = false;
+                          }, 100);
+                        }
+                      }
+                    }}
+                    onValueCommit={(vals) => {
+                      try {
+                        setAnnualChangeAmount(vals);
+                        isSlidingRef.current = false;
+                        if (sliderUpdateTimeouts.current.annualChangeAmount) {
+                          clearTimeout(sliderUpdateTimeouts.current.annualChangeAmount);
+                          sliderUpdateTimeouts.current.annualChangeAmount = null;
+                        }
+                        if (chartDataTimeoutRef.current) {
+                          clearTimeout(chartDataTimeoutRef.current);
+                        }
+                        setDebouncedChartData(chartData);
+                      } catch (error) {
+                        console.warn('Annual change slider commit error caught:', error);
+                      }
+                    }}
+                    min={-5000}
+                    max={5000}
+                    step={100}
+                    className="w-full"
+                  />
+                  <div className="text-xs text-gray-500 mt-1">
+                    {annualChangeAmount[0] >= 0 ? '+' : ''}{formatCurrency(annualChangeAmount[0])}/månad per år
+                    {annualChangeAmount[0] !== 0 && (
+                      <span className="block mt-1 text-primary/60">
+                        År 1: {formatCurrency(effectiveMonthlySavings)}/mån, 
+                        År {sliderYears[0]}: {formatCurrency(effectiveMonthlySavings + (annualChangeAmount[0] * (sliderYears[0] - 1)))}/mån
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
@@ -1380,16 +1572,19 @@ export default function StandaloneSavingsPage() {
                       const availableColors = allColors.filter(c => c !== mainColor);
                       selectedColor = availableColors[savingsPlans.length % availableColors.length];
                     }
-                    const newPlan: SavingsPlan = {
-                      id: `plan-${Date.now()}`,
-                      name: `Plan ${savingsPlans.length + 1}`,
-                      color: selectedColor,
-                      startCapital: effectiveStartCapital,
-                      monthlySavings: effectiveMonthlySavings,
-                      returnNominal: effectiveReturnNominal * 100,
-                      years: sliderYears[0],
-                      inflation: sliderInflation[0]
-                    };
+                  const newPlan: SavingsPlan = {
+                    id: `plan-${Date.now()}`,
+                    name: `Plan ${savingsPlans.length + 1}`,
+                    color: selectedColor,
+                    startCapital: effectiveStartCapital,
+                    monthlySavings: effectiveMonthlySavings,
+                    returnNominal: effectiveReturnNominal * 100,
+                    years: sliderYears[0],
+                    inflation: sliderInflation[0],
+                    // Default: använd globala scenarier om de är aktiva
+                    useWhatIf: showWhatIf ? true : undefined,
+                    useAnnualChange: showAnnualChange ? true : undefined
+                  };
                     setSavingsPlans([...savingsPlans, newPlan]);
                   }}
                   className="flex items-center gap-2"
@@ -1736,16 +1931,59 @@ export default function StandaloneSavingsPage() {
                               className="w-full"
                             />
                           </div>
-                        </div>
-                        
-                        {planResult && (
-                          <div className="pt-2 border-t border-gray-200">
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-gray-600">Slutsumma efter {plan.years} år:</span>
-                              <span className="font-bold text-gray-900">{formatCurrency(planResult.finalAmount)}</span>
-                            </div>
+                      </div>
+                      
+                      {/* Scenario-val - visas endast om det finns aktiva scenarier */}
+                      {(showWhatIf || showAnnualChange) && (
+                        <div className="pt-3 mt-3 border-t border-gray-200">
+                          <Label className="text-xs font-medium text-primary mb-2 block">
+                            Applicera scenarier på denna plan:
+                          </Label>
+                          <div className="flex flex-col gap-2">
+                            {showWhatIf && (
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor={`whatIf-${plan.id}`} className="text-xs text-gray-700 cursor-pointer">
+                                  "Vad händer om"-scenario
+                                </Label>
+                                <Switch
+                                  id={`whatIf-${plan.id}`}
+                                  checked={plan.useWhatIf !== false}
+                                  onCheckedChange={(checked) => {
+                                    const updated = [...savingsPlans];
+                                    updated[idx].useWhatIf = checked;
+                                    setSavingsPlans(updated);
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {showAnnualChange && (
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor={`annualChange-${plan.id}`} className="text-xs text-gray-700 cursor-pointer">
+                                  Årlig förändring
+                                </Label>
+                                <Switch
+                                  id={`annualChange-${plan.id}`}
+                                  checked={plan.useAnnualChange !== false}
+                                  onCheckedChange={(checked) => {
+                                    const updated = [...savingsPlans];
+                                    updated[idx].useAnnualChange = checked;
+                                    setSavingsPlans(updated);
+                                  }}
+                                />
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
+                      )}
+                      
+                      {planResult && (
+                        <div className="pt-2 border-t border-gray-200">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-gray-600">Slutsumma efter {plan.years} år:</span>
+                            <span className="font-bold text-gray-900">{formatCurrency(planResult.finalAmount)}</span>
+                          </div>
+                        </div>
+                      )}
                       </div>
                     );
                   })}
