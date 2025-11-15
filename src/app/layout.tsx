@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const dmSerif = DM_Serif_Display({ weight: "400", subsets: ["latin"], variable: "--font-serif" });
@@ -49,7 +50,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sv">
-      <body className={`${inter.variable} ${dmSerif.variable} font-sans text-primary bg-[var(--surface-bg)]`}>{children}</body>
+      <body className={`${inter.variable} ${dmSerif.variable} font-sans text-primary bg-[var(--surface-bg)] flex flex-col min-h-screen`}>
+        <div className="flex-1">
+          {children}
+        </div>
+        <Footer />
+      </body>
     </html>
   );
 }

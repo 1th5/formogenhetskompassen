@@ -104,15 +104,6 @@ export default function SavingsInfoPage() {
           </Card>
         </div>
 
-        {/* Disclaimer */}
-        <Card className="mt-6 bg-slate-50/50 border-slate-200/60">
-          <CardContent className="p-4">
-            <p className="text-xs text-primary/60 italic leading-relaxed">
-              Den här guiden beskriver vanliga sparformer på en generell nivå. Informationen är inte anpassad till din situation och ska inte ses som personlig finansiell rådgivning eller rekommendation att välja en viss bank, fond eller sparprodukt.
-            </p>
-          </CardContent>
-        </Card>
-
         {/* Tillbaka-knapp */}
         <div className="text-center mt-8">
           <Button
@@ -123,6 +114,16 @@ export default function SavingsInfoPage() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Tillbaka till dashboard
           </Button>
+        </div>
+        
+        {/* Huvuddisclaimer */}
+        <div className="mt-12 pt-8 border-t border-slate-200">
+          <p className="text-sm text-primary/70 leading-relaxed">
+            Förmögenhetskollens beräkningar är baserade på generella antaganden och tekniska modeller. 
+            De utgör inte ekonomisk rådgivning, investeringsråd, pensionsrådgivning eller en prognos om framtida avkastning. 
+            Resultat, tidsangivelser och nivåer är endast simuleringar och kan skilja sig kraftigt från verkligheten. 
+            Förmögenhetskollen står inte under Finansinspektionens tillsyn.
+          </p>
         </div>
       </div>
     </div>

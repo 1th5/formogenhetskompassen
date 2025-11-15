@@ -432,9 +432,9 @@ export default function PersonsWizardStep({ onComplete, onSkip, liabilities = []
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className="text-green-800 flex-shrink-0">Pensionsavsättningar:</span>
                       <div className="flex flex-col sm:items-end">
-                        <span className="font-medium text-green-700">
-                          {formatCurrency(totalPensionContributions)}/månad
-                        </span>
+                      <span className="font-medium text-green-700">
+                        {formatCurrency(totalPensionContributions)}/månad
+                      </span>
                         <p className="text-xs text-green-600 mt-0.5">Omräknat som månadsbelopp, men tjänas in årsvis</p>
                       </div>
                     </div>

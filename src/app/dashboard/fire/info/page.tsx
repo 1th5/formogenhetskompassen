@@ -148,6 +148,13 @@ export default function FIREInfoPage() {
         {/* Content */}
         <div className="bg-white rounded-2xl border border-slate-200/40 p-4 md:p-6 lg:p-8">
           <div className="space-y-6 md:space-y-8 text-sm text-primary/80">
+            {/* Disclaimer */}
+            <section className="bg-warning/10 p-4 md:p-6 rounded-lg border border-warning/30">
+              <p className="text-primary/90 leading-relaxed">
+                <strong>Observera:</strong> FIRE-simulatorn är en förenklad modell. Alla beräkningar bygger på dina inmatade uppgifter och tekniska antaganden. Resultaten är inte en prognos, garanti eller personlig finansiell rådgivning.
+              </p>
+            </section>
+            
             {/* Introduktion till ekonomisk frihet */}
             <section className="bg-accent/10 p-4 md:p-6 rounded-lg border border-accent/30">
               <h3 className="text-xl font-serif text-primary mb-3">Vad är ekonomisk frihet?</h3>
@@ -161,7 +168,10 @@ export default function FIREInfoPage() {
                 Beräkningen är baserad på FIRE-principer (Financial Independence, Retire Early), men fokus är på frihet och valfrihet – inte bara "tidigt pensionerad".
               </p>
               <p className="leading-relaxed mt-3 text-primary/80">
-                Detta verktyg hjälper dig att förstå din faktiska förmögenhet och beräknar när du potentiellt kan uppnå ekonomisk frihet baserat på dina tillgångar, sparande och utgifter.
+                Detta verktyg hjälper dig att förstå din faktiska förmögenhet och gör en förenklad uppskattning av när du potentiellt kan uppnå ekonomisk frihet baserat på dina tillgångar, sparande och utgifter.
+              </p>
+              <p className="leading-relaxed mt-3 text-primary/80 font-medium">
+                Simulatorn passar dig som vill få en känsla för när ditt sparande skulle kunna ge dig större frihet i vardagen.
               </p>
             </section>
             
@@ -187,21 +197,21 @@ export default function FIREInfoPage() {
                   </p>
                 </div>
                 <div className="bg-white/70 p-4 rounded-lg border border-slate-200/40">
-                  <p className="font-medium text-primary mb-2">💰 Tre + statlig "hinkar" för kapital</p>
+                  <p className="font-medium text-primary mb-2">💰 Tre + statlig pensionsdelar för kapital</p>
                   <p className="text-primary/80 mb-2">
-                    Vi delar upp ditt kapital i tre marknadsbaserade hinkar plus statlig pension som behandlas olika:
+                    Vi delar upp ditt kapital i tre marknadsbaserade pensionsdelar plus statlig pension som behandlas olika:
                   </p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-primary/80">
-                    <li><strong>Tillgängligt kapital:</strong> Övriga tillgångar (fonder, aktier, sparkonton, bostad) som du kan använda före pension. Bostaden räknas med till 40% av nettovärdet eftersom allt bostadskapital inte alltid är lätt att frigöra. Andra skulder än bostadslån fördelas först proportionellt över alla positiva tillgångar, sedan räknas 40% av bostadens nettovärde med.</li>
-                    <li><strong>Marknadsbaserad pension (tre separata hinkar):</strong> 
+                    <li><strong>Tillgängligt kapital:</strong> Övriga tillgångar (fonder, aktier, sparkonton, bostad) som du kan använda före pension. Bostaden räknas med till 40 % av nettovärdet eftersom bostadskapital inte alltid är lätt att frigöra. Andra skulder än bostadslån fördelas först proportionellt över alla positiva tillgångar, sedan räknas 40 % av bostadens nettovärde med.</li>
+                    <li><strong>Marknadsbaserad pension (tre separata pensionsdelar):</strong> 
                       <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
                         <li><strong>Tjänstepension:</strong> Låst tills pensionsåldern (eller tidigare om du väljer att börja ta ut från 55 år)</li>
                         <li><strong>Premiepension:</strong> Låst tills pensionsåldern</li>
                         <li><strong>IPS (Privat pensionssparande):</strong> Låst tills pensionsåldern (eller tidigare om du väljer att börja ta ut från 55 år)</li>
                       </ul>
-                      Dessa tre hinkar växer var för sig med sina egna avkastningar och inbetalningar. Vid pensionsstart slås de ihop med tillgängligt kapital.
+                      Dessa tre pensionsdelar växer var för sig med sina egna avkastningar och inbetalningar. Vid pensionsstart slås de ihop med tillgängligt kapital.
                     </li>
-                    <li><strong>Statlig pension (inkomstpension):</strong> Den statliga inkomstpensionen växer fram till pensionsstart, sedan utbetalas den som en årlig inkomst som minskar ditt behov av uttag från portföljen.</li>
+                    <li><strong>Statlig pension (inkomstpension):</strong> Den statliga inkomstpensionen växer fram till pensionsstart enligt de regler som gäller för inkomst- och balansindex och omvandlas sedan till en årlig inkomst som minskar ditt behov av uttag från portföljen. I modellen används ett försiktigt antagande om real tillväxt. Det är ett tekniskt antagande – inte en prognos eller garanti.</li>
                   </ul>
                 </div>
                 <div className="bg-accent/10 p-4 rounded-lg border border-accent/30">
@@ -215,7 +225,7 @@ export default function FIREInfoPage() {
                     <li><strong>Viktat snitt:</strong> Avkastningen beräknas som ett viktat snitt baserat på varje tillgångs värde och förväntad avkastning.</li>
                   </ul>
                   <p className="text-primary/80 mt-2">
-                    Detta ger en mer realistisk bild än att använda en genomsnittlig avkastning för allt.
+                    Detta kan ge en mer nyanserad bild än att använda en enda genomsnittlig avkastning för allt.
                   </p>
                 </div>
                 
@@ -241,18 +251,18 @@ export default function FIREInfoPage() {
                 <div className="border-l-4 border-info pl-4">
                   <h4 className="font-serif text-primary mb-2">1. Startvärden</h4>
                   <p className="leading-relaxed text-primary/80">
-                    Vi börjar med din nuvarande nettoförmögenhet uppdelad i tre marknadsbaserade hinkar plus statlig pension:
+                    Vi börjar med din nuvarande nettoförmögenhet uppdelad i tre marknadsbaserade pensionsdelar plus statlig pension:
                   </p>
                   <ul className="list-disc list-inside ml-4 mt-2 space-y-1">
-                    <li><strong>Tillgängligt kapital:</strong> Tillgångar som inte är pensionslåsta (fonder, aktier, sparkonton, bostad) minus skulder. Andra skulder än bostadslån fördelas först proportionellt över alla positiva tillgångar, sedan räknas 40% av bostadens nettovärde med.</li>
-                    <li><strong>Marknadsbaserad pension (tre separata hinkar):</strong> 
+                    <li><strong>Tillgängligt kapital:</strong> Tillgångar som inte är pensionslåsta (fonder, aktier, sparkonton, bostad) minus skulder. Andra skulder än bostadslån fördelas först proportionellt över alla positiva tillgångar, sedan räknas 40 % av bostadens nettovärde med.</li>
+                    <li><strong>Marknadsbaserad pension (tre separata pensionsdelar):</strong> 
                       <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
                         <li><strong>Tjänstepension:</strong> Växer med egen avkastning och inbetalningar tills pensionsåldern (eller tidigare uttag från 55 år)</li>
                         <li><strong>Premiepension:</strong> Växer med egen avkastning och inbetalningar tills pensionsåldern</li>
                         <li><strong>IPS (Privat pensionssparande):</strong> Växer med egen avkastning och inbetalningar tills pensionsåldern (eller tidigare uttag från 55 år)</li>
                       </ul>
                     </li>
-                    <li><strong>Statlig pension (inkomstpension):</strong> Den statliga inkomstpensionen som växer fram till pensionsstart och sedan utbetalas som inkomst.</li>
+                    <li><strong>Statlig pension (inkomstpension):</strong> Den statliga inkomstpensionen som växer enligt inkomst- och balansindex fram till pensionsstart och sedan utbetalas som inkomst.</li>
                   </ul>
                 </div>
                 
@@ -294,10 +304,10 @@ export default function FIREInfoPage() {
                       </ul>
                       I manuellt läge kan du justera avkastningen för varje kategori separat i simulatorn.
                     </li>
-                    <li><strong>Statlig pension:</strong> {((realReturns.realReturnStatePension || 0.01) * 100).toFixed(1)}% real (default 3% nominell om inga tillgångar finns). Följer balansindex och är generellt lägre än marknadsbaserad pension.</li>
+                    <li><strong>Statlig pension:</strong> {((realReturns.realReturnStatePension || 0.01) * 100).toFixed(1)} % real (defaultvärde motsvarande ca 3 % real om inga egna uppgifter finns). I modellen används ett försiktigt antagande om real tillväxt, men detta är endast ett tekniskt antagande – inte en prognos eller garanti.</li>
                   </ul>
                     <p className="text-xs text-primary/70 mt-2">
-                    I automode räknas avkastning per hink ut automatiskt. I manuellt läge visas tre separata reglage för tjänstepension, premiepension och IPS – de styr respektive hink i simuleringen.
+                    I automode räknas avkastning per pensionsdel ut automatiskt. I manuellt läge visas tre separata reglage för tjänstepension, premiepension och IPS – de styr respektive pensionsdel i simuleringen.
                   </p>
                 </div>
                 
@@ -364,7 +374,7 @@ export default function FIREInfoPage() {
                   <ul className="list-disc list-inside space-y-2 text-primary/80">
                     <li><strong>Pensionsinbetalningar stoppas</strong> – inga nya insättningar till pension (året du når ekonomisk frihet är sista året med inbetalningar)</li>
                     <li><strong>Lever på tillgängligt kapital</strong> – årliga uttag motsvarar dina utgifter</li>
-                    <li><strong>Pension växer endast med avkastning</strong> – de tre pensionshinkarna (tjänstepension, premiepension, IPS) fortsätter växa med sina respektive reala avkastningar</li>
+                    <li><strong>Pension växer endast med avkastning</strong> – de tre pensionsdelarna (tjänstepension, premiepension, IPS) fortsätter växa med sina respektive reala avkastningar</li>
                     <li><strong>Tidiga uttag:</strong> Om du väljer att börja ta ut tjänstepension eller IPS från 55 år, flyttas dessa belopp över till tillgängligt kapital vid den åldern. Om du tar ut t.ex. tjänstepension redan vid 55 räknar simulatorn med att du därefter inte fortsätter betala in på just den tjänstepensionen, utan att de pengarna i stället hamnar i ditt vanliga sparande.</li>
                     <li><strong>Avkastning på tillgängligt:</strong> {realReturns.realPostFireReturnAvailable > toReal(0.07, dSliderInflation[0] / 100) 
                       ? `${(realReturns.realPostFireReturnAvailable * 100).toFixed(1)}% real (behåller din höga avkastning)`
@@ -390,7 +400,7 @@ export default function FIREInfoPage() {
                     <ul className="list-disc list-inside space-y-1 text-primary/80">
                       <li><strong>Inga uttag från kapital</strong> – under Coast FIRE-perioden görs inga uttag från tillgängligt kapital</li>
                       <li><strong>Inget nytt sparande</strong> – allt sparande stoppas under Coast FIRE-perioden</li>
-                      <li><strong>Reducerad pensionsavsättning</strong> – pensionsavsättningarna fortsätter men räknas om baserat på en lägre pensionsgrundande inkomst (sänkt med samma procent som sparandet var i procent av (sparande + utgifter), och löneväxling tas bort)</li>
+                      <li><strong>Reducerad pensionsavsättning</strong> – pensionsavsättningarna justeras utifrån antagandet att deltidsarbete ger en lägre pensionsgrundande inkomst</li>
                       <li><strong>Deltidsarbete</strong> – du jobbar deltid för att täcka dina utgifter, men behöver inte spara mer</li>
                       <li><strong>Kapitalet växer</strong> – ditt investerade kapital fortsätter växa med avkastning, medan du "coastar" mot målet</li>
                     </ul>
@@ -404,13 +414,13 @@ export default function FIREInfoPage() {
                 <div className="bg-success/10 p-4 rounded-lg border border-success/30">
                   <h4 className="font-serif text-success mb-2">🎯 Efter pensionsstart</h4>
                   <ul className="list-disc list-inside space-y-2 text-primary/80">
-                    <li><strong>Sammanslagning:</strong> Tillgängligt kapital och de tre marknadsbaserade pensionshinkarna (tjänstepension, premiepension, IPS) växer det året och slås sedan ihop till en portfölj vid pensionsstart</li>
-                    <li><strong>Statlig pension som inkomst:</strong> Den statliga inkomstpensionen utbetalas som en årlig inkomst (t.ex. över 20 år vid 63 års ålder). Denna inkomst minskar ditt behov av uttag från portföljen.</li>
+                    <li><strong>Sammanslagning:</strong> Tillgängligt kapital och de tre marknadsbaserade pensionsdelarna (tjänstepension, premiepension, IPS) växer det året och slås sedan ihop till en portfölj vid pensionsstart</li>
+                    <li><strong>Statlig pension som inkomst:</strong> Den statliga inkomstpensionen modelleras som en årlig inkomst över ett valt antal år (t.ex. 20 år vid 63 års ålder). I verkligheten betalas allmän pension normalt ut livsvarigt, men här används en förenklad, tidsbegränsad period för att göra beräkningarna hanterbara. Denna inkomst minskar ditt behov av uttag från portföljen.</li>
                     <li><strong>Årliga uttag:</strong> Motsvarar dina utgifter <strong>minus</strong> statlig pension och görs från den sammanfogade portföljen</li>
                     <li><strong>Avkastning:</strong> Hela poolen växer med samma avkastning som tillgängliga tillgångar hade efter ekonomisk frihet ({realReturns.realPostFireReturnAvailable > toReal(0.07, dSliderInflation[0] / 100) 
                       ? `${(realReturns.realPostFireReturnAvailable * 100).toFixed(1)}% real`
                       : `${(toReal(0.07, dSliderInflation[0] / 100) * 100).toFixed(1)}% real (7% nominell minimum)`})</li>
-                    <li><strong>4%-regeln:</strong> Portföljen är dimensionerad för att kunna ta ut 4% per år teoretiskt i evighet, med hänsyn till att statlig pension täcker en del av utgifterna</li>
+                    <li><strong>4%-regeln:</strong> Modellen testar om portföljen skulle klara uttag på 4 % per år under en mycket lång tidsperiod, givet antagandena och med hänsyn till att statlig pension täcker en del av utgifterna</li>
                   </ul>
                 </div>
               </div>
@@ -421,15 +431,18 @@ export default function FIREInfoPage() {
               <h3 className="text-xl font-serif text-primary mb-3">Avkastning efter ekonomisk frihet</h3>
               <div className="bg-accent/10 p-4 rounded-lg border border-accent/30">
                 <p className="leading-relaxed mb-3 text-primary/80">
-                  När ekonomisk frihet uppnås höjs avkastningen på tillgängliga tillgångar till <strong>minst 7% nominell</strong> för att kunna testa 4%-uttag på ett konsekvent sätt.
+                  När ekonomisk frihet uppnås använder modellen <strong>minst 7 % nominell avkastning</strong> på tillgängliga tillgångar för att kunna testa 4 %-uttag på ett enhetligt sätt.
                 </p>
                 <div className="space-y-2">
                   <p className="font-medium">Regler:</p>
                   <ul className="list-disc list-inside ml-4 space-y-1">
-                    <li>Om din ursprungliga reala avkastning är <strong>högre än 7% nominell</strong> → behåller du din höga avkastning</li>
-                    <li>Om din ursprungliga reala avkastning är <strong>lägre än 7% nominell</strong> → höjs den till 7% nominell</li>
-                    <li>När en låst pensionsdel blir uttagsbar och flyttas till den vanliga portföljen höjs dess avkastning i simuleringen till minst den nivå som används efter FIRE (7% nominellt), så att låsta delar med låg avkastning inte drar ned hela portföljen. När kapital slås ihop från flera källor beräknas en gemensam avkastning som ett viktat snitt av delarna.</li>
+                    <li>Om din ursprungliga avkastning är <strong>högre än 7 % nominell</strong> behåller modellen denna högre nivå.</li>
+                    <li>Om din ursprungliga avkastning är <strong>lägre än 7 % nominell</strong> höjs den i simuleringen till 7 % nominell.</li>
+                    <li>När en låst pensionsdel blir uttagsbar och flyttas till den vanliga portföljen höjs dess avkastning i simuleringen till minst den nivå som används efter FIRE (7 % nominellt), så att låsta delar med låg avkastning inte drar ned hela portföljen. När kapital slås ihop från flera källor beräknas en gemensam avkastning som ett viktat snitt av delarna.</li>
                   </ul>
+                  <p className="text-primary/70 text-sm mt-3 italic">
+                    Detta är en teknisk förenkling för att kunna illustrera 4 %-regeln – inte en prognos eller garanti om framtida avkastning.
+                  </p>
                 </div>
               </div>
             </section>
@@ -460,7 +473,7 @@ export default function FIREInfoPage() {
                 <div className="bg-white/70 p-4 rounded-lg border border-slate-200/40">
                   <p className="font-semibold text-primary mb-2">✅ Data från ditt hushåll</p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-sm text-primary/80">
-                    <li>Tillgångar (värde + förväntad APY)</li>
+                    <li>Tillgångar (värde + förväntad årlig avkastning (APY))</li>
                     <li>Skulder och amortering</li>
                     <li>Inkomster</li>
                     <li>Pensionsavsättningar</li>
@@ -471,7 +484,7 @@ export default function FIREInfoPage() {
                 <div className="bg-white/70 p-4 rounded-lg border border-slate-200/40">
                   <p className="font-semibold text-primary mb-2">⚙️ Beräkningar och antaganden</p>
                   <ul className="list-disc list-inside ml-4 space-y-1 text-sm text-primary/80">
-                    <li>Skatter baserat på svenska skattetabeller</li>
+                    <li>Skatter beräknade utifrån svenska skatteregler i förenklad form</li>
                     <li>Nettoinkomst efter skatt</li>
                     <li>Viktad avkastning från tillgångar</li>
                     <li>Real avkastning (nominell − inflation)</li>
@@ -487,13 +500,23 @@ export default function FIREInfoPage() {
                 <strong className="text-warning">⚠️ Viktigt:</strong> FIRE bygger på antaganden om avkastning, inflation och livslängd. Historisk avkastning är ingen garanti för framtiden.
               </p>
               <p className="leading-relaxed text-primary/80">
-                Använd denna simulering som ett verktyg för att förstå och planera, inte som en exakt prognos. Det verkliga målet är att skapa frihet, inte perfektion.
+                Använd denna simulering som ett verktyg för att förstå och planera, inte som en exakt prognos. Det verkliga målet är att skapa frihet, inte perfektion – se simulatorn som ett sätt att få perspektiv, inte ett facit.
               </p>
             </section>
           </div>
           
           <div className="mt-8 flex justify-end">
             <Button onClick={() => router.back()}>Tillbaka</Button>
+          </div>
+          
+          {/* Huvuddisclaimer */}
+          <div className="mt-12 pt-8 border-t border-slate-200">
+            <p className="text-sm text-primary/70 leading-relaxed">
+              Förmögenhetskollens beräkningar är baserade på generella antaganden och tekniska modeller. 
+              De utgör inte ekonomisk rådgivning, investeringsråd, pensionsrådgivning eller en prognos om framtida avkastning. 
+              Resultat, tidsangivelser och nivåer är endast simuleringar och kan skilja sig kraftigt från verkligheten. 
+              Förmögenhetskollen står inte under Finansinspektionens tillsyn.
+            </p>
           </div>
         </div>
       </div>

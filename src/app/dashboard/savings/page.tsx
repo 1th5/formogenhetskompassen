@@ -831,7 +831,10 @@ export default function SavingsPage() {
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif text-primary">Sparkalkylator (ränta-på-ränta)</h1>
               </div>
               <p className="text-primary/70 mt-1 text-xs md:text-sm">
-                Se hur dina besparingar växer över tid med ränta-på-ränta effekten
+                Se hur ditt sparande kan växa över tid med ränta-på-ränta-effekten
+              </p>
+              <p className="text-primary/60 mt-2 text-xs italic">
+                Observera: Sparkalkylatorn är en förenklad simulering baserad på dina inmatade antaganden. Resultaten är inte en prognos och ska inte ses som personlig ekonomisk rådgivning.
               </p>
             </div>
             <Button
@@ -855,13 +858,16 @@ export default function SavingsPage() {
                 <h4 className="font-serif text-primary mb-2 text-xs md:text-sm">Hur fungerar ränta-på-ränta?</h4>
                 <div className="text-xs text-primary/70 space-y-1.5">
                   <p>
-                    <strong>Ränta-på-ränta</strong> betyder att din avkastning också genererar avkastning. Varje år växer inte bara ditt ursprungliga kapital, utan även tidigare års avkastning.
+                    <strong>Ränta-på-ränta</strong> betyder att din avkastning också genererar avkastning. Med tiden växer inte bara ditt ursprungliga kapital, utan även den avkastning du redan har fått.
                   </p>
                   <p>
-                    <strong>Beräkningen:</strong> Varje månad läggs ditt månadssparande till. Därefter appliceras månatlig avkastning (årlig avkastning / 12) på hela beloppet inkl. tidigare månaders avkastning. 
+                    <strong>Beräkningen:</strong> Varje månad läggs ditt månadssparande till. Därefter räknas en månatlig avkastning (omräknad till månatlig ränta: årsränta / 12) på hela beloppet – inklusive tidigare månaders avkastning.
+                  </p>
+                  <p>
+                    <strong>Exempel:</strong> Sparar du 1 000 kr i månaden med 6 % årlig avkastning, växer både dina insättningar och den tidigare avkastningen tillsammans över tid.
                   </p>
                   <p className="text-primary/80 font-medium">
-                    Resultatet visas i dagens penningvärde (justerat för inflation) så att du ser den "riktiga" köpkraften.
+                    Om du väljer att använda inflation i beräkningen visas resultatet i dagens penningvärde (realt), så att du får en bättre bild av köpkraften över tid. Annars visas beloppen i nominella kronor.
                   </p>
                 </div>
               </div>
@@ -874,7 +880,7 @@ export default function SavingsPage() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-primary mb-1">Använd hushållets värden</p>
                 <p className="text-xs text-primary/70">
-                  Auto = dina nuvarande värden | Manuell = experimentera fritt med alla reglage
+                  Auto = hämtar värden från ditt hushåll | Manuell = experimentera fritt med alla reglage
                 </p>
                 <p className="text-xs text-primary/60 mt-1 italic">
                   Obs: Detta påverkar endast nuvarande plan, inte jämförelseplanerna ovan
@@ -905,7 +911,7 @@ export default function SavingsPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-primary mb-1">Startkapital</p>
                     <p className="text-xs text-primary/70">
-                      Välj om startkapitalet ska vara hela nettoförmögenheten eller endast investerat kapital på börsen (ej pension)
+                      Välj om startkapitalet ska vara hela din nettoförmögenhet eller bara ditt investerade kapital på börsen (exklusive pension)
                     </p>
                   </div>
                   <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
@@ -949,7 +955,7 @@ export default function SavingsPage() {
                       {useInvestedCapital ? ' (investerat kapital på börsen)' : ' (nettoförmögenhet)'}
                     </>
                   ) : (
-                    <>Justera fritt med reglaget</>
+                    <>Ange eller justera beloppet fritt med reglaget</>
                   )}
                 </p>
                 <div className="flex items-center gap-2 md:gap-3 mb-2">
@@ -1042,7 +1048,7 @@ export default function SavingsPage() {
                   {useAutoMode ? (
                     <>Auto: {formatCurrency(totalMonthlySavings)}/mån (inkl. amortering)</>
                   ) : (
-                    <>Justera fritt med reglaget</>
+                    <>Ange eller justera hur mycket du sparar varje månad</>
                   )}
                 </p>
                 <div className="flex items-center gap-2 md:gap-3 mb-2">
@@ -1139,9 +1145,14 @@ export default function SavingsPage() {
                         : ' (viktat snitt från alla tillgångar, inkl. pension)'}
                     </>
                   ) : (
-                    <>Justera fritt med reglaget</>
+                    <>Justera den förväntade årliga avkastningen</>
                   )}
                 </p>
+                {!useAutoMode && (
+                  <p className="text-xs text-primary/60 mb-3">
+                    När inflation är påslagen räknas real avkastning fram genom att justera den nominella avkastningen för vald inflation.
+                  </p>
+                )}
                   <div className="flex items-center gap-2 md:gap-3 mb-2">
                     <Input
                       type="number"
@@ -1377,6 +1388,9 @@ export default function SavingsPage() {
               <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-emerald-600 flex-shrink-0" />
               <h3 className="text-lg md:text-xl font-bold text-gray-900">Resultat</h3>
             </div>
+            <p className="text-xs text-primary/60 mb-4 italic">
+              Resultaten nedan är simuleringar baserade på dina aktuella inställningar och historiskt inspirerade antaganden. De visar inte hur ditt sparande faktiskt kommer utvecklas.
+            </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
               <div className="order-2 md:order-1 bg-white p-4 md:p-6 rounded-xl border-2 border-gray-200 shadow-md hover:shadow-lg transition-shadow">

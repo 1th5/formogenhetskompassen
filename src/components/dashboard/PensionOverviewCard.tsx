@@ -782,18 +782,18 @@ export default function PensionOverviewCard({ assets, persons, isLocked = false 
                         {person.name}
                       </p>
                       <div className="flex items-center gap-2">
-                        {person.agreements.length > 0 && (
+                    {person.agreements.length > 0 && (
                           <div className="flex flex-wrap gap-1.5">
-                            {person.agreements.map((agreement, aidx) => (
-                              <Badge 
-                                key={aidx} 
-                                variant="outline" 
+                          {person.agreements.map((agreement, aidx) => (
+                            <Badge 
+                              key={aidx} 
+                              variant="outline" 
                                 className="text-xs bg-white/80 border-slate-300/60 text-gray-700 font-medium px-2 py-0.5"
-                              >
-                                {agreement}
-                              </Badge>
-                            ))}
-                          </div>
+                            >
+                              {agreement}
+                            </Badge>
+                          ))}
+                        </div>
                         )}
                         <span className="text-xs text-gray-500">{person.age} år</span>
                       </div>

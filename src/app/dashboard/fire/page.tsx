@@ -1034,7 +1034,7 @@ export default function FIREPage() {
             <div>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif text-primary">Kapital över tid (realt)</h1>
               <p className="text-sm md:text-base text-primary/70 mt-1">
-                Ekonomisk frihet nås, enl. FIRE, när tillgängligt kapital räcker fram till pension och vid pensionsstart överstiger 4%-kravet.
+                Enligt FIRE-principer nås ekonomisk frihet när ditt tillgängliga kapital räcker fram till pension och vid pensionsstart uppfyller 4 %-regeln.
               </p>
             </div>
             <Button
@@ -1370,9 +1370,9 @@ export default function FIREPage() {
                                 {graphAnalysis.coastCoversFullBridge ? (
                                   <span className="block mt-1 font-semibold">✅ Du täcker hela bridge-perioden med deltidsarbete! Detta eliminerar risken för uttag under bridge-perioden.</span>
                                 ) : graphAnalysis.coastSignificantlyHelps ? (
-                                  <span className="block mt-1">💡 Detta minskar risken betydligt eftersom kapitalet får växa i början av bridge-perioden innan uttag börjar.</span>
+                                  <span className="block mt-1">💡 Detta kan minska risken, eftersom kapitalet får växa en period utan uttag innan uttag börjar.</span>
                                 ) : (
-                                  <span className="block mt-1">💡 Detta minskar risken eftersom kapitalet får växa i början av bridge-perioden.</span>
+                                  <span className="block mt-1">💡 Detta kan minska risken, eftersom kapitalet får växa en period utan uttag.</span>
                                 )}
                               </p>
                             </div>
@@ -1400,13 +1400,13 @@ export default function FIREPage() {
                                 <p>
                                   <strong>Uttagsnivå{withdrawalPeriodText}:</strong> Du tar ut {withdrawalRate.toFixed(1)}% per år från ditt tillgängliga kapital{graphAnalysis.coastYears > 0 ? ` efter Coast FIRE-perioden` : ''}.
                                   {withdrawalRate > 5 && (
-                                    <span className="block mt-1 font-semibold">⚠️ Detta är högt! Över 5% per år ökar risken att kapitalet tar slut. Överväg att spara mer, jobba längre, eller öka Coast FIRE-perioden.</span>
+                                    <span className="block mt-1 font-semibold">⚠️ Detta är en hög uttagsnivå. Uttag över cirka 5 % per år förknippas i många studier med ökad risk att kapitalet tar slut. I simulatorn kan du testa hur olika nivåer på sparande, utgifter, arbetsår eller Coast FIRE-period påverkar resultatet.</span>
                               )}
                                   {withdrawalRate > 4 && withdrawalRate <= 5 && (
-                                    <span className="block mt-1">💡 Detta är över den säkra 4%-regeln. Om marknaden går dåligt kan det bli tufft. Överväg en buffert eller längre Coast FIRE-period.</span>
+                                    <span className="block mt-1">💡 Detta ligger över den ofta använda 4 %-regeln som riktmärke. Om marknaden utvecklas svagt kan det bli ansträngt. I simulatorn kan du testa effekten av till exempel större buffert, lägre uttag eller längre Coast FIRE-period.</span>
                                 )}
                                   {withdrawalRate <= 4 && (
-                                  <span className="block mt-1">✅ Detta är inom den säkra 4%-regeln. Bra!</span>
+                                  <span className="block mt-1">💡 Detta ligger inom den ofta använda 4 %-regeln som riktmärke i FIRE-diskussioner. Det är dock ingen garanti för att kapitalet alltid räcker.</span>
                           )}
                         </p>
                       </div>
@@ -1431,7 +1431,7 @@ export default function FIREPage() {
                             <div className="text-red-700 bg-red-50 p-2 rounded">
                               <p>
                                     <strong>Liten kapitalbuffert{withdrawalPeriodText}:</strong> Ditt kapital kan sjunka till {graphAnalysis.capitalBuffer.toFixed(0)}% av startvärdet under uttagsperioden.
-                                    <span className="block mt-1 font-semibold">⚠️ Detta är riskabelt! En marknadskrasch tidigt i uttagsperioden kan tömma kapitalet. Överväg att spara mer, jobba längre, eller öka Coast FIRE-perioden.</span>
+                                    <span className="block mt-1 font-semibold">⚠️ Detta är en relativt liten buffert. Om marknaden utvecklas svagt kan det bli kännbart. I simulatorn kan du testa hur en större buffert, ändrade utgifter eller längre arbetsliv påverkar utfallet.</span>
                               </p>
                     </div>
                               );
@@ -1461,10 +1461,10 @@ export default function FIREPage() {
                                       : `Ditt kapital behöver växa med ${graphAnalysis.capitalNeededToGrow.toFixed(0)}% under uttagsperioden för att nå 4%-kravet.`
                                     }
                                 {graphAnalysis.capitalNeededToGrow > 100 && (
-                                      <span className="block mt-1 font-semibold">⚠️ Detta är mycket! Det kräver en genomsnittlig real avkastning på över {avgReturnNeeded}% per år. Överväg att spara mer{isCoastFullBridge ? ' eller jobba längre' : ' eller öka Coast FIRE-perioden'}.</span>
+                                      <span className="block mt-1 font-semibold">⚠️ Detta är mycket! Det kräver en genomsnittlig real avkastning på över {avgReturnNeeded}% per år. I simulatorn kan du testa hur olika nivåer på sparande{isCoastFullBridge ? ', arbetsår' : ''} eller Coast FIRE-period påverkar resultatet.</span>
                                 )}
                                 {graphAnalysis.capitalNeededToGrow <= 100 && graphAnalysis.capitalNeededToGrow > 50 && (
-                                      <span className="block mt-1">💡 Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded}% per år. Det är möjligt men inte garanterat{isCoastFullBridge ? '. Överväg att spara mer eller jobba längre' : '. Överväg att öka Coast FIRE-perioden'}.</span>
+                                      <span className="block mt-1">💡 Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded}% per år. Det är möjligt men inte garanterat. I simulatorn kan du testa effekten av till exempel ändrade utgifter{isCoastFullBridge ? ', längre arbetsliv' : ''} eller längre Coast FIRE-period.</span>
                                 )}
                               </p>
                             </div>
@@ -1490,9 +1490,7 @@ export default function FIREPage() {
                               return (
                             <div className="text-green-700 bg-green-50 p-2 rounded">
                               <p>
-                                    <strong>Bra läge{periodText}:</strong> Ditt kapital behöver bara växa med {graphAnalysis.capitalNeededToGrow.toFixed(0)}% för att nå 4%-kravet, 
-                                    vilket är rimligt med en genomsnittlig real avkastning på {avgReturnNeeded}% per år.
-                                <span className="block mt-1">✅ Detta är en hållbar plan!</span>
+                                    <strong>Bra läge{periodText}:</strong> Ditt kapital behöver växa med {graphAnalysis.capitalNeededToGrow.toFixed(0)}% för att nå 4%-kravet. I många historiska scenarier har detta ansetts vara en försiktigare nivå, men det finns inga garantier.
                         </p>
                       </div>
                               );
@@ -1509,7 +1507,7 @@ export default function FIREPage() {
                                 men beräkningen visar att du kan nå det vid {averageAge + dynamicFireResult.yearsToFire} år.
                                 <span className="block mt-1">
                                   {effectiveFireYear > dynamicFireResult.yearsToFire 
-                                    ? `💡 Genom att jobba ${effectiveFireYear - dynamicFireResult.yearsToFire} år extra bygger du en större buffert, vilket minskar risken.`
+                                    ? `💡 Genom att jobba ${effectiveFireYear - dynamicFireResult.yearsToFire} år extra bygger du en större buffert, vilket kan minska risken.`
                                     : `💡 Genom att starta ${dynamicFireResult.yearsToFire - effectiveFireYear} år tidigare ökar du risken eftersom du har mindre kapital.`
                                   }
                                 </span>
@@ -2041,7 +2039,7 @@ export default function FIREPage() {
                     <Label className="text-sm font-medium">Startålder för ekonomisk frihet (simulering)</Label>
                     <InfoIcon 
                       title="Startålder för ekonomisk frihet"
-                      description="Detta är åldern när du når ekonomisk frihet (FIRE) och kan sluta jobba.\n\nDu kan justera denna ålder för att se vad som händer om du:\n• Väntar längre: Mer kapital vid start, men senare frihet\n• Startar tidigare: Tidigare frihet, men mindre kapital och högre risk\n\nOm du sätter en tidigare ålder än beräkningen visar, ökar risken eftersom du har mindre kapital. Om du sätter en senare ålder, bygger du en större buffert som minskar risken."
+                      description="Detta är åldern när du enligt simuleringen når ekonomisk frihet (FIRE) och teoretiskt skulle kunna sluta jobba om antagandena håller.\n\nDu kan justera denna ålder för att se vad som händer om du:\n• Väntar längre: Mer kapital vid start, men senare frihet\n• Startar tidigare: Tidigare frihet, men mindre kapital och högre risk\n\nOm du sätter en tidigare ålder än beräkningen visar, ökar risken eftersom du har mindre kapital. Om du sätter en senare ålder, bygger du en större buffert som kan minska risken."
                     />
                   </div>
                   <div className="flex items-center gap-2">
@@ -2350,10 +2348,10 @@ export default function FIREPage() {
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <Label className="text-sm">Utbetalningsperiod för statlig pension</Label>
+                        <Label className="text-sm">Statlig pensionsutbetalning (år)</Label>
                         <InfoIcon 
                           title="Utbetalningsperiod för statlig pension"
-                          description="Detta är antal år din statliga inkomstpension betalas ut från pensionsstart.\n\nJu längre utbetalningsperiod, desto lägre blir den månatliga utbetalningen men desto längre får du betalningar. Ju kortare period, desto högre månadsutbetalning men kortare tid.\n\nStandardvärdet är 20 år, vilket är en rimlig uppskattning baserat på genomsnittlig livslängd. Du kan justera detta baserat på din egen situation."
+                          description="Detta är antalet år som statlig pension antas utbetalas i modellen (t.ex. 20 år). I verkligheten betalas allmän pension normalt ut så länge du lever. Här använder vi en förenkling där utbetalningen sprids över ett valt antal år."
                         />
                       </div>
                       <span className="text-sm font-medium">{statePensionPayoutYears[0]} år</span>
@@ -2595,7 +2593,7 @@ export default function FIREPage() {
                 </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-1 bg-[#4A84C1] border-dashed border-t-2" style={{ borderColor: '#4A84C1' }}></div>
-                    <span><strong>Marknadsbaserad pension:</strong> Tjänstepension, IPS och premiepension som blir tillgänglig vid pensionsstart (låst tills dess).</span>
+                    <span><strong>Marknadsbaserad pension:</strong> Tjänstepension, premiepension och IPS. Tjänstepension och IPS kan i många avtal tas ut från cirka 55 års ålder, medan premiepension följer samma lägsta ålder som allmän pension (kring 63–65 år beroende på födelseår).</span>
                 </div>
                   {dynamicFireResult?.statePensionAnnualIncome && dynamicFireResult.statePensionAnnualIncome > 0 && (
                     <div className="flex items-center gap-2">

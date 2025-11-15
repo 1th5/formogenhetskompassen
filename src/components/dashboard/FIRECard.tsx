@@ -483,23 +483,23 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
               {fireResult.yearsToFire === 0 ? (
                 <p className="text-base font-semibold text-emerald-700 mb-1 text-center">
                   Du når ekonomisk frihet enligt dina antaganden – grymt jobbat!
-                  <span className="block text-sm font-normal text-emerald-800/80">nu kan du leva på avkastningen utan att behöva arbeta</span>
+                  <span className="block text-sm font-normal text-emerald-800/80">enligt den här modellen skulle du kunna leva på avkastningen utan att behöva arbeta</span>
                 </p>
               ) : (
                 <p className="text-base font-semibold text-gray-800 mb-1 text-center">
                   tills du tidigast kan vara ekonomiskt oberoende
-                  <span className="block text-sm font-normal text-gray-600">om förutsättningarna förblir oförändrade från idag</span>
+                  <span className="block text-sm font-normal text-gray-600">givet att dina antaganden om sparande, avkastning och utgifter håller över tid</span>
                 </p>
               )}
               <p className="text-xs text-gray-500">
-                vid {fireResult.estimatedAge} år • genomsnittlig ålder i hushållet
+                vid {fireResult.estimatedAge} års ålder • baserat på hushållets genomsnittsålder
               </p>
               <div className="mt-3 pt-3 border-t border-amber-200 bg-amber-50/50 rounded-lg p-3">
                 <p className="text-xs text-amber-800 leading-relaxed">
-                  <strong className="text-amber-900">Viktigt:</strong> Beräkningen förutsätter uttag från 55 år och använder genomsnittliga avkastningar. Börsen är oförutsägbar och verktyget garanterar inget. Om du planerar FIRE, gör egna beräkningar med dina förutsättningar.
+                  <strong className="text-amber-900">Viktigt:</strong> Siffran i kortet bygger på en mycket förenklad simulering där tjänstepension och IPS antas kunna börja tas ut från 55 års ålder och där genomsnittliga avkastningar används. Inne i FIRE-simulatorn kan du själv ändra både uttagsåldrar och avkastningsantaganden. Allmän pension (inkomstpension och premiepension) kan normalt tas ut först från den lägsta uttagsålder som gäller för din årskull (ungefär 63–65 år i dag). Börsen är oförutsägbar och resultatet är inte en garanti. Se detta som en modellbaserad illustration – inte som personlig rådgivning.
                 </p>
                 <p className="text-xs text-amber-800 leading-relaxed mt-2">
-                  Beräkningen är en simulering baserad på 4 %-regeln och dina antaganden om avkastning och utgifter – inte en garanti eller personlig rekommendation.
+                  Beräkningen är en förenklad simulering baserad på 4 %-regeln och dina egna antaganden om avkastning och utgifter. Det är ingen prognos, garanti eller personlig rekommendation, utan en teknisk illustration av ett möjligt scenario.
                 </p>
               </div>
             </div>
@@ -613,6 +613,9 @@ export default function FIRECard({ assets, liabilities, persons, totalNetWorth, 
             <div className="text-3xl font-bold text-gray-600 mb-2">Fler år kvar</div>
             <div className="text-sm text-gray-500 mb-4">
               <p>Ekonomisk frihet är inte uppnåelig med nuvarande antaganden.</p>
+              <p className="mt-2 text-xs text-primary/70">
+                I simulatorn kan du testa vad som händer om du till exempel ändrar sparande, utgifter eller avkastningsantaganden.
+              </p>
               {fireResult.warnings.length > 0 && (
                 <p className="mt-2 text-xs text-red-600">{fireResult.warnings[0]}</p>
               )}

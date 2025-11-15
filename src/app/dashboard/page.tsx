@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -27,7 +27,7 @@ import { TrendingUp, Wallet, Gauge, ArrowUpRight, Sparkles, Zap, Coins, CircleDo
 import SavingsCard from '@/components/dashboard/SavingsCard';
 import PensionOverviewCard from '@/components/dashboard/PensionOverviewCard';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { draftHousehold, shouldAnimate, setShouldAnimate, previousLevel, cameFromOnboarding, setPreviousLevel, setCameFromOnboarding } = useHouseholdStore();
@@ -1960,5 +1960,19 @@ export default function DashboardPage() {
         </Dialog>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[var(--surface-bg)] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-primary/70">Laddar...</p>
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }
