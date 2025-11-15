@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, Sparkles, Target, Info, Calculator, Plus, X, Check } from 'lucide-react';
+import { TrendingUp, Sparkles, Target, Info, Calculator, Plus, X, Check, CircleDollarSign, ExternalLink, Home } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils/format';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 
@@ -552,7 +552,10 @@ export default function StandaloneSavingsPage() {
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif text-primary">Sparkalkylator (ränta-på-ränta)</h1>
               </div>
               <p className="text-primary/70 mt-1 text-xs md:text-sm">
-                Se hur dina besparingar växer över tid med ränta-på-ränta effekten
+                Se hur ditt sparande kan växa över tid med ränta-på-ränta-effekten
+              </p>
+              <p className="text-xs text-primary/60 mt-2 italic">
+                Observera: Beräkningarna är förenklade simuleringar baserade på dina egna antaganden. De visar exempel på möjliga utfall, inte en prognos eller garanti.
               </p>
             </div>
           </div>
@@ -568,16 +571,16 @@ export default function StandaloneSavingsPage() {
                   Vad är en ränta-på-ränta-kalkylator?
                 </h3>
                 <p className="text-sm text-primary/80 mb-3">
-                  En ränta-på-ränta-kalkylator (även kallad sammansatt räntekalkylator) hjälper dig förstå hur dina besparingar växer över tid när du både sparar regelbundet och får avkastning på ditt kapital.
+                  En ränta-på-ränta-kalkylator (även kallad sammansatt räntekalkylator) hjälper dig förstå hur ditt sparande kan utvecklas över tid när du både sparar regelbundet och får avkastning på ditt kapital.
                 </p>
                 <p className="text-sm text-primary/80 mb-3">
-                  <strong>Grundprincipen:</strong> När du investerar pengar och får avkastning, så får du i sin tur avkastning på den avkastningen. Detta kallas ränta-på-ränta eller sammansatt ränta. Över många år kan detta leda till en betydande vinst även utan stora månadsinsättningar.
+                  <strong>Grundprincipen:</strong> När du sparar eller investerar pengar får du avkastning – och den avkastningen får i sin tur avkastning. Detta kallas ränta-på-ränta eller sammansatt ränta. Över många år kan det göra stor skillnad, även om du inte sparar enorma belopp varje månad.
                 </p>
                 <p className="text-sm text-primary/80 mb-3">
-                  <strong>Exempel:</strong> Om du börjar med 100 000 kr och sparar 5 000 kr/månad med en årlig avkastning på 7%, kommer du efter 20 år ha över 3,5 miljoner kr – varav över 1,5 miljoner kr kommer från avkastning!
+                  <strong>Exempel:</strong> Om du börjar med 100 000 kr och sparar 5 000 kr/månad med en årlig avkastning på 7% kan sparandet i detta räkneexempel växa till över 3,5 miljoner kr – varav mer än 1,5 miljoner kr från avkastning. Utfallet beror helt på antagandena och tar inte hänsyn till skatt, avgifter eller förändrade villkor.
                 </p>
                 <p className="text-sm text-primary/80">
-                  <strong>Vad kan du göra här:</strong> Jämför olika sparstrategier, testa "vad händer om"-scenarier, och se hur dina besparingar växer år för år med interaktiva grafer och milstolpar.
+                  <strong>Vad kan du göra här:</strong> Jämför olika sparstrategier, testa "vad händer om"-scenarier, och se hur ditt sparande växer år för år med interaktiva grafer och milstolpar.
                 </p>
               </div>
             </div>
@@ -596,7 +599,7 @@ export default function StandaloneSavingsPage() {
                 <div>
                   <Label className="text-sm font-medium mb-3 block text-primary">Startkapital</Label>
                   <p className="text-xs text-primary/60 mb-3">
-                    Justera fritt med reglaget
+                    Ange eller justera ditt startbelopp med reglaget
                   </p>
                   <div className="flex items-center gap-2 md:gap-3 mb-2">
                     <Input
@@ -683,7 +686,7 @@ export default function StandaloneSavingsPage() {
                 <div>
                   <Label className="text-sm font-medium mb-3 block text-primary">Månadssparande</Label>
                   <p className="text-xs text-primary/60 mb-3">
-                    Justera fritt med reglaget
+                    Ange hur mycket du sparar varje månad och justera med reglaget
                   </p>
                   <div className="flex items-center gap-2 md:gap-3 mb-2">
                     <Input
@@ -770,7 +773,7 @@ export default function StandaloneSavingsPage() {
                 <div>
                   <Label className="text-sm font-medium mb-3 block text-primary">Årlig avkastning (nominell)</Label>
                   <p className="text-xs text-primary/60 mb-3">
-                    Förväntad årlig avkastning före inflation
+                    Förväntad årlig avkastning före inflation. Nominell avkastning är före inflation. Den reala avkastningen beräknas automatiskt om inflation är aktiverad.
                   </p>
                   <div className="flex items-center gap-2 md:gap-3 mb-2">
                     <Input
@@ -1229,7 +1232,7 @@ export default function StandaloneSavingsPage() {
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-primary mb-1">Vad händer om-scenario</h4>
                   <p className="text-xs text-primary/70">
-                    Se vad som händer om du ökar månadssparandet efter X år (påverkar alla planer)
+                    Se vad som händer om du ökar månadssparandet efter X år (påverkar alla sparplaner)
                   </p>
                 </div>
                 <Switch
@@ -1821,27 +1824,27 @@ export default function StandaloneSavingsPage() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
                 <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">
-                  Vill du få en fullständig översikt över din ekonomi?
+                  Vill du se hur ditt sparande passar in i din totala förmögenhet?
                 </h3>
                 <p className="text-sm text-primary/80 mb-4">
-                  Med <strong>Förmögenhetskollen</strong> får du en komplett bild av din ekonomi: få en bättre uppfattning om din nettoförmögenhet, följ upp din väg mot ekonomisk frihet genom olika nivåer, analysera ditt sparande och mycket mer. Allt sparas lokalt i din webbläsare – ingen registrering krävs.
+                  Med <strong>Förmögenhetskollen</strong> kan du koppla ihop ditt sparande med hela din ekonomi: bostad, pension, lån och övriga tillgångar. Du kan se en beräknad nettoförmögenhet, en uppskattad nivå i Rikedomstrappan och en simulerad bild av hur din ekonomi förändras varje månad – inte bara hur ett enskilt sparande växer.
                 </p>
                 <ul className="text-sm text-primary/80 space-y-1 mb-4">
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-primary/80 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>Få en bättre uppfattning om alla dina tillgångar och skulder på ett ställe</span>
+                    <span>Få en samlad bild av tillgångar, skulder och pension</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-primary/80 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>Följ upp din progress mot ekonomisk frihet genom 6 nivåer</span>
+                    <span>Se din beräknade nivå i Rikedomstrappan (The Wealth Ladder)</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-primary/80 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>Få insikter om ditt månatliga sparande och utveckling</span>
+                    <span>Följ hur din nettoförmögenhet förändras månad för månad</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="w-4 h-4 text-primary/80 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>Helt gratis och sparas lokalt – ingen registrering</span>
+                    <span>Helt gratis och sparas lokalt i din webbläsare – ingen registrering</span>
                   </li>
                 </ul>
               </div>
@@ -1856,6 +1859,76 @@ export default function StandaloneSavingsPage() {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Ytterligare verktyg */}
+        <div className="mt-8 mb-6">
+          <div className="border border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-slate-100/50 backdrop-blur-sm rounded-lg p-4 sm:p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-slate-200/60">
+                <Calculator className="w-5 h-5 text-slate-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-serif text-sm sm:text-base text-slate-700 mb-1">Ytterligare verktyg</h3>
+                <p className="text-xs sm:text-sm text-slate-600">
+                  Ytterligare kalkylatorer som kan vara användbara
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/fire')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-blue-50">
+                    <TrendingUp className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">FIRE-kalkylator</div>
+                    <div className="text-xs text-slate-500 truncate">Ekonomisk frihet</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/salary')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-purple-50">
+                    <CircleDollarSign className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">Lönekalkylator</div>
+                    <div className="text-xs text-slate-500 truncate">Efter skatt</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/dashboard')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-blue-50">
+                    <Home className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">Förmögenhetskollen</div>
+                    <div className="text-xs text-slate-500 truncate">Dashboard</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1423,10 +1423,10 @@ function DashboardContent() {
         {/* Pensionstillgångar kort */}
         <div id="pension-card" className="mb-4 sm:mb-6 md:mb-8">
           <PensionOverviewCard
-            assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
-            persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
+              assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
+              persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
             isLocked={effectiveIsLevelZero}
-          />
+            />
         </div>
         
         {/* Sparande kort */}
@@ -1444,20 +1444,20 @@ function DashboardContent() {
         <div className="mb-4 sm:mb-6 md:mb-8">
           <div id="fire-card">
           <FIRECard
-              assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
+            assets={effectiveIsLevelZero ? [] : (draftHousehold?.assets || [])}
               liabilities={effectiveIsLevelZero ? [] : (draftHousehold?.liabilities || [])}
-              persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
+            persons={effectiveIsLevelZero ? [] : (draftHousehold?.persons || [])}
               totalNetWorth={displayNetWorth}
               currentLevel={displayLevel}
-            />
+          />
           </div>
         </div>
         
         {/* Förmögenhetsfördelning flyttad till modal */}
         
         {/* Månatlig uppdelning flyttad till modal */}
-        
-        {/* Externa verktyg */}
+
+          {/* Externa verktyg */}
         <div className="mb-4 sm:mb-6 md:mb-8">
           <Card className="border border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-slate-100/50 backdrop-blur-sm">
             <CardContent className="p-4 sm:p-6">
@@ -1528,8 +1528,8 @@ function DashboardContent() {
             </CardContent>
           </Card>
         </div>
-        
-        {/* Om-knapp för mobil - utanför boxen */}
+          
+          {/* Om-knapp för mobil - utanför boxen */}
           <Button
             variant="secondary"
             onClick={() => router.push('/about')}

@@ -12,7 +12,7 @@ import { formatCurrency } from '@/lib/utils/format';
 import { toNumber } from '@/lib/utils/number';
 import { simulatePortfolio, YearData } from '@/lib/fire/simulate';
 import { calculateFIRE, FIREResult, calculateAutoReturns, toReal } from '@/lib/fire/calc';
-import { ArrowLeft, Info, Calculator, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Info, Calculator, ChevronDown, ChevronUp, Wallet, CircleDollarSign, ExternalLink, Home } from 'lucide-react';
 import { calculateIncomePension, calculateOccupationalPension, calculatePremiePension } from '@/lib/wealth/calc';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -859,7 +859,10 @@ export default function StandaloneFIREPage() {
             <div>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif text-primary">FIRE-kalkylator</h1>
               <p className="text-sm md:text-base text-primary/70 mt-1">
-                Simulera när du kan nå ekonomisk frihet enligt FIRE-principer
+                Simulera en uppskattning av när du kan nå ekonomisk frihet enligt FIRE-principer
+              </p>
+              <p className="text-xs text-primary/60 mt-2 italic">
+                Observera: Denna kalkylator visar förenklade simuleringar baserade på dina inmatade antaganden. Resultaten är inte en prognos, garanti eller personlig ekonomisk rådgivning.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -884,13 +887,13 @@ export default function StandaloneFIREPage() {
                     Vad är FIRE?
                   </h3>
                   <p className="text-sm text-primary/80 mb-3">
-                    <strong>FIRE</strong> (Financial Independence, Retire Early) är en strategi för att nå ekonomisk frihet så att du kan välja när och hur du vill arbeta. Fokus ligger på frihet och valfrihet – inte bara "tidigt pensionerad". När du når FIRE har du tillräckligt kapital för att täcka dina utgifter utan att behöva arbeta heltid.
+                    <strong>FIRE</strong> (Financial Independence, Retire Early) är ett sätt att resonera kring ekonomisk frihet så att du kan välja när och hur du vill arbeta. Fokus ligger på frihet och valfrihet – inte bara "tidigt pensionerad". När du når FIRE har du tillräckligt kapital för att täcka dina utgifter utan att behöva arbeta heltid.
                   </p>
                   <p className="text-sm text-primary/80 mb-3">
-                    <strong>Hur fungerar simulatorn?</strong> Den simulerar hur ditt kapital växer över tid baserat på ditt sparande, avkastning och utgifter. Den visar när du kan nå ekonomisk frihet enligt <strong>4%-regeln</strong> – att kunna leva på 4% av ditt kapital per år (vilket motsvarar 25 gånger dina årsutgifter). Simulatorn visar också hur kapitalet utvecklas genom både sparande och pension över din livstid.
+                    <strong>Hur fungerar simulatorn?</strong> Den gör en förenklad simulering av hur ditt kapital kan utvecklas över tid baserat på sparande, avkastning och utgifter. Den visar en uppskattning av när du kan nå ekonomisk frihet enligt <strong>4 %-regeln</strong> – en tumregel där man ofta utgår från att 4 % av kapitalet per år motsvarar cirka 25 gånger dina årsutgifter. Simulatorn visar också hur kapitalet utvecklas genom både sparande och pension över din livstid.
                   </p>
                   <p className="text-sm text-primary/80 mb-3">
-                    <strong>Bridge-period:</strong> Tiden mellan ekonomisk frihet och pension kallas "bridge-period" – när ditt tillgängliga kapital (exkl. pension) används för att täcka utgifter tills pensionen börjar. Under denna period växer dina pensionspengar medan du använder ditt övriga kapital. Ju längre bridge-period, desto mer kapital behöver du vid FIRE.
+                    <strong>Bridge-period:</strong> Tiden mellan ekonomisk frihet och pension kallas "bridge-period" – då ditt tillgängliga kapital (exklusive pension) används för att täcka utgifter fram tills pensionen börjar betalas ut. Under denna period växer dina pensionspengar medan du använder ditt övriga kapital. Ju längre bridge-period, desto mer kapital behöver du vid FIRE.
                   </p>
                   <div className="mt-4 pt-4 border-t border-blue-300">
                     <p className="text-sm font-semibold text-primary mb-2">
@@ -1015,7 +1018,7 @@ export default function StandaloneFIREPage() {
                       <Label htmlFor="expenses-standalone-grund" className="block">Utgifter per månad (kr)</Label>
                       <InfoIcon 
                         title="Månadsutgifter"
-                        description="Detta är dina totala månadsutgifter som du behöver täcka efter ekonomisk frihet.\n\nJu lägre dina utgifter, desto mindre kapital behöver du för att nå FIRE. Detta är en av de viktigaste faktorerna för att nå ekonomisk frihet tidigt.\n\n4%-regeln säger att du behöver 25 gånger dina årsutgifter i kapital. Om dina utgifter är 20 000 kr/mån (240 000 kr/år), behöver du 6 miljoner kr för att nå FIRE."
+                        description="Detta är dina totala månadsutgifter som du behöver täcka efter ekonomisk frihet.\n\nJu lägre dina utgifter, desto mindre kapital behöver du för att nå FIRE. Detta är en av de viktigaste faktorerna för att nå ekonomisk frihet tidigt.\n\n4 %-regeln är en tumregel från historiska studier som ofta används i FIRE-sammanhang. Den säger förenklat att uttag på cirka 4 % per år i många historiska perioder inte har tömt kapitalet, men det finns inga garantier för framtiden. Ofta utgår man från att du behöver cirka 25 gånger dina årsutgifter i kapital. Om dina utgifter är 20 000 kr/mån (240 000 kr/år), skulle det enligt denna tumregel innebära cirka 6 miljoner kr."
                       />
                     </div>
                     <Input
@@ -1476,7 +1479,7 @@ export default function StandaloneFIREPage() {
                     />
                     <div className="flex items-center justify-between mt-1">
                       <p className="text-xs text-primary/60">
-                        Månatlig inkomstpensionsavsättning
+                        Månatlig inkomstpensionsavsättning. (Detta är en teknisk uppskattning av inbetalningarna till inkomstpensionen. Den dras inte direkt från din lön utan ingår i arbetsgivaravgifterna.)
                       </p>
                       <Button
                         type="button"
@@ -1608,7 +1611,7 @@ export default function StandaloneFIREPage() {
                       {simulation.capitalDepletedYear !== null ? (
                         <>
                           <span className="text-base md:text-lg font-semibold text-red-600">
-                            Kapitalet tar slut vid {simulation.capitalDepletedYear} år
+                            Kapitalet tar slut vid {simulation.capitalDepletedYear} års ålder
                           </span>
                           <span className="block text-xs mt-1">
                             {effectiveFireYear !== null 
@@ -1617,11 +1620,12 @@ export default function StandaloneFIREPage() {
                             }
                           </span>
                           <div className="mt-3 pt-3 border-t border-red-200 bg-red-50/50 rounded-lg p-3">
-                            <p className="text-xs font-semibold text-red-900 mb-2">För att det ska hålla till minst {sliderPensionAge[0] + 15} år behöver du antingen:</p>
+                            <p className="text-xs font-semibold text-red-900 mb-2">För att simuleringen ska hålla till minst {sliderPensionAge[0] + 15} år visar denna modell att något av följande kan behöva ändras:</p>
                             <ul className="text-xs text-red-800 space-y-1 ml-4 list-disc">
-                              <li>Minska utgifterna eller öka månadssparandet</li>
-                              <li>Skjuta på pensionen till {Math.min(67, sliderPensionAge[0] + 2)} år</li>
+                              <li>Utgifter, sparande eller avkastningsantaganden</li>
+                              <li>Planerad pensionsålder</li>
                             </ul>
+                            <p className="text-xs text-red-800 mt-2">Du kan testa olika kombinationer i kalkylatorn för att se hur de påverkar resultatet.</p>
                           </div>
                         </>
                       ) : effectiveFireYear !== null ? (
@@ -1708,7 +1712,7 @@ export default function StandaloneFIREPage() {
                         4%-krav: {formatCurrency(requiredAtPensionLive)}
                         <InfoIcon
                           title="4%-kravet"
-                          description="4%-kravet beräknas som: (Årsutgifter – Statlig pension) × 25\n\nDetta är det kapital du behöver vid pensionsstart för att kunna leva på 4% av kapitalet per år. Statlig pension dras av eftersom den minskar dina uttag från övrigt kapital.\n\n4%-regeln säger att du kan ta ut 4% av ditt kapital per år utan att riskera att det tar slut. Om dina årsutgifter är 240 000 kr och statlig pension ger 60 000 kr/år, behöver du (240 000 - 60 000) × 25 = 4 500 000 kr."
+                          description="4 %-kravet beräknas som: (Årsutgifter – Statlig pension) × 25\n\nDetta är det kapital du behöver vid pensionsstart för att kunna leva på 4 % av kapitalet per år enligt den ofta använda tumregeln. Statlig pension dras av eftersom den minskar dina uttag från övrigt kapital.\n\n4 %-regeln är en tumregel från historiska studier som ofta används i FIRE-sammanhang. Den säger förenklat att uttag på cirka 4 % per år i många historiska perioder inte har tömt kapitalet, men det finns inga garantier för framtiden. Om dina årsutgifter är 240 000 kr och statlig pension ger 60 000 kr/år, skulle det enligt denna tumregel innebära (240 000 - 60 000) × 25 = 4 500 000 kr."
                         />
                       </span>
                     </div>
@@ -1830,13 +1834,13 @@ export default function StandaloneFIREPage() {
                                 <p>
                                   <strong>Uttagsnivå (mellan {fireAge}-{sliderPensionAge[0]} år):</strong> Du tar ut {withdrawalRateAtFire.toFixed(1)}% per år från ditt tillgängliga kapital.
                                   {withdrawalRateAtFire > 5 && (
-                                    <span className="block mt-1 font-semibold">⚠️ Detta är högt! Över 5% per år ökar risken att kapitalet tar slut. Överväg att spara mer eller jobba längre.</span>
+                                    <span className="block mt-1 font-semibold">⚠️ Detta är en hög uttagsnivå. Uttag över cirka 5 % per år förknippas i många studier med ökad risk att kapitalet tar slut. I kalkylatorn kan du testa hur olika nivån på sparande, utgifter eller arbetstid påverkar resultatet.</span>
                                   )}
                                   {withdrawalRateAtFire > 4 && withdrawalRateAtFire <= 5 && (
-                                    <span className="block mt-1">💡 Detta är över den säkra 4%-regeln. Om marknaden går dåligt kan det bli tufft. Överväg en buffert eller högre avkastning.</span>
+                                    <span className="block mt-1">💡 Detta ligger över den ofta använda 4 %-regeln som riktmärke. Om marknaden utvecklas svagt kan det bli ansträngt. I kalkylatorn kan du testa effekten av större buffert, lägre uttagsnivå eller förändrade antaganden om avkastning.</span>
                                   )}
                                   {withdrawalRateAtFire <= 4 && (
-                                    <span className="block mt-1">✅ Detta är inom den säkra 4%-regeln. Bra!</span>
+                                    <span className="block mt-1">✅ Detta ligger inom den ofta använda 4 %-regeln som riktmärke i FIRE-diskussioner. Det är dock ingen garanti för att kapitalet alltid räcker.</span>
                           )}
                         </p>
                       </div>
@@ -1848,13 +1852,13 @@ export default function StandaloneFIREPage() {
                                 <p>
                                   <strong>Stor tillväxt krävs (mellan {fireAge}-{sliderPensionAge[0]} år):</strong> Ditt kapital behöver växa med {growthNeededPercent?.toFixed(1)}% under bridge-perioden för att nå 4%-kravet.
                                   {avgReturnNeeded && avgReturnNeeded > 10 && (
-                                    <span className="block mt-1 font-semibold">⚠️ Detta är mycket! Det kräver en genomsnittlig real avkastning på över {avgReturnNeeded.toFixed(1)}% per år. Överväg att spara mer.</span>
+                                    <span className="block mt-1 font-semibold">⚠️ Detta är mycket! Det kräver en genomsnittlig real avkastning på över {avgReturnNeeded.toFixed(1)} % per år. I kalkylatorn kan du testa hur olika nivån på sparande, utgifter eller arbetstid påverkar resultatet.</span>
                                   )}
                                   {avgReturnNeeded && avgReturnNeeded > 7 && avgReturnNeeded <= 10 && (
-                                    <span className="block mt-1">💡 Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded.toFixed(1)}% per år, vilket är högt men möjligt med rätt investeringar.</span>
+                                    <span className="block mt-1">💡 Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded.toFixed(1)} % per år. Det är en hög nivå som i vissa historiska perioder har förekommit, men det finns inga garantier för framtiden.</span>
                                   )}
                                   {avgReturnNeeded && avgReturnNeeded <= 7 && (
-                                    <span className="block mt-1">✅ Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded.toFixed(1)}% per år, vilket är rimligt.</span>
+                                    <span className="block mt-1">✅ Detta kräver en genomsnittlig real avkastning på {avgReturnNeeded.toFixed(1)} % per år. Det ligger närmare de nivåer som ofta används i historiska exempel, men utfallet kan avvika kraftigt.</span>
                                   )}
                                 </p>
                     </div>
@@ -1864,8 +1868,8 @@ export default function StandaloneFIREPage() {
                             {portfolioAtFire >= requiredAtPensionLive && (
                               <div className="text-green-700 bg-green-50 p-2 rounded">
                                 <p>
-                                  <strong>✅ Buffert:</strong> Din portfölj vid frihet överstiger redan 4%-kravet med {formatCurrency(portfolioAtFire - requiredAtPensionLive)}. 
-                                  Detta ger dig en säkerhetsmarginal om marknaden går dåligt.
+                                  <strong>✅ Buffert:</strong> Din portfölj vid frihet överstiger 4 %-kravet med {formatCurrency(portfolioAtFire - requiredAtPensionLive)}. 
+                                  Det kan ge ökad motståndskraft vid marknadsnedgångar, men tar inte bort risken helt.
                         </p>
                               </div>
                             )}
@@ -1876,13 +1880,13 @@ export default function StandaloneFIREPage() {
                                 <p>
                                   <strong>4%-regeln nås vid {fourPercentRuleMetYear} år</strong>
                                   {fourPercentRuleMetYear < fireAge ? (
-                                    <span className="block mt-1">✅ Redan innan ekonomisk frihet! Du har en stor säkerhetsmarginal.</span>
+                                    <span className="block mt-1">✅ Redan innan den valda tidpunkten för ekonomisk frihet. Det innebär att modellen visar att kapitalet når 4 %-nivån tidigare, givet antagandena.</span>
                                   ) : fourPercentRuleMetYear === fireAge ? (
-                                    <span className="block mt-1">✅ Exakt vid ekonomisk frihet! Perfekt timing.</span>
+                                    <span className="block mt-1">✅ Vid den valda tidpunkten för ekonomisk frihet. Det betyder att 4 %-nivån och din valda FIRE-tidpunkt sammanfaller i simuleringen.</span>
                                   ) : fourPercentRuleMetYear <= sliderPensionAge[0] ? (
-                                    <span className="block mt-1">✅ Under bridge-perioden. Ditt kapital växer tillräckligt för hållbara uttag.</span>
+                                    <span className="block mt-1">✅ Under bridge-perioden. Ditt kapital växer tillräckligt för hållbara uttag enligt modellen, givet antagandena.</span>
                                   ) : (
-                                    <span className="block mt-1">⚠️ Efter pensionsstart. Överväg att spara mer eller jobba längre.</span>
+                                    <span className="block mt-1">⚠️ Efter pensionsstart. I kalkylatorn kan du testa hur olika nivån på sparande, utgifter eller arbetstid påverkar resultatet.</span>
                           )}
                         </p>
                       </div>
@@ -1890,12 +1894,12 @@ export default function StandaloneFIREPage() {
                             
                             {/* General tips */}
                             <div className="text-gray-700 bg-gray-50 p-2 rounded">
-                              <p className="font-medium mb-1">💡 Allmänna tips:</p>
+                              <p className="font-medium mb-1">💡 Allmänna beskrivningar:</p>
                               <ul className="list-disc list-inside space-y-1">
-                                <li>Ju lägre utgifter, desto mindre kapital behöver du. Överväg att minska utgifter för att nå FIRE tidigare.</li>
-                                <li>Högre avkastning kan hjälpa, men kom ihåg att högre avkastning innebär högre risk.</li>
-                                <li>Om du kan jobba längre eller spara mer, minskar risken betydligt.</li>
-                                <li>Dessa beräkningar är baserade på antaganden – verkligheten kan avvika.</li>
+                                <li>Ju lägre utgifter, desto mindre kapital behöver modellen för att visa ekonomisk frihet. I kalkylatorn kan du testa hur olika utgiftsnivåer påverkar resultatet.</li>
+                                <li>Högre antagen avkastning gör att kapitalet växer snabbare i simuleringen, men i verkligheten innebär högre avkastning normalt också högre risk.</li>
+                                <li>Om du i modellen lägger in längre arbetsliv eller högre sparande minskar kapitalbehovet vid ekonomisk frihet.</li>
+                                <li>Alla beräkningar bygger på antaganden – verkligheten kan skilja sig kraftigt från simuleringen.</li>
                               </ul>
                             </div>
                           </div>
@@ -2469,7 +2473,7 @@ export default function StandaloneFIREPage() {
                         <Label className="text-sm">Tjänstepension (nominell)</Label>
                         <InfoIcon 
                           title="Avkastning på tjänstepension"
-                          description="Detta är den förväntade årliga avkastningen (före inflation) på din tjänstepension.\n\nTjänstepension har ofta lägre avkastning än övriga tillgångar eftersom den ofta är mer konservativt förvaltad. Standardvärdet är 7% nominell avkastning."
+                          description="Detta är den förväntade årliga avkastningen (före inflation) på din tjänstepension.\n\nPensionstillgångar kan vara mer eller mindre aktiebaserade beroende på val och förvaltning. Standardvärdet här är ett exempel – du kan justera avkastningen för varje pensionsdel."
                         />
                       </div>
                       <span className="text-sm font-medium">
@@ -2549,7 +2553,7 @@ export default function StandaloneFIREPage() {
                       <Label className="text-sm">Inflation</Label>
                       <InfoIcon 
                         title="Inflation"
-                        description="Inflation är den årliga prisökningen i samhället. När inflationen är 2% betyder det att samma varor och tjänster kostar 2% mer nästa år.\n\nI FIRE-beräkningen används real avkastning (avkastning minus inflation) för att se din faktiska köpkraft över tid. Om dina tillgångar växer med 7% men inflationen är 2%, är din reala avkastning 5%.\n\nStandardvärdet är 2%, vilket är Riksbankens inflationsmål. Du kan justera detta om du tror inflationen kommer vara högre eller lägre."
+                        description="Inflation är den årliga prisökningen i samhället. När inflationen är 2% betyder det att samma varor och tjänster kostar 2% mer nästa år.\n\nI FIRE-beräkningen används real avkastning (avkastning minus inflation) för att se din faktiska köpkraft över tid. Om dina tillgångar växer med 7% men inflationen är 2%, är din reala avkastning 5%.\n\nStandardvärdet är 2%, vilket är Riksbankens inflationsmål. Du kan justera detta om du tror inflationen kommer vara högre eller lägre.\n\nReal avkastning = nominell avkastning minus inflation."
                       />
                     </div>
                     <span className="text-sm font-medium">{sliderInflation[0]}%</span>
@@ -2570,7 +2574,7 @@ export default function StandaloneFIREPage() {
                       <Label className="text-sm">Pensionsstartålder</Label>
                       <InfoIcon 
                         title="Pensionsstartålder"
-                        description="Detta är åldern när du planerar att börja ta ut din statliga pension och marknadsbaserade pensioner.\n\nBridge-perioden är tiden mellan när du når ekonomisk frihet (FIRE) och när pensionen börjar. Ju längre bridge-period, desto mer kapital behöver du vid FIRE för att täcka utgifterna.\n\nStandardvärdet är 63 år (om du är under 63) eller 67 år (om du är 63 eller äldre), vilket är den tidigaste åldern du kan ta ut statlig pension i Sverige. Du kan öka detta om du planerar att jobba längre.\n\nTjänstepension och IPS kan tas ut tidigare (från 55 år) via sliders längre ner."
+                        description="Detta är åldern när du planerar att börja ta ut din statliga pension och marknadsbaserade pensioner.\n\nBridge-perioden är tiden mellan när du når ekonomisk frihet (FIRE) och när pensionen börjar. Ju längre bridge-period, desto mer kapital behöver du vid FIRE för att täcka utgifterna.\n\nStandardvärdet är 63 år (för nuvarande födelsekullar), men lägsta uttagsålder för statlig pension höjs stegvis och kan vara högre beroende på födelseår. Du kan justera detta reglage om du planerar att arbeta längre.\n\nTjänstepension och IPS kan i många avtal tas ut tidigare (från 55 år) via sliders längre ner. Premiepension är en del av den allmänna pensionen och följer därför samma lägsta uttagsålder (ca 63–65 år beroende på födelseår)."
                       />
                     </div>
                     <span className="text-sm font-medium">{sliderPensionAge[0]} år</span>
@@ -2606,7 +2610,7 @@ export default function StandaloneFIREPage() {
                         <Label className="text-sm">Utbetalningsperiod för statlig pension</Label>
                         <InfoIcon 
                           title="Utbetalningsperiod för statlig pension"
-                          description="Detta är antal år din statliga inkomstpension betalas ut från pensionsstart.\n\nJu längre utbetalningsperiod, desto lägre blir den månatliga utbetalningen men desto längre får du betalningar. Ju kortare period, desto högre månadsutbetalning men kortare tid.\n\nStandardvärdet är 20 år, vilket är en rimlig uppskattning baserat på genomsnittlig livslängd. Du kan justera detta baserat på din egen situation."
+                          description="Allmän pension betalas normalt ut livsvarigt.\n\nI denna simulator används en tidsbegränsad period för att göra prognoser enklare att överblicka. Ju längre utbetalningsperiod, desto lägre blir den månatliga utbetalningen men desto längre får du betalningar. Ju kortare period, desto högre månadsutbetalning men kortare tid.\n\nStandardvärdet är 20 år, vilket är en modell-förenkling. Du kan justera detta baserat på din egen situation."
                         />
                       </div>
                       <span className="text-sm font-medium">{statePensionPayoutYears[0]} år</span>
@@ -2633,7 +2637,7 @@ export default function StandaloneFIREPage() {
                         <Label className="text-sm">Börja använda tjänstepension från ålder</Label>
                         <InfoIcon 
                           title="Tidig uttag av tjänstepension"
-                          description="Detta är åldern när du börjar ta ut din tjänstepension.\n\nTjänstepension kan ofta tas ut från 55 år, vilket gör den användbar för bridge-perioden innan statlig pension börjar. När du når denna ålder, flyttas hela tjänstepensionen automatiskt till dina tillgängliga tillgångar.\n\nOm du tar ut tidigt (t.ex. vid 55 år) får du mer kapital tillgängligt tidigt, vilket kan hjälpa dig nå FIRE tidigare eller minska risken under bridge-perioden.\n\nNär tjänstepensionen slås ihop med ditt övriga kapital beräknas en viktad avkastning baserat på storleken av varje del. För att simuleringen ska bli jämn höjs avkastningen på tjänstepensionen till minst samma nivå som efter FIRE (7% nominellt) innan viktningen.\n\nOm du väljer att börja använda denna pensionsdel före din pensionsålder flyttas både kapitalet och de löpande inbetalningarna över till din fria portfölj i simuleringen. Det gör vi för att inte fortsätta sätta in pengar i en pensionshink som redan har tagits i bruk.\n\n⚠️ Kontrollera ditt pensionsavtal för faktiska regler om tidiga uttag."
+                          description="Detta är åldern när du börjar ta ut din tjänstepension.\n\nTjänstepension kan i många avtal tas ut från 55 år, men inte i alla. Kontrollera alltid vad som gäller för just ditt avtal. Det gör den användbar för bridge-perioden innan statlig pension börjar. När du når denna ålder, flyttas hela tjänstepensionen automatiskt till dina tillgängliga tillgångar.\n\nOm du tar ut tidigt (t.ex. vid 55 år) får du mer kapital tillgängligt tidigt, vilket kan hjälpa dig nå FIRE tidigare eller minska risken under bridge-perioden.\n\nNär tjänstepensionen slås ihop med ditt övriga kapital beräknas en viktad avkastning baserat på storleken av varje del. För att simuleringen ska bli jämn höjs avkastningen på tjänstepensionen till minst samma nivå som efter FIRE (7% nominellt) innan viktningen.\n\nOm du väljer att börja använda denna pensionsdel före din pensionsålder flyttas både kapitalet och de löpande inbetalningarna över till din fria portfölj i simuleringen. Det gör vi för att inte fortsätta sätta in pengar i en pensionshink som redan har tagits i bruk.\n\n⚠️ Kontrollera ditt pensionsavtal för faktiska regler om tidiga uttag."
                         />
                       </div>
                       <span className="text-sm font-medium">{occPensionEarlyStartAge} år</span>
@@ -2660,7 +2664,7 @@ export default function StandaloneFIREPage() {
                         <Label className="text-sm">Börja använda IPS från ålder</Label>
                         <InfoIcon 
                           title="Tidig uttag av IPS"
-                          description="Detta är åldern när du börjar ta ut ditt IPS (Individuellt Pensionssparande).\n\nIPS kan tas ut från 55 år, vilket gör det användbart för bridge-perioden innan statlig pension börjar. När du når denna ålder, flyttas hela IPS-kapitalet automatiskt till dina tillgängliga tillgångar.\n\nOm du tar ut tidigt (t.ex. vid 55 år) får du mer kapital tillgängligt tidigt, vilket kan hjälpa dig nå FIRE tidigare eller minska risken under bridge-perioden.\n\nNär IPS slås ihop med ditt övriga kapital beräknas en viktad avkastning baserat på storleken av varje del. För att simuleringen ska bli jämn höjs avkastningen på IPS till minst samma nivå som efter FIRE (7% nominellt) innan viktningen.\n\nOm du väljer att börja använda denna pensionsdel före din pensionsålder flyttas både kapitalet och de löpande inbetalningarna över till din fria portfölj i simuleringen. Det gör vi för att inte fortsätta sätta in pengar i en pensionshink som redan har tagits i bruk.\n\n⚠️ Kontrollera ditt pensionsavtal för faktiska regler om tidiga uttag."
+                          description="Detta är åldern när du börjar ta ut ditt IPS (Individuellt Pensionssparande).\n\nIPS kan i många avtal tas ut från 55 år, men kontrollera alltid vad som gäller för just ditt avtal. Det gör det användbart för bridge-perioden innan statlig pension börjar. När du når denna ålder, flyttas hela IPS-kapitalet automatiskt till dina tillgängliga tillgångar.\n\nOm du tar ut tidigt (t.ex. vid 55 år) får du mer kapital tillgängligt tidigt, vilket kan hjälpa dig nå FIRE tidigare eller minska risken under bridge-perioden.\n\nNär IPS slås ihop med ditt övriga kapital beräknas en viktad avkastning baserat på storleken av varje del. För att simuleringen ska bli jämn höjs avkastningen på IPS till minst samma nivå som efter FIRE (7% nominellt) innan viktningen.\n\nOm du väljer att börja använda denna pensionsdel före din pensionsålder flyttas både kapitalet och de löpande inbetalningarna över till din fria portfölj i simuleringen. Det gör vi för att inte fortsätta sätta in pengar i en pensionshink som redan har tagits i bruk.\n\n⚠️ Kontrollera ditt pensionsavtal för faktiska regler om tidiga uttag."
                         />
                       </div>
                       <span className="text-sm font-medium">{ipsEarlyStartAge} år</span>
@@ -2703,7 +2707,7 @@ export default function StandaloneFIREPage() {
                 <span className="text-xs text-gray-600 italic block mt-1">Tänk på att pensionsdelen efter pension kan ha en lägre avkastning beroende på hur mycket av den som är inkomstpensionen, som då följer balansindex.</span>
               </p>
               <p className="text-sm text-gray-700 leading-relaxed">
-                <strong>Avkastning efter ekonomisk frihet:</strong> När ekonomisk frihet uppnås höjs avkastningen på tillgängliga tillgångar till minst 7% nominell för att säkerställa 4%-regeln. Om din ursprungliga avkastning redan är högre än 7%, fortsätter du med den höga avkastningen. Om ekonomisk frihet inte är uppnåelig används din ursprungliga avkastning hela vägen till pension.
+                <strong>Avkastning efter ekonomisk frihet:</strong> När ekonomisk frihet uppnås används en teknisk modellnivå på 7 % nominell avkastning (används för att göra uttagsanalysen jämförbar med historiska 4 %-studier, inte som en prognos eller garanti) för tillgängliga tillgångar i simuleringen. Om din ursprungliga avkastning redan är högre än 7 % används den högre nivån, och om ekonomisk frihet inte är uppnåelig används dina ursprungliga avkastningsantaganden hela vägen till pension.
               </p>
               <p className="text-sm text-gray-700 leading-relaxed">
                 <strong>Viktad avkastning vid sammanslagning:</strong> När kapital slås ihop från flera källor (t.ex. när pensionsdelar blir uttagsbara eller vid pensionsstart) beräknas en gemensam avkastning som ett viktat snitt av delarna. Pensionsdelar som blir uttagsbara justeras först upp till simulatorns lägsta nivå för avkastning efter frihet (7% nominellt) innan viktningen, så att låga pensionsavkastningar inte drar ner hela portföljen.
@@ -2892,7 +2896,7 @@ export default function StandaloneFIREPage() {
                     <Label className="text-sm">Inflation</Label>
                     <InfoIcon 
                       title="Inflation"
-                      description="Inflation är den årliga prisökningen i samhället. När inflationen är 2% betyder det att samma varor och tjänster kostar 2% mer nästa år.\n\nI FIRE-beräkningen används real avkastning (avkastning minus inflation) för att se din faktiska köpkraft över tid. Om dina tillgångar växer med 7% men inflationen är 2%, är din reala avkastning 5%.\n\nStandardvärdet är 2%, vilket är Riksbankens inflationsmål. Du kan justera detta om du tror inflationen kommer vara högre eller lägre."
+                      description="Inflation är den årliga prisökningen i samhället. När inflationen är 2% betyder det att samma varor och tjänster kostar 2% mer nästa år.\n\nI FIRE-beräkningen används real avkastning (avkastning minus inflation) för att se din faktiska köpkraft över tid. Om dina tillgångar växer med 7% men inflationen är 2%, är din reala avkastning 5%.\n\nStandardvärdet är 2%, vilket är Riksbankens inflationsmål. Du kan justera detta om du tror inflationen kommer vara högre eller lägre.\n\nReal avkastning = nominell avkastning minus inflation."
                     />
                   </div>
                   <span className="text-sm font-medium">{sliderInflation[0]}%</span>
@@ -2913,7 +2917,7 @@ export default function StandaloneFIREPage() {
                       <Label className="text-sm">Pensionsstartålder</Label>
                       <InfoIcon 
                         title="Pensionsstartålder"
-                        description="Detta är åldern när du planerar att börja ta ut din statliga pension och marknadsbaserade pensioner.\n\nBridge-perioden är tiden mellan när du når ekonomisk frihet (FIRE) och när pensionen börjar. Ju längre bridge-period, desto mer kapital behöver du vid FIRE för att täcka utgifterna.\n\nStandardvärdet är 63 år (om du är under 63) eller 67 år (om du är 63 eller äldre), vilket är den tidigaste åldern du kan ta ut statlig pension i Sverige. Du kan öka detta om du planerar att jobba längre.\n\nTjänstepension och IPS kan tas ut tidigare (från 55 år) via sliders längre ner."
+                        description="Detta är åldern när du planerar att börja ta ut din statliga pension och marknadsbaserade pensioner.\n\nBridge-perioden är tiden mellan när du når ekonomisk frihet (FIRE) och när pensionen börjar. Ju längre bridge-period, desto mer kapital behöver du vid FIRE för att täcka utgifterna.\n\nStandardvärdet är 63 år (för nuvarande födelsekullar), men lägsta uttagsålder för statlig pension höjs stegvis och kan vara högre beroende på födelseår. Du kan justera detta reglage om du planerar att arbeta längre.\n\nTjänstepension och IPS kan i många avtal tas ut tidigare (från 55 år) via sliders längre ner. Premiepension är en del av den allmänna pensionen och följer därför samma lägsta uttagsålder (ca 63–65 år beroende på födelseår)."
                       />
                     </div>
                     <span className="text-sm font-medium">{sliderPensionAge[0]} år</span>
@@ -3068,23 +3072,23 @@ export default function StandaloneFIREPage() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
                 <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">
-                  Vill du få en fullständig översikt över din ekonomi?
+                  Vill du se hur din FIRE-plan passar in i hela din ekonomi?
                 </h3>
                 <p className="text-sm text-primary/80 mb-4">
-                  Med <strong>Förmögenhetskollen</strong> får du en komplett bild av din ekonomi: få en bättre uppfattning om din nettoförmögenhet, följ upp din väg mot ekonomisk frihet genom olika nivåer, analysera ditt sparande och mycket mer. Allt sparas lokalt i din webbläsare – ingen registrering krävs.
+                  Med <strong>Förmögenhetskollen</strong> kan du inte bara göra en fristående FIRE-simulering, utan också se hur din ekonomiska frihet hänger ihop med hela hushållets ekonomi: tillgångar, skulder, pension och Rikedomstrappan. Du får en beräknad nivå, hastighet mot nästa nivå och en simulering av hur din nettoförmögenhet kan utvecklas över tid.
                 </p>
                 <ul className="text-sm text-primary/80 space-y-1 mb-4">
                   <li className="flex items-start">
                     <span className="text-primary/80 mr-2">✓</span>
-                    <span>Få en bättre uppfattning om alla dina tillgångar och skulder på ett ställe</span>
+                    <span>Se din beräknade nivå i Rikedomstrappan (The Wealth Ladder)</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary/80 mr-2">✓</span>
-                    <span>Följ upp din progress mot ekonomisk frihet genom 6 nivåer</span>
+                    <span>Följ hur nettoförmögenheten förändras månad för månad</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary/80 mr-2">✓</span>
-                    <span>Få insikter om ditt månatliga sparande och utveckling</span>
+                    <span>Simulera FIRE, bridge-period och pension i ett sammanhang</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary/80 mr-2">✓</span>
@@ -3098,11 +3102,81 @@ export default function StandaloneFIREPage() {
                 size="lg"
                 className="w-full md:w-auto flex-shrink-0 bg-primary text-white hover:bg-primary/90"
               >
-                Kom igång med Förmögenhetskollen
+                Utforska Förmögenhetskollen
               </Button>
             </div>
           </CardContent>
         </Card>
+        
+        {/* Ytterligare verktyg */}
+        <div className="mt-8 mb-6">
+          <div className="border border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-slate-100/50 backdrop-blur-sm rounded-lg p-4 sm:p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-slate-200/60">
+                <Calculator className="w-5 h-5 text-slate-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-serif text-sm sm:text-base text-slate-700 mb-1">Ytterligare verktyg</h3>
+                <p className="text-xs sm:text-sm text-slate-600">
+                  Ytterligare kalkylatorer som kan vara användbara
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/savings')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-green-50">
+                    <Wallet className="w-4 h-4 text-green-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">Sparkalkylator</div>
+                    <div className="text-xs text-slate-500 truncate">Ränta på ränta</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/salary')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-purple-50">
+                    <CircleDollarSign className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">Lönekalkylator</div>
+                    <div className="text-xs text-slate-500 truncate">Efter skatt</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/dashboard')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-blue-50">
+                    <Home className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">Förmögenhetskollen</div>
+                    <div className="text-xs text-slate-500 truncate">Dashboard</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

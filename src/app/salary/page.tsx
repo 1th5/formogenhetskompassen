@@ -10,7 +10,7 @@ import { calculateJobNetIncome } from '@/lib/wealth/tax-calc';
 import { calculatePublicPension, calculateOccupationalPensionForIncome, calculateIncomePension, calculatePremiePension } from '@/lib/wealth/calc';
 import { formatCurrency } from '@/lib/utils/format';
 import { PensionType, Income } from '@/lib/types';
-import { Calculator, AlertCircle, RotateCcw } from 'lucide-react';
+import { Calculator, AlertCircle, RotateCcw, TrendingUp, Wallet, ExternalLink, Home } from 'lucide-react';
 import PensionWizardInline from '@/components/household/PensionWizardInline';
 
 export default function SalaryCalculatorPage() {
@@ -139,7 +139,10 @@ export default function SalaryCalculatorPage() {
             </h1>
           </div>
           <p className="text-primary/70 text-sm sm:text-base max-w-2xl mx-auto">
-            Räkna ut din nettolön och pensionsavsättningar. En enkel och snabb kalkylator som hjälper dig förstå hur mycket som blir kvar efter skatt och vilka pensionsavsättningar som görs.
+            Räkna ut din nettolön och se uppskattade pensionsavsättningar. En enkel kalkylator som visar hur mycket du får ut efter skatt och hur mycket som sätts av till framtida pension.
+          </p>
+          <p className="text-xs text-primary/60 mt-2 italic max-w-2xl mx-auto">
+            Observera: Denna kalkylator visar förenklade simuleringar baserade på dina inmatade antaganden. Resultaten är inte en prognos, garanti eller personlig ekonomisk rådgivning.
           </p>
         </div>
 
@@ -150,7 +153,7 @@ export default function SalaryCalculatorPage() {
               <AlertCircle className="w-5 h-5 text-primary/60 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-primary/80">
                 <p className="font-medium mb-1">Viktigt att veta:</p>
-                <p>Denna kalkylator ger en <strong>ungefärlig och förenklad</strong> beräkning. Den exakta skatten kan variera beroende på dina personliga omständigheter, kommun, eventuella skattereduktioner, och andra faktorer. Använd resultatet som en vägledning, inte som en garanti.</p>
+                <p>Denna kalkylator ger en <strong>ungefärlig och förenklad</strong> beräkning. Den exakta skatten kan variera beroende på dina personliga omständigheter, kommun, eventuella skattereduktioner och andra faktorer. Använd resultatet som en vägledning, inte som en garanti eller personlig skatte- eller pensionsrådgivning.</p>
               </div>
             </div>
           </CardContent>
@@ -334,7 +337,7 @@ export default function SalaryCalculatorPage() {
                                 {formatCurrency(incomePension)}
                               </div>
                               <p className="text-xs text-primary/70 leading-relaxed">
-                                16% av din pensionsgrundande inkomst. Denna del växer med inkomstindexering och ger en trygg, förutsägbar pension.
+                                16% av din pensionsgrundande inkomst. Beloppet gäller upp till det så kallade PGI-taket (8,07 inkomstbasbelopp). Inkomst över taket ger inte extra inkomstpension. Denna del följer inkomstindex och justeras med balansindex vid behov. Den är mindre direkt marknadsberoende än premiepensionen, men framtida utveckling kan ändå bli både bättre och sämre än idag.
                               </p>
                             </div>
 
@@ -351,7 +354,7 @@ export default function SalaryCalculatorPage() {
                                 {formatCurrency(premiePension)}
                               </div>
                               <p className="text-xs text-primary/70 leading-relaxed">
-                                2,5% av din pensionsgrundande inkomst. Denna del kan du investera mot börsen och har potential för högre avkastning.
+                                2,5% av din pensionsgrundande inkomst. Beloppet gäller upp till det så kallade PGI-taket (8,07 inkomstbasbelopp). Inkomst över taket ger inte extra premiepension. Denna del placeras i fonder som följer marknaden. Värdet kan både stiga och sjunka över tid beroende på hur marknaden utvecklas.
                               </p>
                             </div>
                           </div>
@@ -401,7 +404,12 @@ export default function SalaryCalculatorPage() {
                               {formatCurrency(occupationalPension)}
                             </div>
                             <p className="text-xs text-primary/70 leading-relaxed">
-                              Baserat på ditt valda pensionsavtal. Tjänstepensionen betalas vanligtvis både av dig och din arbetsgivare, men här visas endast din egen del som dras från lönen.
+                              Baserat på ditt valda pensionsavtal. Tjänstepensionen betalas normalt av din arbetsgivare och baseras på din lön. Här visas en uppskattad månadsavsättning till tjänstepension.
+                              {pensionType === 'ITP2' && (
+                                <span className="block mt-1 italic">
+                                  (ITP2 är förmånsbestämd och bygger inte på procent av lönen, men här visas en uppskattad månadsavsättning motsvarande dess värde omräknat till premiebaserad form.)
+                                </span>
+                              )}
                             </p>
                           </div>
                         </div>
@@ -417,12 +425,15 @@ export default function SalaryCalculatorPage() {
                             {formatCurrency(totalPublicPension + occupationalPension)}
                           </div>
                           <p className="text-sm text-primary/70 leading-relaxed">
-                            Detta är den totala summan som dras från din lön varje månad för pension. Dessa pengar investeras och växer över tid, så att du har en trygg pension när du går i pension.
+                            Detta är den totala uppskattade pensionsavsättningen per månad, baserad på din lön och ditt pensionsavtal (allmän pension och tjänstepension). Beloppen dras inte direkt från din nettolön, utan visar hur mycket som sätts av till framtida pension.
                           </p>
                           {netSalary && (
-                            <div className="mt-4 pt-4 border-t border-green-300">
+                            <div className="mt-4 pt-4 border-t border-green-300 space-y-2">
                               <p className="text-xs text-primary/70">
-                                <strong>Efter skatt och pension:</strong> Du behåller cirka <strong className="text-green-800">{formatCurrency(netSalary - (totalPublicPension + occupationalPension))}</strong> per månad.
+                                <strong>Efter skatt:</strong> Du får ut cirka <strong className="text-green-800">{formatCurrency(netSalary)}</strong> per månad.
+                              </p>
+                              <p className="text-xs text-primary/70">
+                                Pensionsavsättning per månad (allmän pension + tjänstepension): <strong className="text-green-800">{formatCurrency(totalPublicPension + occupationalPension)}</strong>
                               </p>
                             </div>
                           )}
@@ -443,27 +454,27 @@ export default function SalaryCalculatorPage() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
                 <h3 className="text-lg md:text-xl font-semibold text-primary mb-2">
-                  Vill du få en fullständig översikt över din ekonomi?
+                  Vill du se hur din lön och pension påverkar din totala förmögenhet?
                 </h3>
                 <p className="text-sm text-primary/80 mb-4">
-                  Med <strong>Förmögenhetskollen</strong> får du en komplett bild av din ekonomi: få en bättre uppfattning om din nettoförmögenhet, följ upp din väg mot ekonomisk frihet genom olika nivåer, analysera ditt sparande och mycket mer. Allt sparas lokalt i din webbläsare – ingen registrering krävs.
+                  Med <strong>Förmögenhetskollen</strong> kan du koppla ihop din lön, dina pensionsavsättningar och ditt sparande med hela hushållets ekonomi. Du ser hur mycket som sätts av till pension, hur det påverkar din framtida nettoförmögenhet och vilken nivå du ligger på i Rikedomstrappan.
                 </p>
                 <ul className="text-sm text-primary/80 space-y-1 mb-4">
                   <li className="flex items-start">
                     <span className="text-primary/80 mr-2">✓</span>
-                    <span>Få en bättre uppfattning om alla dina tillgångar och skulder på ett ställe</span>
+                    <span>Se en beräknad nettoförmögenhet för hela hushållet</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary/80 mr-2">✓</span>
-                    <span>Följ upp din progress mot ekonomisk frihet genom 6 nivåer</span>
+                    <span>Få överblick över pensionstillgångar och sparande</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary/80 mr-2">✓</span>
-                    <span>Få insikter om ditt månatliga sparande och utveckling</span>
+                    <span>Följ hur din ekonomi utvecklas månad för månad</span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary/80 mr-2">✓</span>
-                    <span>Helt gratis och sparas lokalt – ingen registrering</span>
+                    <span>Helt gratis, ingen inloggning – allt sparas lokalt</span>
                   </li>
                 </ul>
               </div>
@@ -473,11 +484,81 @@ export default function SalaryCalculatorPage() {
                 size="lg"
                 className="w-full md:w-auto flex-shrink-0 bg-primary text-white hover:bg-primary/90"
               >
-                Kom igång med Förmögenhetskollen
+                Testa Förmögenhetskollen
               </Button>
             </div>
           </CardContent>
         </Card>
+        
+        {/* Ytterligare verktyg */}
+        <div className="mt-8 mb-6">
+          <div className="border border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-slate-100/50 backdrop-blur-sm rounded-lg p-4 sm:p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-slate-200/60">
+                <Calculator className="w-5 h-5 text-slate-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-serif text-sm sm:text-base text-slate-700 mb-1">Ytterligare verktyg</h3>
+                <p className="text-xs sm:text-sm text-slate-600">
+                  Ytterligare kalkylatorer som kan vara användbara
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/fire')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-blue-50">
+                    <TrendingUp className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">FIRE-kalkylator</div>
+                    <div className="text-xs text-slate-500 truncate">Ekonomisk frihet</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/savings')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-green-50">
+                    <Wallet className="w-4 h-4 text-green-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">Sparkalkylator</div>
+                    <div className="text-xs text-slate-500 truncate">Ränta på ränta</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => router.push('/dashboard')}
+                className="flex items-center justify-between gap-2 h-auto py-3 px-4 border border-slate-300/60 hover:border-slate-400 hover:bg-slate-100/50"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="p-1.5 rounded bg-blue-50">
+                    <Home className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  </div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-slate-700 truncate">Förmögenhetskollen</div>
+                    <div className="text-xs text-slate-500 truncate">Dashboard</div>
+                  </div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

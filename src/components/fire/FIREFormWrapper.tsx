@@ -226,7 +226,7 @@ export function FIREFormWrapper({ quickMode, onModeChange, onValuesChange }: FIR
         <CardTitle className="text-lg md:text-xl">Dina grundvärden</CardTitle>
         {quickMode && (
           <p className="text-xs text-primary/70 mt-2 mb-3">
-            Fyll i det du vet så gissar vi på resten. Du kan alltid öppna avancerat sen.
+            Fyll i det du vet så fyller vi i rimliga standardvärden åt dig. Du kan alltid öppna avancerat läge senare.
           </p>
         )}
         <div className="mt-4 flex gap-4">
